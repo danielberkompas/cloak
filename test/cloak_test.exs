@@ -2,6 +2,8 @@ defmodule CloakTest do
   use ExUnit.Case
   import Cloak
 
+  doctest Cloak
+
   test ".encrypt can encrypt a value" do
     assert encrypt("value") != "value"
   end

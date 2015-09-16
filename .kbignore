@@ -1,0 +1,12 @@
+test/
+script/
+config/
+mix.lock
+NOTICE
+.travis.yml
+.gitignore
+.kbignore
+CONTRIBUTING.md
+.hex
+.fetch
+.vimrc

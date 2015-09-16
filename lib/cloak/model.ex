@@ -1,4 +1,26 @@
 defmodule Cloak.Model do
+  @moduledoc """
+  Track what encryption configuration was used to encrypt a given Ecto model.
+
+  ## How to Use
+
+  Add a binary field to your Ecto module. It should be indexed, so that you can
+  easily query on it.
+
+      schema "table" do
+        field :encryption_version, :binary
+      end
+
+  You can then `use` this module, specifying the `:encryption_version` field as
+  the one to store the value on:
+
+      use Cloak.Model, :encryption_version
+
+  The `:encryption_version` field will then automatically be reset with the
+  current value of `Cloak.version/0` every time a row is inserted or updated.
+  """
+
+  @doc false
   defmacro __using__(field_name) when is_atom(field_name) do
     quote do
       before_insert :set_cloak_encryption_version

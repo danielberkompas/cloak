@@ -2,6 +2,8 @@ defmodule Cloak.AES.CTRTest do
   use ExUnit.Case
   import Cloak.AES.CTR
 
+  doctest Cloak.AES.CTR
+
   test ".encrypt can encrypt a value" do
     assert encrypt("value") != "value"
   end

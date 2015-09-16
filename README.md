@@ -3,8 +3,16 @@ Cloak
 
 Cloak makes it easy to use encryption with Ecto.
 
-## Configuration
+## Installation
 
-First, you must specify the cipher that you want to use. Note that you can have
-multiple ciphers active at any one time. This makes migrating between ciphers
-and keys easy.
+Add `cloak` to your hex dependencies:
+
+```elixir
+defp deps do
+  [{:cloak, "~> 0.0.1"}]
+end
+```
+
+## Usage
+
+See [the hex documentation](http://hexdocs.pm/cloak).
