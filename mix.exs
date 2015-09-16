@@ -9,6 +9,7 @@ defmodule Cloak.Mixfile do
      start_permanent: Mix.env == :prod,
      source_url: "https://github.com/danielberkompas/cloak",
      description: "Encrypted fields for Ecto.",
+     package: package,
      deps: deps,
      docs: docs]
   end
