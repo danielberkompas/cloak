@@ -18,8 +18,6 @@ defmodule Cloak do
         
   ### Options
 
-:qa
-:q
   Both of these options are required for every cipher:
 
   - `:default` - Boolean. Determines whether this module will be the default module for
