@@ -9,7 +9,7 @@ Add `cloak` to your hex dependencies:
 
 ```elixir
 defp deps do
-  [{:cloak, "~> 0.0.1"}]
+  [{:cloak, "0.1.0-pre"}]
 end
 ```
 
