@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
   use Mix.Task
   import Ecto.Query, only: [from: 2]
   import Logger, only: [info: 1]
-  import String, only: [to_existing_atom: 1]
+  import String, only: [to_atom: 1]
 
   @config  Application.get_env(:cloak, :migration)
   @repo    @config[:repo]
@@ -59,12 +59,12 @@ defmodule Mix.Tasks.Cloak.Migrate do
 
     repo = case opts[:repo] do
       nil   -> @repo
-      other -> to_existing_atom(other)
+      other -> to_atom(other)
     end
 
     models = case opts[:model] do
       nil   -> @models
-      other -> [to_existing_atom(other)]
+      other -> [to_atom(other)]
     end
 
     {repo, models}
