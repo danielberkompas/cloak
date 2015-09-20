@@ -18,12 +18,11 @@ defmodule Mix.Tasks.Cloak.Migrate do
   ## Configuration
 
   In order for the Mix task to update rows in the correct database, it must have
-  access to the correct repo. You can configure this with the `:repo` option in
-  Cloak's OTP configuration:
+  access to the correct repo, and a list of models to migrate.
 
-      config :cloak, repo: MyApp.Repo
-
-  Every model which `use`s `Cloak.Model` will automatically be migrated.
+      config :cloak, :migration, 
+        repo: MyApp.Repo,
+        models: [MyApp.Model1, MyApp.Model2]
 
   ## Usage
 
@@ -41,7 +40,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
   import Logger, only: [info: 1]
   import String, only: [to_existing_atom: 1]
 
-  @config  Application.get_all_env(:cloak)
+  @config  Application.get_env(:cloak, :migration)
   @repo    @config[:repo]
   @models  @config[:models] || []
   @version Cloak.version
