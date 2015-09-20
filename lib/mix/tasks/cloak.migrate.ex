@@ -71,13 +71,19 @@ defmodule Mix.Tasks.Cloak.Migrate do
   end
 
   defp migrate(model, repo) do
-    info "--- Migrating #{model} Model ---"
+    info "--- Migrating #{model_name(model)} Model ---"
     ids = ids_for(model, repo)
     info "#{length(ids)} records found needing migration"
 
     for id <- ids do
       repo.get(model, id) |> migrate_row(repo)
     end
+  end
+
+  defp model_name(model) do
+    model
+    |> Atom.to_string
+    |> String.replace(~r/^Elixir\./, "")
   end
 
   defp ids_for(model, repo) do
