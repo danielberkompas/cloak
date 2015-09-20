@@ -26,9 +26,13 @@ defmodule Cloak.Model do
       before_insert :set_cloak_encryption_version
       before_update :set_cloak_encryption_version
 
+      Cloak.Model.register(__MODULE__)
+
       def set_cloak_encryption_version(changeset) do
         put_change(changeset, unquote(field_name), Cloak.version)
       end
+
+      def __encryption_version_field__, do: unquote(field_name)
     end
   end
 
@@ -39,5 +43,10 @@ defmodule Cloak.Model do
 
         use Cloak.Model, :encryption_version
     """
+  end
+
+  def register(module) do
+    models = [module | Application.get_env(:cloak, :models, [])]
+    Application.put_env(:cloak, :models, models)
   end
 end
