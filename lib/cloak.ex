@@ -120,8 +120,8 @@ defmodule Cloak do
       unquote(cipher).decrypt(ciphertext)
     end
   end
-  def decrypt(invalid) do
-    raise ArgumentError, "No cipher found to decrypt #{inspect invalid}."
+  def decrypt(ciphertext) do
+    raise ArgumentError, "No cipher found to decrypt #{inspect ciphertext}."
   end
 
   @doc """
