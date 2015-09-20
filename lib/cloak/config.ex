@@ -1,13 +1,14 @@
 defmodule Cloak.Config do
   @moduledoc false
-  @config Application.get_all_env(:cloak)
 
   def all do
-    @config
+    Enum.reject Application.get_all_env(:cloak), fn({key, _}) ->
+      key == :migration
+    end
   end
 
   def default_cipher do
-    cipher = Enum.find @config, fn({_cipher, opts}) ->
+    cipher = Enum.find all, fn({_cipher, opts}) ->
       opts[:default] == true
     end
 
