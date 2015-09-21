@@ -1,8 +1,9 @@
 defmodule Cloak.Model do
   @moduledoc """
-  Track what encryption configuration was used to encrypt a given Ecto model.
+  Use this module to track the kind of encryption a row in your database was
+  encrypted with.
 
-  ## How to Use
+  ## Usage
 
   Add a binary field to your Ecto module. It should be indexed, so that you can
   easily query on it.

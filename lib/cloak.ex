@@ -1,6 +1,9 @@
 defmodule Cloak do
   @moduledoc """
-  This module is Cloak's main entry point. It wraps the encryption and 
+  Cloak makes it easy to encrypt and decrypt database fields using
+  [Ecto](http://hexdocs.pm/ecto). 
+
+  This `Cloak` module is Cloak's main entry point. It wraps the encryption and 
   decryption process, ensuring that everything works smoothly without downtime 
   even when there are multiple encryption ciphers and keys in play at the same 
   time.
@@ -15,32 +18,58 @@ defmodule Cloak do
         default: true,
         tag: "TAG", 
         # any other attributes required by the cipher
+
+  You can also have multiple ciphers configured at the same time, provided that
+  they are not both set to `default: true`.
         
+      config :cloak, CipherOne,
+        default: true,
+        tag: "one", 
+        # ...
+
+      config :cloak, CipherTwo,
+        default: true,
+        tag: "two", 
+        # ...
+
   ### Options
 
   Both of these options are required for every cipher:
 
-  - `:default` - Boolean. Determines whether this module will be the default module for
-    encryption or decryption.
+  - `:default` - Boolean. Determines whether this module will be the default 
+    module for encryption or decryption. The default module will be used to 
+    generate all new encrypted values.
 
   - `:tag` - Binary. Used to tag any ciphertext that the cipher module
-    generates. This allows Cloak to send a ciphertext to the correct decryption
-    cipher when you have multiple ciphers in use at the same time.
+    generates. This allows Cloak to decrypt a ciphertext with the correct module
+    when you have multiple ciphers in use at the same time.
 
-  If your cipher module requires additional config options, you can also add 
-  those keys to this configuration.
+  If your cipher module requires additional configuration options, you can also 
+  add those keys and values to this configuration.
+
+      # Example of custom settings for a cipher module
+      config :cloak, MyCustomCipher,
+        default: true,
+        tag: "tag",
+        custom_setting1: "...",
+        custom_setting2: "..."
+
+  It will be the responsibility of the cipher module to read these values from
+  the `:cloak` application configuration and use them.
 
   ## Provided Ciphers
 
   - `Cloak.AES.CTR` - AES encryption in CTR stream mode.
 
-  If you don't see what you need here, you can implement your own cipher module
-  if you adhere to the `Cloak.Cipher` behaviour. (And [open a PR](https://github.com/danielberkompas/cloak), please!)
+  If you don't see what you need here, you can use your own cipher module,
+  provided it adheres to the `Cloak.Cipher` behaviour.
+
+  (And [open a PR](https://github.com/danielberkompas/cloak), please!)
 
   ## Ecto Integration
 
   Once Cloak is configured with a Cipher module, you can use it seamlessly with
-  [Ecto](http://hex.pm/ecto) with these `Ecto.Type`s:
+  [Ecto](http://hex.pm/ecto) with these `Ecto.Type` modules:
 
   - `Cloak.EncryptedBinaryField`
   - `Cloak.EncryptedFloatField`
@@ -48,7 +77,26 @@ defmodule Cloak do
   - `Cloak.EncryptedMapField`
   - `Cloak.SHA256Field`
 
+  For example, to encrypt a binary field, change your schema from this:
+
+      schema "users" do
+        field :name, :binary
+      end
+
+  To this:
+
+      schema "users" do
+        field :name, Cloak.EncryptedBinaryField
+      end
+
+  The `name` field will then be encrypted whenever it is saved to the database,
+  using your configured cipher module. It will also be transparently decrypted
+  whenever the user is loaded from the database.
+
   ## Examples
+
+  The `Cloak` module can be called directly to generate ciphertext using the
+  current default cipher module.
 
       iex> Cloak.encrypt("Hello") != "Hello"
       true
