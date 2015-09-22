@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.1.0](https://github.com/danielberkompas/cloak/tree/v0.1.0) (2015-09-22)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.1.0-pre...v0.1.0)
+
 ## [v0.1.0-pre](https://github.com/danielberkompas/cloak/tree/v0.1.0-pre) (2015-09-16)
 
 
