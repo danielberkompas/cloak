@@ -44,7 +44,7 @@ Add `cloak` to your hex dependencies:
 
 ```elixir
 defp deps do
-  [{:cloak, "0.1.0-pre"}]
+  [{:cloak, "~> 0.1.0"}]
 end
 ```
 
