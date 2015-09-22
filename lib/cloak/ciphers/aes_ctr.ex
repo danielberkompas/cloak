@@ -27,6 +27,23 @@ defmodule Cloak.AES.CTR do
     format you will need to decode them first.
 
   - `:default` - Boolean. Whether to use this key by default or not.
+
+  ## Upgrading to a New Key
+
+  To upgrade to a new key, simply add the key to the `:keys` array, and set it
+  as `default: true`.
+
+      keys: [
+        %{tag: <<1>>, key: "old key", default: false},
+        %{tag: <<2>>, key: "new key", default: true}
+      ]
+
+  You'll then likely need to recompile the Cloak dependency. After this, your
+  new key will automatically be used for all new encyption, while the old key
+  will be used to decrypt legacy values.
+
+  To migrate everything proactively to the new key, see the `mix cloak.migrate`
+  mix task defined in `Mix.Tasks.Cloak.Migrate`.
   """
 
   @behaviour Cloak.Cipher
