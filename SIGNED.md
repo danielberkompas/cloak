@@ -3,19 +3,19 @@
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - https://gpgtools.org
 
-iQIcBAABCgAGBQJWAc0wAAoJEKU82t1CbYQMPN4QAJL52qn7vnocmFwkV8SGtzjo
-euyZa9pgbwYliTioD6RwafjwHqiqp7TQMI6JfMsqbXWH0ViGu6ipaEYMt/ZGhKAb
-KbQdaUpcdho90cSkdeXtNX2A57mK44sRmoB9hosQ6ULpZ+dpFdYuEz40qLdpC6Gj
-91Mcz5ZO6Ji1u+e077vlgsan7r7pLOK4N0EueA34rKt34bIQEF0hg+6gMEhGhhbE
-zhHheaOdCHcWmVsUMBdquQE0+uTDAJNR4AMP9nCkATIVClJjd5rcHI4OLASlhbbX
-rM1VDgtjztST0ag8CHF3aQZ+qCgfn9RCJLPVFDrdwMupOaTqwzE343sgzjxTpkgM
-2UWFJm+nixSoNFw674BJOYBCkn0hufEMw8URsEFOeRemuLUykYPDHINp+jBBDCnt
-Cxwm85QZESvtHXc0DqgrqN0HCoF7sCwRQtbyyd3/W4LPH30aXedbpk5+005GvWew
-DNpwrSHzT2CKRlBLGD7SWcfeaF5XVLgrCi/mnt9F6fp4IJhR5dtMm0VCDnObcOfo
-ZT88+rMvkf8/Bm8TOvtBzjpK9A8ZJhS4TBKpUnF9cACtUfYL00Xi0Qn4fpKlcjGc
-4M6k1GlQYiHcnk0g3KPuJCGYUd2R8xTSXbOMER9lsPJ++fqknMEUElulE+6sELPp
-EWTQ7vbsAMq1dP9K3oJY
-=6xbg
+iQIcBAABCgAGBQJWAdA9AAoJEKU82t1CbYQMf9EQAJXRbx0XZLWWr5Dpf9Ec1pzO
+KwUngwKF8ge195XQssf5Fsr0QVMaIwPZ43ob7FI4OdyHa5l4AyQb9vO6YZ7aCu8s
+yLhFIRIxaBPeloyLW7X5k0GOHeCfR5hwi+obRdxLYSqJMFE4u4qrDBfK/LqxQ8Yg
+hH1sdc/CiDNHrUKpf37DxSIf7VwiyMfXEeFICpmWWD9Z0FBq6tgW/UFsK4cmd3tr
+dJooZcddpdBF5fmQG80YJbAwDRfDLCgACJ2+T9yvR4f3e9RFlH0qf541ys8CySYl
+2Uy/VDrwMQjOkSVVQIkZfT93DKEgWKl/kcjBaLypVTAn6gIrrCJNDUS6kPHAas7t
+5c+5TmDi+w3Eo9IAZCod5TtZcyqdi3WW+y6whL2RgiH159rmPTcW5yRgS/LIChKS
+qwxXDIBY0LAOU9VAiTKW/QCoJzF36U6bSeEwBoUO3ikqybr59uSJfmBB4TQ2iXgY
+yF96EncxRAqxBS2NXeKRq9bdl7sqrynmkXU87rjYnjMYFThWLeKJwjoyTxEiAaCg
+qpMTGGZJmsHirvbfrTemYn7I5yzC3B3vi4NApTFkw9I/AcoftlqSS83MdFkG+mgv
+2s6SunwKS+aKWU0N1k/8EHxjIqf/TrReLVH0moZOQbA8kQH/oP6L2NkxQKJhrH7V
+3v7DTrawdTR6VE9OVzgb
+=ACqO
 -----END PGP SIGNATURE-----
 
 ```
@@ -30,7 +30,7 @@ EWTQ7vbsAMq1dP9K3oJY
 size  exec  file                              contents                                                        
             ./                                                                                                
 240           CHANGELOG.md                    c80ed7ae07436b3588428c5b1aa446bb43a837d01a3367f46667b03ae9f7db65
-1023          README.md                       1729f6833386b94e2faec3d3db132a1936d00a56ac9964875f4d46cbcd4955c7
+1371          README.md                       fea1fce3b128e38cf0076ecb46438a735d246f817662cc2f5f8e5ef6ac8ebdc5
               lib/                                                                                            
                 cloak/                                                                                        
                   ciphers/                                                                                    
@@ -49,7 +49,7 @@ size  exec  file                              contents
                 mix/                                                                                          
                   tasks/                                                                                      
 2820                cloak.migrate.ex          3a4bb04b29d1add671f886b37502c1cdceb4be3d97611f3ef8af0eef2299790e
-922           mix.exs                         5c9f501ab9cd673ea3f358dfa7cb86ab3b33fa9f53e943c0477d3b513a199434
+954           mix.exs                         e5292d9b3819f364cbaa9a617155c27b73012edf7a6ebbeb2889fa18369800bf
 ```
 
 #### Ignore
