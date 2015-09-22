@@ -1,6 +1,8 @@
 Cloak
 ======
 
+[![Build Status](https://travis-ci.org/danielberkompas/cloak.svg?branch=master)](https://travis-ci.org/danielberkompas/cloak)
+
 Cloak makes it easy to use encryption with Ecto.
 
 ## Features
