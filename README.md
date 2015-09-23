@@ -55,3 +55,7 @@ end
 ## Documentation
 
 See [the hex documentation](http://hexdocs.pm/cloak).
+
+## License
+
+MIT.
