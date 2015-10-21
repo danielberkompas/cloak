@@ -16,6 +16,17 @@ defmodule Cloak.AES.CTR do
           %{tag: <<2>>, key: :base64.decode("..."), default: false}
         ]
 
+  If you want to store your key in the environment variable, you can use
+  `{:system, "VAR"}` syntax:
+
+      config :cloak, Cloak.AES.CTR,
+        default: true,
+        tag: "AES",
+        keys: [
+          %{tag: <<1>>, key: {:system, "CLOAK_KEY_PRIMARY"}, default: true},
+          %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDAY"}, default: false}
+        ]
+
   ### Key Configuration Options
 
   A key may have the following attributes:
@@ -96,12 +107,12 @@ defmodule Cloak.AES.CTR do
       true
   """
   def encrypt(plaintext, key_tag \\ @tag) do
-    key   = get_key(key_tag)
-    iv    = :crypto.strong_rand_bytes(16)
-    state = :crypto.stream_init(:aes_ctr, key.key, iv)
+    key_config = get_key_config(key_tag)
+    iv         = :crypto.strong_rand_bytes(16)
+    state      = :crypto.stream_init(:aes_ctr, get_key_value(key_config), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
-    key.tag <> iv <> ciphertext
+    key_config.tag <> iv <> ciphertext
   end
 
   @doc """
@@ -121,8 +132,8 @@ defmodule Cloak.AES.CTR do
       "Hello"
   """
   def decrypt(<<key_tag::binary-1, iv::binary-16, ciphertext::binary>> = _ciphertext) do
-    key   = get_key(key_tag)
-    state = :crypto.stream_init(:aes_ctr, key.key, iv)
+    key_config = get_key_config(key_tag)
+    state      = :crypto.stream_init(:aes_ctr, get_key_value(key_config), iv)
 
     {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
     plaintext
@@ -136,7 +147,17 @@ defmodule Cloak.AES.CTR do
     @key.tag
   end
 
-  defp get_key(tag) do
+  defp get_key_config(tag) do
     Enum.find(@keys, fn(key) -> key.tag == tag end)
+  end
+
+  defp get_key_value(key_config) do
+    case key_config do
+      {:system, env_var} ->
+        System.get_env(env_var)
+      
+      _ ->
+        key_config.key
+    end
   end
 end
