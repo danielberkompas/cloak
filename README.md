@@ -26,13 +26,27 @@ config :cloak, Cloak.AES.CTR,
     %{tag: <<1>>, key: :base64.decode("..."), default: true}
   ]
 
+# in your migration
+defmodule MyApp.Repo.Migrations.AddSecretKeyToModel do
+  use Ecto.Migration
+
+  def change do
+    alter table(:models) do
+      add :secret_key, :binary
+      add :encryption_version, :binary
+    end
+
+    create index(:models, [:encryption_version])
+  end
+end
+
 # in your model
 defmodule MyApp.Model do
   use Ecto.Model
   use Cloak.Model, :encryption_version
 
   schema "models" do
-    field :field_name, Cloak.EncryptedBinaryField
+    field :secret_key, Cloak.EncryptedBinaryField
     field :encryption_version, :binary
   end
 end
