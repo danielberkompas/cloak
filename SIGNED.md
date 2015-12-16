@@ -3,19 +3,19 @@
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - https://gpgtools.org
 
-iQIcBAABCgAGBQJWAdA9AAoJEKU82t1CbYQMf9EQAJXRbx0XZLWWr5Dpf9Ec1pzO
-KwUngwKF8ge195XQssf5Fsr0QVMaIwPZ43ob7FI4OdyHa5l4AyQb9vO6YZ7aCu8s
-yLhFIRIxaBPeloyLW7X5k0GOHeCfR5hwi+obRdxLYSqJMFE4u4qrDBfK/LqxQ8Yg
-hH1sdc/CiDNHrUKpf37DxSIf7VwiyMfXEeFICpmWWD9Z0FBq6tgW/UFsK4cmd3tr
-dJooZcddpdBF5fmQG80YJbAwDRfDLCgACJ2+T9yvR4f3e9RFlH0qf541ys8CySYl
-2Uy/VDrwMQjOkSVVQIkZfT93DKEgWKl/kcjBaLypVTAn6gIrrCJNDUS6kPHAas7t
-5c+5TmDi+w3Eo9IAZCod5TtZcyqdi3WW+y6whL2RgiH159rmPTcW5yRgS/LIChKS
-qwxXDIBY0LAOU9VAiTKW/QCoJzF36U6bSeEwBoUO3ikqybr59uSJfmBB4TQ2iXgY
-yF96EncxRAqxBS2NXeKRq9bdl7sqrynmkXU87rjYnjMYFThWLeKJwjoyTxEiAaCg
-qpMTGGZJmsHirvbfrTemYn7I5yzC3B3vi4NApTFkw9I/AcoftlqSS83MdFkG+mgv
-2s6SunwKS+aKWU0N1k/8EHxjIqf/TrReLVH0moZOQbA8kQH/oP6L2NkxQKJhrH7V
-3v7DTrawdTR6VE9OVzgb
-=ACqO
+iQIcBAABCgAGBQJWcOGqAAoJEKU82t1CbYQMgPsP/17E+WPFCpeLNebm/4AoIEwe
+IQouXy7lN1xYdX1OwIIw6yg4LDS+o6lMRYMj3aLJCrDiPbV9Od4HKJQT3XPorSUI
+8KC981pM5T+PY3FcUYex1EUsk97vxezRrK2fhtZBk3ScQ2RNND6I4+frT6XG5YJt
+WmQdWHCo8gw13HJrh2IYo/j+PmIx/t0Mp8B6UX/Oy0Xz4Rubq0+rr7IBWhTEm+L4
+MTLupzHPPQB2+VM7tl3QIKjYPhaPySNG7ZhOMe0r7AkZEb7s9PR1p6ZFR5uWvXBX
+Pti8486J1JeKx7K+BFG62S+oHswlltRXpgYUvxTYxH+dPp/p7bt5Xkj75/rUb3FL
+v0okTrUDf+jQJVRbePLOOV0LDQEZG/g9gNAhyOO6sfdtFTCvgPzHiBfG5/mLSNIs
+Cz9teZQbosIw+PMqhpKUYOhDcmV5eIDSRXwCJ4PbgxjodOaGv/qgJeQEBRv2exC3
+L/NPQewrgOKmI8iCKOfFQTZtxYyh3xxqvKppHmBhbZ9TTKj2qeID6hU+NkzwdnsE
+59Dte2n/1g7x8XjrQpysFIIC42Soi9dtXw6/wKUx7L2OYYXBBw4r+ehe3qwgYxJT
+NMaIovtrn8+XeACSV5tdIrHIrF+og4wf2x6fL0YCPmMW4MdSNRFtpD2jwY9YB8KO
+bR9ZkGU6yLtGRCfI6tU2
+=q6kI
 -----END PGP SIGNATURE-----
 
 ```
@@ -29,12 +29,13 @@ qpMTGGZJmsHirvbfrTemYn7I5yzC3B3vi4NApTFkw9I/AcoftlqSS83MdFkG+mgv
 ```
 size  exec  file                              contents                                                        
             ./                                                                                                
-240           CHANGELOG.md                    c80ed7ae07436b3588428c5b1aa446bb43a837d01a3367f46667b03ae9f7db65
-1371          README.md                       fea1fce3b128e38cf0076ecb46438a735d246f817662cc2f5f8e5ef6ac8ebdc5
+1009          CHANGELOG.md                    9d1fc2f704bcb3020fbea726ea1eee0358b082b24c54da18952840657044f148
+1083          LICENSE                         19d19056f1f4578cedeb79241715a815a61b0f06793f4e779544c45c8df232c2
+1669          README.md                       2ee77c8c517ff829f0df9b64150e175d30a2a0a051bf5394a267444c986a5eaf
               lib/                                                                                            
                 cloak/                                                                                        
                   ciphers/                                                                                    
-4716                aes_ctr.ex                feb9314429df52e66c6ff0c2d3bac76857828d26047cfa21386c4d8770c37516
+5432                aes_ctr.ex                d278a8013de9b281f506d7ced23f874d2ed6cc30797ddb4784fcf3312484520e
 2175                behaviour.ex              5669a4679fc5e9f82a793f052062ba94cb08d27d23c03d271ad4b1ef897a08dd
 469               config.ex                   ce487149f713557272ed46e27f7b8316a7aa6ef738637b155b0811bdddb29ea5
 1299              model.ex                    07e760087e90bd1625d3e9fbbd40d7db45dab51d243e65a815b17fafe4a1ecfb
@@ -49,7 +50,7 @@ size  exec  file                              contents
                 mix/                                                                                          
                   tasks/                                                                                      
 2820                cloak.migrate.ex          3a4bb04b29d1add671f886b37502c1cdceb4be3d97611f3ef8af0eef2299790e
-954           mix.exs                         e5292d9b3819f364cbaa9a617155c27b73012edf7a6ebbeb2889fa18369800bf
+955           mix.exs                         2faa2ee7ad6601723900b335eb8b2ab6b2bbfb9d8d212bd6740546719ca8af57
 ```
 
 #### Ignore

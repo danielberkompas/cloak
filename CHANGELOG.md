@@ -1,5 +1,15 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.1.0...HEAD)
+
+**Merged pull requests:**
+
+- Added sample migration to README [\#3](https://github.com/danielberkompas/cloak/pull/3) ([mspanc](https://github.com/mspanc))
+- Added ability to store keys in the environment variables [\#2](https://github.com/danielberkompas/cloak/pull/2) ([mspanc](https://github.com/mspanc))
+- Inform that key must be 16, 24 or 32 bytes long [\#1](https://github.com/danielberkompas/cloak/pull/1) ([mspanc](https://github.com/mspanc))
+
 ## [v0.1.0](https://github.com/danielberkompas/cloak/tree/v0.1.0) (2015-09-22)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.1.0-pre...v0.1.0)
 
