@@ -35,7 +35,8 @@ defmodule Cloak.AES.CTR do
     only a single byte. See `encrypt/2` for more details.
 
   - `:key` - The AES key to use, in binary. If you store your keys in Base64
-    format you will need to decode them first.
+    format you will need to decode them first. The key must be 128, 192, or 256 bits 
+    long (16, 24 or 32 bytes, respectively).
 
   - `:default` - Boolean. Whether to use this key by default or not.
 
