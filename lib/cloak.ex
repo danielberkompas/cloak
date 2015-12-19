@@ -1,11 +1,11 @@
 defmodule Cloak do
   @moduledoc """
   Cloak makes it easy to encrypt and decrypt database fields using
-  [Ecto](http://hexdocs.pm/ecto). 
+  [Ecto](http://hexdocs.pm/ecto).
 
-  This `Cloak` module is Cloak's main entry point. It wraps the encryption and 
-  decryption process, ensuring that everything works smoothly without downtime 
-  even when there are multiple encryption ciphers and keys in play at the same 
+  This `Cloak` module is Cloak's main entry point. It wraps the encryption and
+  decryption process, ensuring that everything works smoothly without downtime
+  even when there are multiple encryption ciphers and keys in play at the same
   time.
 
   ## Configuration
@@ -16,35 +16,35 @@ defmodule Cloak do
 
       config :cloak, ModuleName,
         default: true,
-        tag: "TAG", 
+        tag: "TAG",
         # any other attributes required by the cipher
 
   You can also have multiple ciphers configured at the same time, provided that
   they are not both set to `default: true`.
-        
+
       config :cloak, CipherOne,
         default: true,
-        tag: "one", 
+        tag: "one",
         # ...
 
       config :cloak, CipherTwo,
         default: true,
-        tag: "two", 
+        tag: "two",
         # ...
 
   ### Options
 
   Both of these options are required for every cipher:
 
-  - `:default` - Boolean. Determines whether this module will be the default 
-    module for encryption or decryption. The default module will be used to 
+  - `:default` - Boolean. Determines whether this module will be the default
+    module for encryption or decryption. The default module will be used to
     generate all new encrypted values.
 
   - `:tag` - Binary. Used to tag any ciphertext that the cipher module
     generates. This allows Cloak to decrypt a ciphertext with the correct module
     when you have multiple ciphers in use at the same time.
 
-  If your cipher module requires additional configuration options, you can also 
+  If your cipher module requires additional configuration options, you can also
   add those keys and values to this configuration.
 
       # Example of custom settings for a cipher module
@@ -113,10 +113,10 @@ defmodule Cloak do
   @tag config[:tag]
 
   @doc """
-  Encrypt a value using the default cipher module. 
-  
-  The `:tag` of the cipher will be prepended to the output. So, if the cipher 
-  was `Cloak.AES.CTR`, and the tag was "AES", the output would be in this 
+  Encrypt a value using the default cipher module.
+
+  The `:tag` of the cipher will be prepended to the output. So, if the cipher
+  was `Cloak.AES.CTR`, and the tag was "AES", the output would be in this
   format:
 
       +-------+---------------+
@@ -125,7 +125,7 @@ defmodule Cloak do
 
   This tagging allows Cloak to delegate decryption of a ciphertext to the
   correct module when you have multiple ciphers in use at the same time. (For
-  example, this can occur while you migrate your encrypted data to a new 
+  example, this can occur while you migrate your encrypted data to a new
   cipher.)
 
   ### Parameters

@@ -20,9 +20,17 @@ defmodule Mix.Tasks.Cloak.Migrate do
   In order for the Mix task to update rows in the correct database, it must have
   access to the correct repo, and a list of models to migrate.
 
-      config :cloak, :migration, 
+  Each model should be specified in this format:
+
+      {model_name, :encryption_field_name}
+
+  Where `:encryption_field_name` is the name of the field the model uses to
+  track it's encryption version.
+
+      config :cloak, :migration,
         repo: MyApp.Repo,
-        models: [MyApp.Model1, MyApp.Model2]
+        models: [{MyApp.Model1, :encryption_version},
+                 {MyApp.Model2, :encryption_version}]
 
   ## Usage
 
@@ -31,8 +39,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
   The task allows you to customize the repo and models which will be migrated at
   runtime.
 
-      mix cloak.migrate --model MyApp.Model --repo MyApp.Repo
-      mix cloak.migrate -m MyApp.Model -r MyApp.Repo
+      mix cloak.migrate -m MyApp.Model -f encryption_version -r MyApp.Repo
   """
 
   use Mix.Task
@@ -43,62 +50,82 @@ defmodule Mix.Tasks.Cloak.Migrate do
   @config  Application.get_env(:cloak, :migration)
   @repo    @config[:repo]
   @models  @config[:models] || []
-  @version Cloak.version
 
   @doc false
   def run(args) do
     info "=== Starting Migration ==="
-    {repo, models} = parse_args(args)
+    {repo, models} = parse(args)
     Mix.Task.run "app.start", args
     Enum.each(models, &migrate(&1, repo))
     info "=== Migration Complete ==="
   end
 
-  defp parse_args(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [m: :model, r: :repo])
-
+  defp parse(args) do
+    {opts, _, _} = OptionParser.parse(args, aliases: [m: :model,
+                                                      f: :field,
+                                                      r: :repo])
     repo = case opts[:repo] do
-      nil   -> @repo
-      other -> to_existing_atom("Elixir." <> other)
+      nil  -> @repo
+      repo -> to_module(repo)
     end
 
     models = case opts[:model] do
       nil   -> @models
-      other -> [to_existing_atom("Elixir." <> other)]
+      model -> [{to_module(model), opts[:field]}]
     end
+
+    validate!(repo, models)
 
     {repo, models}
   end
 
-  defp migrate(model, repo) do
-    info "--- Migrating #{model_name(model)} Model ---"
-    ids = ids_for(model, repo)
+  defp validate!(repo, [h|_t]) when repo == nil or not is_tuple(h) do
+    raise ArgumentError, """
+    You must specify which models you wish to migrate and which repo to use.
+
+    You can do this in your Mix config, like so:
+
+        config :cloak, :migration,
+          repo: MyApp.Repo,
+          models: [{MyApp.Model1, :encryption_version},
+                   {MyApp.Model2, :encryption_version}]
+
+    Alternatively, you can pass in the model, field, and repo as command line
+    arguments to `mix cloak.migrate`:
+
+        mix cloak.migrate -r Repo -m ModelName -f encryption_version_field
+    """
+  end
+
+  defp migrate({model, field}, repo) do
+    info "--- Migrating #{inspect model.__struct__} Model ---"
+    ids = ids_for({model, field}, repo)
     info "#{length(ids)} records found needing migration"
 
     for id <- ids do
-      repo.get(model, id) |> migrate_row(repo)
+      model
+      |> repo.get(id)
+      |> migrate_row(repo, field)
     end
   end
 
-  defp model_name(model) do
-    model
-    |> Atom.to_string
-    |> String.replace(~r/^Elixir\./, "")
-  end
-
-  defp ids_for(model, repo) do
-    query = from m in model, 
-              where: field(m, ^model.__encryption_version_field__) != ^@version,
+  defp ids_for({model, field}, repo) do
+    query = from m in model,
+              where: field(m, ^field) != ^Cloak.version,
               select: m.id
 
     repo.all(query)
   end
 
-  defp migrate_row(row, repo) do
-    version = Map.get(row, row.__struct__.__encryption_version_field__)
+  defp migrate_row(row, repo, field) do
+    version = Map.get(row, field)
 
-    if version != @version do
+    if version != Cloak.version do
       repo.update!(row)
     end
+  end
+
+  defp to_module(name) do
+    to_existing_atom("Elixir." <> name)
   end
 end
