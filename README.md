@@ -42,18 +42,23 @@ end
 
 # in your model
 defmodule MyApp.Model do
-  use Ecto.Model
-  use Cloak.Model, :encryption_version
+  use Ecto.Schema
 
   schema "models" do
     field :secret_key, Cloak.EncryptedBinaryField
     field :encryption_version, :binary
   end
+
+  def changeset(model, params \\ :empty) do
+    model
+    |> cast(params, ~w(secret_key), ~w(encryption_version))
+    |> put_change(:encryption_version, Cloak.version)
+  end
 end
 
 # Query
 MyApp.Repo.one(MyApp.Model)
-# => %MyApp.Model{field_name: "Decrypted value", encryption_version: <<"AES", 1>>}
+# => %MyApp.Model{secret_key: "Decrypted value", encryption_version: <<"AES", 1>>}
 ```
 
 ## Installation
