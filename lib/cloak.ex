@@ -176,7 +176,7 @@ defmodule Cloak do
   Returns the default cipher module's tag combined with the result of that
   cipher's `version/0` function.
 
-  It is used by `Cloak.Model` to record which cipher was used to encrypt a row
+  It is used in changesets to record which cipher was used to encrypt a row
   in a database table. This is very useful when migrating to a new cipher or new
   encryption key, because you'd be able to query your database to find records
   that need to be migrated.

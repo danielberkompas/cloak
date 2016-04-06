@@ -6,7 +6,7 @@ defmodule Cloak.Cipher do
   ## Example
 
   Here's a sample custom cipher that adds "Hello, " to the start of every
-  ciphertext, and removes it on decryption. 
+  ciphertext, and removes it on decryption.
 
       defmodule MyCustomCipher do
         @behaviour Cloak.Cipher
@@ -24,14 +24,14 @@ defmodule Cloak.Cipher do
         end
       end
 
-  As long as you implement the 3 callbacks below, everything should work 
-  smoothly. 
+  As long as you implement the 3 callbacks below, everything should work
+  smoothly.
 
   ## Configuration
 
   Your custom cipher will be responsible for reading any custom configuration
-  that it requires from the `:cloak` application configuration. 
-  
+  that it requires from the `:cloak` application configuration.
+
   For example, suppose we wanted to make the word "Hello" in the custom cipher
   above configurable. We could add it to the `config.exs`:
 
@@ -75,13 +75,11 @@ defmodule Cloak.Cipher do
 
   @doc """
   Must return a string representing the default settings of your module as it is
-  currently configured. 
-  
-  This will be used by `Cloak.version/0` to generate a unique tag, which can 
+  currently configured.
+
+  This will be used by `Cloak.version/0` to generate a unique tag, which can
   then be stored on each database table row to track which encryption
   configuration it is currently encrypted with.
-
-  See `Cloak.Model` for more details.
   """
   defcallback version :: String.t
 end
