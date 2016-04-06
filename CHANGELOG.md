@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
-
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.0...HEAD)
+## [v0.2.1](https://github.com/danielberkompas/cloak/tree/v0.2.1) (2016-04-06)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.0...v0.2.1)
 
 **Merged pull requests:**
 
