@@ -1,5 +1,20 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.1...HEAD)
+
+**Closed issues:**
+
+- :system AES keys aren't getting base64 decoded [\#9](https://github.com/danielberkompas/cloak/issues/9)
+- Cloak.EncryptedMapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
+- How to generate keys? [\#5](https://github.com/danielberkompas/cloak/issues/5)
+
+**Merged pull requests:**
+
+- Decode AES environment variable keys from base64 [\#11](https://github.com/danielberkompas/cloak/pull/11) ([philss](https://github.com/philss))
+- Update dependencies [\#7](https://github.com/danielberkompas/cloak/pull/7) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v0.2.1](https://github.com/danielberkompas/cloak/tree/v0.2.1) (2016-04-06)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.0...v0.2.1)
 
