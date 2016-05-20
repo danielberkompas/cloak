@@ -4,8 +4,8 @@ defmodule Cloak.AES.CTR do
 
   ## Configuration
 
-  In addition to the normal `:default` and `:tag` configuration options, this 
-  cipher takes a `:keys` option to support using multiple AES keys at the same 
+  In addition to the normal `:default` and `:tag` configuration options, this
+  cipher takes a `:keys` option to support using multiple AES keys at the same
   time.
 
       config :cloak, Cloak.AES.CTR,
@@ -24,7 +24,7 @@ defmodule Cloak.AES.CTR do
         tag: "AES",
         keys: [
           %{tag: <<1>>, key: {:system, "CLOAK_KEY_PRIMARY"}, default: true},
-          %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDAY"}, default: false}
+          %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDARY"}, default: false}
         ]
 
   ### Key Configuration Options
@@ -35,7 +35,7 @@ defmodule Cloak.AES.CTR do
     only a single byte. See `encrypt/2` for more details.
 
   - `:key` - The AES key to use, in binary. If you store your keys in Base64
-    format you will need to decode them first. The key must be 128, 192, or 256 bits 
+    format you will need to decode them first. The key must be 128, 192, or 256 bits
     long (16, 24 or 32 bytes, respectively).
 
   - `:default` - Boolean. Whether to use this key by default or not.
@@ -67,7 +67,7 @@ defmodule Cloak.AES.CTR do
   @tag    @key.tag
 
   @doc """
-  Callback implementation for `Cloak.Cipher.encrypt`. Encrypts a value using 
+  Callback implementation for `Cloak.Cipher.encrypt`. Encrypts a value using
   AES in CTR mode.
 
   Generates a random IV for every encryption, and prepends the key tag and IV to
@@ -156,9 +156,23 @@ defmodule Cloak.AES.CTR do
     case key_config.key do
       {:system, env_var} ->
         System.get_env(env_var)
-      
+        |> validate_key(env_var)
+        |> decode_key(env_var)
+
       _ ->
         key_config.key
+    end
+  end
+
+  defp validate_key(key, env_var) when key in [nil, ""] do
+    raise "Expect env variable #{env_var} to define a key, but is empty."
+  end
+  defp validate_key(key, _), do: key
+
+  defp decode_key(key, env_var) do
+    case Base.decode64(key) do
+      {:ok, decoded_key} -> decoded_key
+      :error -> raise "Expect env variable #{env_var} to be a valid base64 string."
     end
   end
 end
