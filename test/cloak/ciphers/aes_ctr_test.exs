@@ -18,6 +18,12 @@ defmodule Cloak.AES.CTRTest do
     assert String.length(ciphertext) > 0
   end
 
+  test ".encrypt can encrypt a value using an environment variable as key" do
+    System.put_env("CLOAK_THIRD_KEY", "NhsNVkstdaUiXIh6fFZaRu+O6gK/p9C9LKJr3kkEWNA=")
+
+    assert encrypt("value", <<3>>) != "value"
+  end
+
   test ".decrypt can decrypt a value" do
     assert encrypt("value") |> decrypt == "value"
   end
