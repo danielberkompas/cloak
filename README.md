@@ -18,6 +18,9 @@ Cloak makes it easy to use encryption with Ecto.
 ## Example
 
 ```elixir
+# key generation example (random 256-bit key)
+:crypto.strong_rand_bytes(32) |> Base.encode64
+
 # in config/config.exs
 config :cloak, Cloak.AES.CTR,
   tag: "AES",
