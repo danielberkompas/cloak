@@ -97,6 +97,9 @@ defmodule Mix.Tasks.Cloak.Migrate do
     """
   end
 
+  defp validate!(_repo, _models) do
+  end
+
   defp migrate({model, field}, repo) do
     info "--- Migrating #{inspect model.__struct__} Model ---"
     ids = ids_for({model, field}, repo)
