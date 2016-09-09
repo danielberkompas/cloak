@@ -3,8 +3,6 @@ defmodule Cloak.EncryptedField do
 
   defmacro __using__(_) do
     quote do
-      alias Cloak.Encryptable
-
       @doc false
       def type, do: :binary
 
@@ -15,8 +13,8 @@ defmodule Cloak.EncryptedField do
 
       @doc false
       def dump(value) do
-        value = value 
-                |> before_encrypt 
+        value = value
+                |> before_encrypt
                 |> Cloak.encrypt
 
         {:ok, value}

@@ -108,10 +108,6 @@ defmodule Cloak do
       <<"AES", 1>>
   """
 
-  {cipher, config} = Cloak.Config.default_cipher
-  @cipher cipher
-  @tag config[:tag]
-
   @doc """
   Encrypt a value using the default cipher module.
 
@@ -138,7 +134,7 @@ defmodule Cloak do
       <<"AES", ...>>
   """
   def encrypt(plaintext) do
-    @tag <> @cipher.encrypt(plaintext)
+    tag <> cipher.encrypt(plaintext)
   end
 
   @doc """
@@ -163,13 +159,24 @@ defmodule Cloak do
       ...> Cloak.decrypt(ciphertext)
       "Hello world!"
   """
-  for {cipher, config} <- Cloak.Config.all do
-    def decrypt(unquote(config[:tag]) <> ciphertext) do
-      unquote(cipher).decrypt(ciphertext)
-    end
-  end
   def decrypt(ciphertext) do
-    raise ArgumentError, "No cipher found to decrypt #{inspect ciphertext}."
+    plaintexts =
+      for {cipher, config} <- Cloak.Config.all do
+        tag = config[:tag]
+
+        if String.starts_with?(ciphertext, tag) do
+          tag_size = byte_size(tag)
+          ciphertext = binary_part(ciphertext, tag_size, byte_size(ciphertext) - tag_size)
+          cipher.decrypt(ciphertext)
+        end
+      end
+
+    case plaintexts do
+      [plaintext|_] ->
+        plaintext
+      _ ->
+        raise ArgumentError, "No cipher found to decrypt #{inspect ciphertext}."
+    end
   end
 
   @doc """
@@ -182,6 +189,16 @@ defmodule Cloak do
   that need to be migrated.
   """
   def version do
-    @tag <> @cipher.version
+    tag <> cipher.version
+  end
+
+  defp cipher do
+    {cipher, _config} = Cloak.Config.default_cipher
+    cipher
+  end
+
+  defp tag do
+    {_cipher, config} = Cloak.Config.default_cipher
+    config[:tag]
   end
 end

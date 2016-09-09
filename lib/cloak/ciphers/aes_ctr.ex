@@ -50,21 +50,14 @@ defmodule Cloak.AES.CTR do
         %{tag: <<2>>, key: "new key", default: true}
       ]
 
-  You'll then likely need to recompile the Cloak dependency. After this, your
-  new key will automatically be used for all new encyption, while the old key
-  will be used to decrypt legacy values.
+  After this, your new key will automatically be used for all new encyption, 
+  while the old key will be used to decrypt legacy values.
 
   To migrate everything proactively to the new key, see the `mix cloak.migrate`
   mix task defined in `Mix.Tasks.Cloak.Migrate`.
   """
 
   @behaviour Cloak.Cipher
-
-  # Module configuration
-  @config Application.get_env(:cloak, __MODULE__)
-  @keys   @config[:keys]
-  @key    Enum.find(@keys, fn(key) -> key.default end)
-  @tag    @key.tag
 
   @doc """
   Callback implementation for `Cloak.Cipher.encrypt`. Encrypts a value using
@@ -107,13 +100,13 @@ defmodule Cloak.AES.CTR do
       iex> encrypt("Hello") != encrypt("Hello")
       true
   """
-  def encrypt(plaintext, key_tag \\ @tag) do
-    key_config = get_key_config(key_tag)
-    iv         = :crypto.strong_rand_bytes(16)
-    state      = :crypto.stream_init(:aes_ctr, get_key_value(key_config), iv)
+  def encrypt(plaintext, key_tag \\ nil) do
+    iv = :crypto.strong_rand_bytes(16)
+    key = get_key_config(key_tag) || default_key
+    state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
-    key_config.tag <> iv <> ciphertext
+    key.tag <> iv <> ciphertext
   end
 
   @doc """
@@ -133,8 +126,8 @@ defmodule Cloak.AES.CTR do
       "Hello"
   """
   def decrypt(<<key_tag::binary-1, iv::binary-16, ciphertext::binary>> = _ciphertext) do
-    key_config = get_key_config(key_tag)
-    state      = :crypto.stream_init(:aes_ctr, get_key_value(key_config), iv)
+    key = get_key_config(key_tag)
+    state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
 
     {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
     plaintext
@@ -145,11 +138,11 @@ defmodule Cloak.AES.CTR do
   current default key.
   """
   def version do
-    @key.tag
+    default_key.tag
   end
 
   defp get_key_config(tag) do
-    Enum.find(@keys, fn(key) -> key.tag == tag end)
+    Enum.find(config[:keys], fn(key) -> key.tag == tag end)
   end
 
   defp get_key_value(key_config) do
@@ -174,5 +167,13 @@ defmodule Cloak.AES.CTR do
       {:ok, decoded_key} -> decoded_key
       :error -> raise "Expect env variable #{env_var} to be a valid base64 string."
     end
+  end
+
+  defp config do
+    Application.get_env(:cloak, __MODULE__)
+  end
+
+  defp default_key do
+    Enum.find config[:keys], fn(key) -> key.default end
   end
 end
