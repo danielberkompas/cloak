@@ -47,10 +47,6 @@ defmodule Mix.Tasks.Cloak.Migrate do
   import Logger, only: [info: 1]
   import String, only: [to_existing_atom: 1]
 
-  @config  Application.get_env(:cloak, :migration)
-  @repo    @config[:repo]
-  @models  @config[:models] || []
-
   @doc false
   def run(args) do
     info "=== Starting Migration ==="
@@ -65,13 +61,13 @@ defmodule Mix.Tasks.Cloak.Migrate do
                                                       f: :field,
                                                       r: :repo])
     repo = case opts[:repo] do
-      nil  -> @repo
+      nil  -> Application.get_env(:cloak, :migration)[:repo]
       repo -> to_module(repo)
     end
 
     models = case opts[:model] do
-      nil   -> @models
-      model -> [{to_module(model), opts[:field]}]
+      nil   -> Application.get_env(:cloak, :migration)[:models]
+      model -> [{to_module(model), String.to_atom(opts[:field])}]
     end
 
     validate!(repo, models)
@@ -96,12 +92,11 @@ defmodule Mix.Tasks.Cloak.Migrate do
         mix cloak.migrate -r Repo -m ModelName -f encryption_version_field
     """
   end
-
   defp validate!(_repo, _models) do
   end
 
   defp migrate({model, field}, repo) do
-    info "--- Migrating #{inspect model.__struct__} Model ---"
+    info "--- Migrating #{inspect model} Model ---"
     ids = ids_for({model, field}, repo)
     info "#{length(ids)} records found needing migration"
 
@@ -124,7 +119,10 @@ defmodule Mix.Tasks.Cloak.Migrate do
     version = Map.get(row, field)
 
     if version != Cloak.version do
-      repo.update!(row)
+      row
+      |> Ecto.Changeset.change
+      |> Ecto.Changeset.put_change(field, Cloak.version)
+      |> repo.update!
     end
   end
 
