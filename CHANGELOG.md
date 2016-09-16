@@ -1,11 +1,32 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.2...HEAD)
+
+**Fixed bugs:**
+
+- mix cloak.migrate doesn't update encryption\_version field [\#16](https://github.com/danielberkompas/cloak/issues/16)
+
+**Closed issues:**
+
+- cloak migration not running [\#18](https://github.com/danielberkompas/cloak/issues/18)
+- Issue integration with Ecto2? [\#12](https://github.com/danielberkompas/cloak/issues/12)
+- Support for Ecto 2.0 [\#10](https://github.com/danielberkompas/cloak/issues/10)
+- :system AES keys aren't getting base64 decoded [\#9](https://github.com/danielberkompas/cloak/issues/9)
+
+**Merged pull requests:**
+
+- \[\#16\] Update encryption version in cloak.migrate [\#19](https://github.com/danielberkompas/cloak/pull/19) ([danielberkompas](https://github.com/danielberkompas))
+- Fix validation bug in cloak.migrate [\#15](https://github.com/danielberkompas/cloak/pull/15) ([bgeihsgt](https://github.com/bgeihsgt))
+- Add key generation example to README. [\#14](https://github.com/danielberkompas/cloak/pull/14) ([rpelyush](https://github.com/rpelyush))
+- Add deps badge to README [\#13](https://github.com/danielberkompas/cloak/pull/13) ([rrrene](https://github.com/rrrene))
+
 ## [v0.2.2](https://github.com/danielberkompas/cloak/tree/v0.2.2) (2016-05-20)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.1...v0.2.2)
 
 **Closed issues:**
 
-- :system AES keys aren't getting base64 decoded [\#9](https://github.com/danielberkompas/cloak/issues/9)
 - Cloak.EncryptedMapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
 - How to generate keys? [\#5](https://github.com/danielberkompas/cloak/issues/5)
 
