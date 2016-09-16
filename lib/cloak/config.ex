@@ -3,7 +3,7 @@ defmodule Cloak.Config do
 
   def all do
     Enum.reject Application.get_all_env(:cloak), fn({key, _}) ->
-      key == :migration
+      key in [:migration, :included_applications]
     end
   end
 
