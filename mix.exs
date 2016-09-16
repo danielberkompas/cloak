@@ -3,7 +3,7 @@ defmodule Cloak.Mixfile do
 
   def project do
     [app: :cloak,
-     version: "0.3.0",
+     version: "0.3.1",
      elixir: "~> 1.0",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
@@ -21,7 +21,7 @@ defmodule Cloak.Mixfile do
   defp deps do
     [{:poison, ">= 1.5.0"},
      {:ecto, ">= 1.0.0"},
-     {:ex_doc, "~> 0.11", only: :docs},
+     {:ex_doc, "~> 0.11", only: [:dev, :docs]},
      {:inch_ex, ">= 0.0.0", only: :docs}
    ]
   end

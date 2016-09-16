@@ -71,7 +71,7 @@ Add `cloak` to your hex dependencies:
 
 ```elixir
 defp deps do
-  [{:cloak, "~> 0.3.0"}]
+  [{:cloak, "~> 0.3.1"}]
 end
 ```
 
