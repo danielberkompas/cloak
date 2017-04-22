@@ -24,11 +24,25 @@ defmodule Cloak.AES.CTRTest do
     assert encrypt("value", <<3>>) != "value"
   end
 
+  test ".encrypt returns ciphertext using specified iv" do
+    System.put_env("CLOAK_FOURTH_IV", "V3dNbozwXkLjp1nhT5BxyA==")
+
+    assert <<4, iv::binary-16, _ciphertext1::binary>> = encrypt("value", <<4>>)
+
+    assert iv == System.get_env("CLOAK_FOURTH_IV") |> Base.decode64!
+  end
+
   test ".decrypt can decrypt a value" do
     assert encrypt("value") |> decrypt == "value"
   end
 
   test ".decrypt can decrypt a value encrypted with a non-default key" do
     assert encrypt("value", <<2>>) |> decrypt == "value"
+  end
+
+  test ".decrypt can decrypt a value using specified iv" do
+    System.put_env("CLOAK_FOURTH_IV", "V3dNbozwXkLjp1nhT5BxyA==")
+
+    assert encrypt("value", <<4>>) |> decrypt == "value"
   end
 end
