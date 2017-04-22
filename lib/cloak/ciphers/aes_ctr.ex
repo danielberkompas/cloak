@@ -13,7 +13,8 @@ defmodule Cloak.AES.CTR do
         tag: "AES",
         keys: [
           %{tag: <<1>>, key: :base64.decode("..."), default: true},
-          %{tag: <<2>>, key: :base64.decode("..."), default: false}
+          %{tag: <<2>>, key: :base64.decode("..."), default: false},
+          %{tag: <<3>>, key: :base64.decode("..."), iv: :base64.decode("..."), default: false}
         ]
 
   If you want to store your key in the environment variable, you can use
@@ -38,6 +39,10 @@ defmodule Cloak.AES.CTR do
     format you will need to decode them first. The key must be 128, 192, or 256 bits
     long (16, 24 or 32 bytes, respectively).
 
+  - `:iv` - The AES iv to use, in binary.  If you store you iv in base64
+     format you will need to decode it first. The iv must be 128 bits (16 bytes)
+     If iv is not speicifed, then random iv will be used for each encryption.
+
   - `:default` - Boolean. Whether to use this key by default or not.
 
   ## Upgrading to a New Key
@@ -50,7 +55,7 @@ defmodule Cloak.AES.CTR do
         %{tag: <<2>>, key: "new key", default: true}
       ]
 
-  After this, your new key will automatically be used for all new encyption, 
+  After this, your new key will automatically be used for all new encyption,
   while the old key will be used to decrypt legacy values.
 
   To migrate everything proactively to the new key, see the `mix cloak.migrate`
@@ -101,8 +106,8 @@ defmodule Cloak.AES.CTR do
       true
   """
   def encrypt(plaintext, key_tag \\ nil) do
-    iv = :crypto.strong_rand_bytes(16)
     key = get_key_config(key_tag) || default_key
+    iv = get_iv_value(key)
     state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
@@ -155,6 +160,21 @@ defmodule Cloak.AES.CTR do
       _ ->
         key_config.key
     end
+  end
+
+  defp get_iv_value(%{iv: iv} = key_config) when not is_nil(iv) do
+    case iv do
+      {:system, env_var} ->
+        System.get_env(env_var)
+        |> validate_key(env_var)
+        |> decode_key(env_var)
+      _ ->
+        iv
+    end
+  end
+
+  defp get_iv_value(_key) do
+    :crypto.strong_rand_bytes(16)
   end
 
   defp validate_key(key, env_var) when key in [nil, ""] do
