@@ -23,12 +23,12 @@ defmodule Cloak.MigrateTest do
     end
 
     def update!(changeset) do
-      send self, {:changeset, changeset}
+      send self(), {:changeset, changeset}
     end
   end
 
   setup do
-    Logger.disable(self)
+    Logger.disable(self())
     :ok
   end
 
@@ -39,7 +39,7 @@ defmodule Cloak.MigrateTest do
       "-f", "encryption_version"
     ])
 
-    assert_changed_version
+    assert_changed_version()
   end
 
   test "uses cloak configuration if present" do
@@ -50,7 +50,7 @@ defmodule Cloak.MigrateTest do
 
     run("cloak.migrate", [])
 
-    assert_changed_version
+    assert_changed_version()
   end
 
   defp assert_changed_version do
