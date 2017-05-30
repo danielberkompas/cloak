@@ -13,13 +13,13 @@ defmodule CloakTest do
   end
 
   test ".decrypt can decrypt a value" do
-    assert encrypt("value") |> decrypt == "value"
+    assert encrypt("value") |> decrypt() == "value"
   end
 
   test ".decrypt can decrypt a value encrypted by a non-default encryptor" do
   end
 
   test ".version returns the default cipher tag joined with the cipher.version" do
-    assert <<"AES", 1>> = version
+    assert <<"AES", 1>> = version()
   end
 end

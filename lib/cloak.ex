@@ -134,7 +134,7 @@ defmodule Cloak do
       <<"AES", ...>>
   """
   def encrypt(plaintext) do
-    tag <> cipher.encrypt(plaintext)
+    tag() <> cipher().encrypt(plaintext)
   end
 
   @doc """
@@ -161,7 +161,7 @@ defmodule Cloak do
   """
   def decrypt(ciphertext) do
     plaintexts =
-      for {cipher, config} <- Cloak.Config.all do
+      for {cipher, config} <- Cloak.Config.all() do
         tag = config[:tag]
 
         if String.starts_with?(ciphertext, tag) do
@@ -189,16 +189,16 @@ defmodule Cloak do
   that need to be migrated.
   """
   def version do
-    tag <> cipher.version
+    tag() <> cipher().version
   end
 
   defp cipher do
-    {cipher, _config} = Cloak.Config.default_cipher
+    {cipher, _config} = Cloak.Config.default_cipher()
     cipher
   end
 
   defp tag do
-    {_cipher, config} = Cloak.Config.default_cipher
+    {_cipher, config} = Cloak.Config.default_cipher()
     config[:tag]
   end
 end
