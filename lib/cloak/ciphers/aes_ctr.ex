@@ -27,7 +27,7 @@ defmodule Cloak.AES.CTR do
           %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDARY"}, default: false}
         ]
   If you want to store your key in the OTP app environment, you can use
-  `{:app_env, :otp_app, "VAR"}` syntax:
+  `{:app_env, :otp_app, :env_key}` syntax:
 
       config :cloak, Cloak.AES.CTR,
         default: true,
