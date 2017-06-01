@@ -33,8 +33,8 @@ defmodule Cloak.AES.CTR do
         default: true,
         tag: "AES",
         keys: [
-          %{tag: <<1>>, key: {:app_env, :my_app, "CLOAK_KEY_PRIMARY"}, default: true},
-          %{tag: <<2>>, key: {:app_env, :my_app, "CLOAK_KEY_SECONDARY"}, default: false}
+          %{tag: <<1>>, key: {:app_env, :my_app, :env_primary_key}, default: true},
+          %{tag: <<2>>, key: {:app_env, :my_app, :env_secondary_key}, default: false}
         ]
 
   ### Key Configuration Options
