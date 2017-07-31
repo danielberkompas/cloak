@@ -24,6 +24,14 @@ defmodule Cloak.AES.CTRTest do
     assert encrypt("value", <<3>>) != "value"
   end
 
+  test ".encrypt can encrypt a value using an OTP environment variable as key" do
+    encryption_key = <<54, 27, 13, 86, 75, 45, 117, 165, 34, 92, 136, 122, 124, 86, 90, 70, 239,
+   142, 234, 2, 191, 167, 208, 189, 44, 162, 107, 222, 73, 4, 88, 208>>
+    Application.put_env(:testapp, :encryption_key, encryption_key)
+
+    assert encrypt("value", <<4>>) != "value"
+  end
+
   test ".decrypt can decrypt a value" do
     assert encrypt("value") |> decrypt == "value"
   end
