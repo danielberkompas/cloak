@@ -102,7 +102,7 @@ defmodule Cloak.AES.CTR do
   """
   def encrypt(plaintext, key_tag \\ nil) do
     iv = :crypto.strong_rand_bytes(16)
-    key = get_key_config(key_tag) || default_key
+    key = get_key_config(key_tag) || default_key()
     state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
@@ -138,11 +138,11 @@ defmodule Cloak.AES.CTR do
   current default key.
   """
   def version do
-    default_key.tag
+    default_key().tag
   end
 
   defp get_key_config(tag) do
-    Enum.find(config[:keys], fn(key) -> key.tag == tag end)
+    Enum.find(config()[:keys], fn(key) -> key.tag == tag end)
   end
 
   defp get_key_value(key_config) do
@@ -174,6 +174,6 @@ defmodule Cloak.AES.CTR do
   end
 
   defp default_key do
-    Enum.find config[:keys], fn(key) -> key.default end
+    Enum.find config()[:keys], fn(key) -> key.default end
   end
 end

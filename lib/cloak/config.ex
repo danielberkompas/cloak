@@ -8,7 +8,7 @@ defmodule Cloak.Config do
   end
 
   def default_cipher do
-    cipher = Enum.find all, fn({_cipher, opts}) ->
+    cipher = Enum.find all(), fn({_cipher, opts}) ->
       opts[:default] == true
     end
 

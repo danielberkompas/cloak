@@ -134,7 +134,7 @@ defmodule Cloak do
       <<"AES", ...>>
   """
   def encrypt(plaintext) do
-    tag <> cipher.encrypt(plaintext)
+    tag() <> cipher().encrypt(plaintext)
   end
 
   @doc """
@@ -189,7 +189,7 @@ defmodule Cloak do
   that need to be migrated.
   """
   def version do
-    tag <> cipher.version
+    tag() <> cipher().version
   end
 
   defp cipher do

@@ -20,6 +20,6 @@ defmodule CloakTest do
   end
 
   test ".version returns the default cipher tag joined with the cipher.version" do
-    assert <<"AES", 1>> = version
+    assert <<"AES", 1>> = version()
   end
 end
