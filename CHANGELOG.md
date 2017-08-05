@@ -1,5 +1,25 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.0...HEAD)
+
+**Closed issues:**
+
+- Compile warnings [\#34](https://github.com/danielberkompas/cloak/issues/34)
+- Allow key to be in Application env [\#31](https://github.com/danielberkompas/cloak/issues/31)
+- Add salt option to cloak for increased security [\#26](https://github.com/danielberkompas/cloak/issues/26)
+- How to encrypt with user's own key instead of key from config? [\#24](https://github.com/danielberkompas/cloak/issues/24)
+- index on encryption\_version [\#23](https://github.com/danielberkompas/cloak/issues/23)
+- Adding interoperability with attr\_encrypted? [\#22](https://github.com/danielberkompas/cloak/issues/22)
+- Provide Vault Transit cipher [\#21](https://github.com/danielberkompas/cloak/issues/21)
+
+**Merged pull requests:**
+
+- Add ability to pull cipher key from OTP app env [\#32](https://github.com/danielberkompas/cloak/pull/32) ([tielur](https://github.com/tielur))
+- Add `prepare\_changes` example to module doc for use with ecto 2.0 [\#27](https://github.com/danielberkompas/cloak/pull/27) ([kgautreaux](https://github.com/kgautreaux))
+- clean up compile warnings under Elixir 1.4 [\#25](https://github.com/danielberkompas/cloak/pull/25) ([boydm](https://github.com/boydm))
+
 ## [v0.3.0](https://github.com/danielberkompas/cloak/tree/v0.3.0) (2016-09-16)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.3...v0.3.0)
 
