@@ -60,8 +60,6 @@ defmodule Cloak.Cipher do
       end
   """
 
-#  use Behaviour
-
   @doc """
   Encrypt a value. Your function should include any information it will need for
   decryption with the output.
