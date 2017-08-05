@@ -5,7 +5,6 @@ print "> "
 version = gets.gsub(/\n/, "")
 
 continue = system "github_changelog_generator"
-continue = system "keybase dir sign" if continue
 continue = system "git add ."
 continue = system "git commit -am \"Release version #{version}\"" if continue
 continue = system "git tag v#{version}" if continue
