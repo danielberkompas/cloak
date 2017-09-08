@@ -14,5 +14,9 @@ defmodule Cloak.EncryptedFloatField do
 
   use Cloak.EncryptedField
 
+  def cast(value) do
+    Ecto.Type.cast(:float, value)
+  end
+
   def after_decrypt(value), do: String.to_float(value)
 end

@@ -35,7 +35,7 @@ defmodule Cloak.EncryptedField do
       @doc false
       def after_decrypt(value), do: value
 
-      defoverridable [before_encrypt: 1, after_decrypt: 1]
+      defoverridable Module.definitions_in(__MODULE__)
     end
   end
 end

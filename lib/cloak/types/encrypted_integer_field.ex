@@ -14,5 +14,9 @@ defmodule Cloak.EncryptedIntegerField do
 
   use Cloak.EncryptedField
 
+  def cast(value) do
+    Ecto.Type.cast(:integer, value)
+  end
+
   def after_decrypt(value), do: String.to_integer(value)
 end
