@@ -75,14 +75,6 @@ defp deps do
 end
 ```
 
-And add it to your `applications` in your `mix.exs` file:
-
-```elixir
-def application do
-  [applications: [:cloak]]
-end
-```
-
 ## Documentation
 
 See [the hex documentation](http://hexdocs.pm/cloak).
