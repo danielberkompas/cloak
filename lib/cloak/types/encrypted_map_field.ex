@@ -25,6 +25,10 @@ defmodule Cloak.EncryptedMapField do
 
   use Cloak.EncryptedField
 
+  def cast(value) do
+    Ecto.Type.cast(:map, value)
+  end
+
   def before_encrypt(value) do 
     {:ok, json} = Poison.encode(value)
     json
