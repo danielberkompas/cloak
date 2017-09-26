@@ -112,8 +112,8 @@ defmodule Cloak.AES.CTR do
   """
   def encrypt(plaintext, key_tag \\ nil) do
     iv = :crypto.strong_rand_bytes(16)
-    key = Cloak.Util.config(__MODULE__, key_tag) || default_key()
-    state = :crypto.stream_init(:aes_ctr, Cloak.Util.key_value(key), iv)
+    key = Cloak.Ciphers.Util.config(__MODULE__, key_tag) || default_key()
+    state = :crypto.stream_init(:aes_ctr, Cloak.Ciphers.Util.key_value(key), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
     key.tag <> iv <> ciphertext
@@ -136,8 +136,8 @@ defmodule Cloak.AES.CTR do
       "Hello"
   """
   def decrypt(<<key_tag::binary-1, iv::binary-16, ciphertext::binary>> = _ciphertext) do
-    key = Cloak.Util.config(__MODULE__, key_tag)
-    state = :crypto.stream_init(:aes_ctr, Cloak.Util.key_value(key), iv)
+    key = Cloak.Ciphers.Util.config(__MODULE__, key_tag)
+    state = :crypto.stream_init(:aes_ctr, Cloak.Ciphers.Util.key_value(key), iv)
 
     {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
     plaintext
@@ -152,7 +152,7 @@ defmodule Cloak.AES.CTR do
   end
 
   defp default_key do
-    Cloak.Util.default_key(__MODULE__)
+    Cloak.Ciphers.Util.default_key(__MODULE__)
   end
 
 end

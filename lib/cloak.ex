@@ -109,7 +109,7 @@ defmodule Cloak do
   """
 
   @doc """
-  Encrypt a value using the default cipher module.
+  Encrypt a value using the cipher module associated with the tag.
 
   The `:tag` of the cipher will be prepended to the output. So, if the cipher
   was `Cloak.AES.CTR`, and the tag was "AES", the output would be in this
@@ -128,15 +128,22 @@ defmodule Cloak do
 
   - `plaintext` - The value to be encrypted.
 
-  ### Example
+  ### Optional Parameters
 
+  - `tag` - The tag of the cipher to use for encryption. If omitted,
+    will default to the default cipher.
+
+  ### Example
       Cloak.encrypt("Hello, World!")
       <<"AES", ...>>
+
+      Cloak.encrypt("Hello, World!", "AES")
+      <<"AES", ...>>
   """
-  def encrypt(plaintext) do
+  def encrypt(plaintext, tag \\ nil)
+  def encrypt(plaintext, nil) do
     default_tag() <> default_cipher().encrypt(plaintext)
   end
-
   def encrypt(plaintext, tag) do
     tag <> cipher(tag).encrypt(plaintext)
   end
@@ -199,11 +206,13 @@ defmodule Cloak do
     default_tag() <> default_cipher().version
   end
 
+  @spec default_cipher() :: module
   defp default_cipher do
     {cipher, _config} = Cloak.Config.default_cipher()
     cipher
   end
 
+  @spec default_tag() :: String.t
   defp default_tag do
     {_cipher, config} = Cloak.Config.default_cipher()
     config[:tag]
@@ -211,9 +220,10 @@ defmodule Cloak do
 
   @spec version(String.t) :: String.t
   def version(tag) do
-    tag <> cipher(tag).version
+    tag <> cipher(tag).version()
   end
 
+  @spec cipher(String.t) :: module
   defp cipher(tag) do
     {cipher, _config} = Cloak.Config.cipher(tag)
     cipher

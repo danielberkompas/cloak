@@ -28,7 +28,7 @@ defmodule CloakTest do
       @behaviour Cloak.Cipher
 
       def encrypt(plaintext, key_tag \\ nil) do
-        key = Cloak.Util.config(__MODULE__, key_tag) || Cloak.Util.default_key(__MODULE__)
+        key = Cloak.Ciphers.Util.config(__MODULE__, key_tag) || Cloak.Ciphers.Util.default_key(__MODULE__)
         key.tag <> Base.encode64(plaintext)
       end
 
@@ -36,7 +36,7 @@ defmodule CloakTest do
         Base.decode64!(ciphertext)
       end
 
-      def version, do: Cloak.Util.default_key(__MODULE__).tag
+      def version, do: Cloak.Ciphers.Util.default_key(__MODULE__).tag
     end
 
     setup do
