@@ -12,8 +12,8 @@ defmodule Cloak.AES.CTR do
         default: true,
         tag: "AES",
         keys: [
-          %{tag: <<1>>, key: :base64.decode("..."), default: true},
-          %{tag: <<2>>, key: :base64.decode("..."), default: false}
+          %{tag: <<1>>, key: Base.decode64!("..."), default: true},
+          %{tag: <<2>>, key: Base.decode64!("..."), default: false}
         ]
 
   If you want to store your key in the environment variable, you can use
@@ -60,7 +60,7 @@ defmodule Cloak.AES.CTR do
         %{tag: <<2>>, key: "new key", default: true}
       ]
 
-  After this, your new key will automatically be used for all new encyption, 
+  After this, your new key will automatically be used for all new encyption,
   while the old key will be used to decrypt legacy values.
 
   To migrate everything proactively to the new key, see the `mix cloak.migrate`
@@ -112,15 +112,15 @@ defmodule Cloak.AES.CTR do
   """
   def encrypt(plaintext, key_tag \\ nil) do
     iv = :crypto.strong_rand_bytes(16)
-    key = get_key_config(key_tag) || default_key()
-    state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
+    key = Cloak.Util.config(__MODULE__, key_tag) || default_key()
+    state = :crypto.stream_init(:aes_ctr, Cloak.Util.key_value(key), iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
     key.tag <> iv <> ciphertext
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.decrypt`. Decrypts a value
+  Callback implementation for `Cloak.Cipher.decrypt/2`. Decrypts a value
   encrypted with AES in CTR mode.
 
   Uses the key tag to find the correct key for decryption, and the IV included
@@ -136,58 +136,23 @@ defmodule Cloak.AES.CTR do
       "Hello"
   """
   def decrypt(<<key_tag::binary-1, iv::binary-16, ciphertext::binary>> = _ciphertext) do
-    key = get_key_config(key_tag)
-    state = :crypto.stream_init(:aes_ctr, get_key_value(key), iv)
+    key = Cloak.Util.config(__MODULE__, key_tag)
+    state = :crypto.stream_init(:aes_ctr, Cloak.Util.key_value(key), iv)
 
     {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
     plaintext
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.version`. Returns the tag of the
+  Callback implementation for `Cloak.Cipher.version/0`. Returns the tag of the
   current default key.
   """
   def version do
     default_key().tag
   end
 
-  defp get_key_config(tag) do
-    Enum.find(config()[:keys], fn(key) -> key.tag == tag end)
-  end
-
-  defp get_key_value(key_config) do
-    case key_config.key do
-      {:system, env_var} ->
-        System.get_env(env_var)
-        |> validate_key(env_var)
-        |> decode_key(env_var)
-
-      {:app_env, otp_app, env_var} ->
-        Application.get_env(otp_app, env_var)
-        |> validate_key(env_var)
-
-      _ ->
-        key_config.key
-    end
-  end
-
-  defp validate_key(key, env_var) when key in [nil, ""] do
-    raise "Expect env variable #{env_var} to define a key, but is empty."
-  end
-  defp validate_key(key, _), do: key
-
-  defp decode_key(key, env_var) do
-    case Base.decode64(key) do
-      {:ok, decoded_key} -> decoded_key
-      :error -> raise "Expect env variable #{env_var} to be a valid base64 string."
-    end
-  end
-
-  defp config do
-    Application.get_env(:cloak, __MODULE__)
-  end
-
   defp default_key do
-    Enum.find config()[:keys], fn(key) -> key.default end
+    Cloak.Util.default_key(__MODULE__)
   end
+
 end
