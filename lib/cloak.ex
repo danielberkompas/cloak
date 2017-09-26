@@ -134,7 +134,11 @@ defmodule Cloak do
       <<"AES", ...>>
   """
   def encrypt(plaintext) do
-    tag() <> cipher().encrypt(plaintext)
+    default_tag() <> default_cipher().encrypt(plaintext)
+  end
+
+  def encrypt(plaintext, tag) do
+    tag <> cipher(tag).encrypt(plaintext)
   end
 
   @doc """
@@ -161,15 +165,17 @@ defmodule Cloak do
   """
   def decrypt(ciphertext) do
     plaintexts =
-      for {cipher, config} <- Cloak.Config.all do
+      Cloak.Config.all()
+      |> Enum.filter(fn {_cipher, config} ->
         tag = config[:tag]
-
-        if String.starts_with?(ciphertext, tag) do
-          tag_size = byte_size(tag)
-          ciphertext = binary_part(ciphertext, tag_size, byte_size(ciphertext) - tag_size)
-          cipher.decrypt(ciphertext)
-        end
-      end
+        String.starts_with?(ciphertext, tag)
+      end)
+      |> Enum.map(fn {cipher, config} ->
+        tag = config[:tag]
+        tag_size = byte_size(tag)
+        ciphertext = binary_part(ciphertext, tag_size, byte_size(ciphertext) - tag_size)
+        cipher.decrypt(ciphertext)
+      end)
 
     case plaintexts do
       [plaintext|_] ->
@@ -188,17 +194,28 @@ defmodule Cloak do
   encryption key, because you'd be able to query your database to find records
   that need to be migrated.
   """
-  def version do
-    tag() <> cipher().version
+  @spec version() :: String.t
+  def version() do
+    default_tag() <> default_cipher().version
   end
 
-  defp cipher do
-    {cipher, _config} = Cloak.Config.default_cipher
+  defp default_cipher do
+    {cipher, _config} = Cloak.Config.default_cipher()
     cipher
   end
 
-  defp tag do
-    {_cipher, config} = Cloak.Config.default_cipher
+  defp default_tag do
+    {_cipher, config} = Cloak.Config.default_cipher()
     config[:tag]
+  end
+
+  @spec version(String.t) :: String.t
+  def version(tag) do
+    tag <> cipher(tag).version
+  end
+
+  defp cipher(tag) do
+    {cipher, _config} = Cloak.Config.cipher(tag)
+    cipher
   end
 end
