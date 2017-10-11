@@ -49,11 +49,13 @@ defmodule Mix.Tasks.Cloak.Migrate do
 
   @doc false
   def run(args) do
-    info "=== Starting Migration ==="
+    _ = info("=== Starting Migration ===")
     {repo, models} = parse(args)
     Mix.Task.run "app.start", args
     Enum.each(models, &migrate(&1, repo))
-    info "=== Migration Complete ==="
+    _ = info("=== Migration Complete ===")
+
+    :ok
   end
 
   defp parse(args) do
@@ -92,13 +94,12 @@ defmodule Mix.Tasks.Cloak.Migrate do
         mix cloak.migrate -r Repo -m ModelName -f encryption_version_field
     """
   end
-  defp validate!(_repo, _models) do
-  end
+  defp validate!(_repo, _models), do: :ok
 
   defp migrate({model, field}, repo) do
-    info "--- Migrating #{inspect model} Model ---"
+    _ = info("--- Migrating #{inspect model} Model ---")
     ids = ids_for({model, field}, repo)
-    info "#{length(ids)} records found needing migration"
+    _ = info("#{length(ids)} records found needing migration")
 
     for id <- ids do
       model

@@ -8,7 +8,7 @@ defmodule Cloak.Config do
     end
   end
 
-  @spec cipher(String.t) :: Keyword.t
+  @spec cipher(String.t) :: {module, Keyword.t}
   def cipher(tag) do
     # TODO Should we throw here if we can't find?
     Enum.find all(), fn({_cipher, opts}) ->
