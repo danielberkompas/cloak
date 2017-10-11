@@ -204,7 +204,7 @@ defmodule Cloak do
   """
   @spec version() :: String.t
   def version() do
-    default_tag() <> default_cipher().version
+    default_tag() <> default_cipher().version()
   end
 
   @spec default_cipher() :: module

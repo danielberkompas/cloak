@@ -2,7 +2,7 @@ defmodule Cloak.Config do
   @moduledoc false
 
   @spec all() :: Keyword.t
-  def all do
+  def all() do
     Enum.reject Application.get_all_env(:cloak), fn({key, _}) ->
       key in [:migration, :included_applications]
     end
@@ -16,8 +16,8 @@ defmodule Cloak.Config do
     end
   end
 
-  @spec default_cipher() :: Keyword.t
-  def default_cipher do
+  @spec default_cipher() :: {module, Keyword.t}
+  def default_cipher() do
     cipher = Enum.find all(), fn({_cipher, opts}) ->
       opts[:default] == true
     end
