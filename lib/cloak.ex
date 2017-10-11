@@ -140,6 +140,7 @@ defmodule Cloak do
       Cloak.encrypt("Hello, World!", "AES")
       <<"AES", ...>>
   """
+  @spec encrypt(term, String.t | nil) :: String.t
   def encrypt(plaintext, tag \\ nil)
   def encrypt(plaintext, nil) do
     default_tag() <> default_cipher().encrypt(plaintext)
