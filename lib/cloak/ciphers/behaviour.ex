@@ -64,12 +64,12 @@ defmodule Cloak.Cipher do
   Encrypt a value. Your function should include any information it will need for
   decryption with the output.
   """
-  @callback encrypt(any) :: String.t
+  @callback encrypt(any) :: String.t()
 
   @doc """
   Decrypt a value.
   """
-  @callback decrypt(String.t) :: String.t
+  @callback decrypt(String.t()) :: String.t()
 
   @doc """
   Must return a string representing the default settings of your module as it is
@@ -79,5 +79,5 @@ defmodule Cloak.Cipher do
   then be stored on each database table row to track which encryption
   configuration it is currently encrypted with.
   """
-  @callback version :: String.t
+  @callback version :: String.t()
 end

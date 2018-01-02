@@ -31,38 +31,38 @@ config :cloak, Cloak.AES.CTR,
   ]
 
 # in your migration
-defmodule MyApp.Repo.Migrations.AddSecretKeyToModel do
+defmodule MyApp.Repo.Migrations.AddSecretKeyToSchema do
   use Ecto.Migration
 
   def change do
-    alter table(:models) do
+    alter table(:schemas) do
       add :secret_key, :binary
       add :encryption_version, :binary
     end
 
-    create index(:models, [:encryption_version])
+    create index(:schemas, [:encryption_version])
   end
 end
 
-# in your model
-defmodule MyApp.Model do
+# in your schema
+defmodule MyApp.Schema do
   use Ecto.Schema
 
-  schema "models" do
+  schema "schemas" do
     field :secret_key, Cloak.EncryptedBinaryField
     field :encryption_version, :binary
   end
 
-  def changeset(model, params \\ :empty) do
-    model
+  def changeset(schema, params \\ :empty) do
+    schema
     |> cast(params, ~w(secret_key), ~w(encryption_version))
     |> put_change(:encryption_version, Cloak.version)
   end
 end
 
 # Query
-MyApp.Repo.one(MyApp.Model)
-# => %MyApp.Model{secret_key: "Decrypted value", encryption_version: <<"AES", 1>>}
+MyApp.Repo.one(MyApp.Schema)
+# => %MyApp.Schema{secret_key: "Decrypted value", encryption_version: <<"AES", 1>>}
 ```
 
 ## Installation

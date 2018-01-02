@@ -39,13 +39,13 @@ defmodule Cloak.Tags.Encoder do
   end
 
   def encode(bitstring, value) do
-    @reserved <> <<(@half_byte + byte_size(bitstring))>> <> bitstring <> value
+    @reserved <> <<@half_byte + byte_size(bitstring)>> <> bitstring <> value
   end
 
   defp to_bitstring(decimal) do
     decimal
     |> convert()
-    |> Enum.map(fn(num) -> <<num>> end)
+    |> Enum.map(fn num -> <<num>> end)
     |> Enum.join()
   end
 
@@ -53,6 +53,6 @@ defmodule Cloak.Tags.Encoder do
   defp convert(0, list), do: list
 
   defp convert(decimal, list) do
-    convert(div(decimal, @byte_length), [rem(decimal, @byte_length) | list ])
+    convert(div(decimal, @byte_length), [rem(decimal, @byte_length) | list])
   end
 end

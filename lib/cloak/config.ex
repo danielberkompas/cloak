@@ -1,26 +1,32 @@
 defmodule Cloak.Config do
   @moduledoc false
 
-  @spec all() :: Keyword.t
+  @spec all() :: Keyword.t()
   def all() do
-    Enum.reject Application.get_all_env(:cloak), fn({key, _}) ->
-      key in [:migration, :included_applications]
-    end
+    Enum.reject(Application.get_all_env(:cloak), fn {key, _} ->
+      key in [:migration, :included_applications, :json_library]
+    end)
   end
 
-  @spec cipher(String.t) :: {module, Keyword.t}
+  @spec json_library :: module
+  def json_library do
+    Application.get_env(:cloak, :json_library, Poison)
+  end
+
+  @spec cipher(String.t()) :: {module, Keyword.t()}
   def cipher(tag) do
     # TODO Should we throw here if we can't find?
-    Enum.find all(), fn({_cipher, opts}) ->
+    Enum.find(all(), fn {_cipher, opts} ->
       opts[:tag] == tag
-    end
+    end)
   end
 
-  @spec default_cipher() :: {module, Keyword.t}
+  @spec default_cipher() :: {module, Keyword.t()}
   def default_cipher() do
-    cipher = Enum.find all(), fn({_cipher, opts}) ->
-      opts[:default] == true
-    end
+    cipher =
+      Enum.find(all(), fn {_cipher, opts} ->
+        opts[:default] == true
+      end)
 
     unless cipher do
       raise """

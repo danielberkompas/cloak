@@ -13,18 +13,20 @@ defmodule Cloak.EncryptedField do
 
       @doc false
       def dump(value) do
-        value = value
-                |> before_encrypt
-                |> Cloak.encrypt
+        value =
+          value
+          |> before_encrypt
+          |> Cloak.encrypt()
 
         {:ok, value}
       end
 
       @doc false
       def load(value) do
-        value = value
-                |> Cloak.decrypt
-                |> after_decrypt
+        value =
+          value
+          |> Cloak.decrypt()
+          |> after_decrypt
 
         {:ok, value}
       end

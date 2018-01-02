@@ -22,7 +22,7 @@ defmodule Cloak.SHA256Field do
       
   Ensure that the hash is updated whenever the target field changes with the 
   `put_change/3` function:
-  
+
       def changeset(struct, params \\ %{}) do
         struct
         |> cast(params, [:field_name, :field_name_hash])
@@ -31,7 +31,7 @@ defmodule Cloak.SHA256Field do
       
   Query the Repo using the `:field_name_hash` in any place you would typically 
   query by `:field_name`.
-  
+
       user = Repo.get_by(User, email_hash: "user@email.com")
   """
 
