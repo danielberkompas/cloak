@@ -2,7 +2,28 @@
 
 ## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
 
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.2...HEAD)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.3...HEAD)
+
+**Fixed bugs:**
+
+- instructions to cloak plain text fields [\#17](https://github.com/danielberkompas/cloak/issues/17)
+
+**Closed issues:**
+
+- Make json library configurable [\#44](https://github.com/danielberkompas/cloak/issues/44)
+- Encryption Arguement Error [\#41](https://github.com/danielberkompas/cloak/issues/41)
+- \*\* \(MatchError\) no match of right hand side value: false [\#40](https://github.com/danielberkompas/cloak/issues/40)
+- Proposal / Forthcoming PRs: Multiple Ciphers With Keys [\#36](https://github.com/danielberkompas/cloak/issues/36)
+
+**Merged pull requests:**
+
+- Modernize codebase for new release [\#45](https://github.com/danielberkompas/cloak/pull/45) ([danielberkompas](https://github.com/danielberkompas))
+- \[\#33\] Add galois counter mode cipher [\#42](https://github.com/danielberkompas/cloak/pull/42) ([tomciopp](https://github.com/tomciopp))
+- Fix typespecs / dialyzer errors across the board [\#39](https://github.com/danielberkompas/cloak/pull/39) ([asummers](https://github.com/asummers))
+- Allow multiple concurrent ciphers to encrypt [\#37](https://github.com/danielberkompas/cloak/pull/37) ([asummers](https://github.com/asummers))
+
+## [v0.3.3](https://github.com/danielberkompas/cloak/tree/v0.3.3) (2017-09-08)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.2...v0.3.3)
 
 **Closed issues:**
 
