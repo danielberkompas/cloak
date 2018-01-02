@@ -1,6 +1,6 @@
 defmodule Mix.Tasks.Cloak.Migrate do
   @moduledoc """
-  Migrate all configured models to your new encryption configuration.
+  Migrate all configured schemas to your new encryption configuration.
 
   While Cloak will automatically decrypt rows which use an old decryption cipher
   or key, this isn't usually enough. Usually, you want to retire the old key, so
@@ -18,28 +18,28 @@ defmodule Mix.Tasks.Cloak.Migrate do
   ## Configuration
 
   In order for the Mix task to update rows in the correct database, it must have
-  access to the correct repo, and a list of models to migrate.
+  access to the correct repo, and a list of schemas to migrate.
 
-  Each model should be specified in this format:
+  Each schema should be specified in this format:
 
-      {model_name, :encryption_field_name}
+      {schema_name, :encryption_field_name}
 
-  Where `:encryption_field_name` is the name of the field the model uses to
+  Where `:encryption_field_name` is the name of the field the schema uses to
   track it's encryption version.
 
       config :cloak, :migration,
         repo: MyApp.Repo,
-        models: [{MyApp.Model1, :encryption_version},
-                 {MyApp.Model2, :encryption_version}]
+        schemas: [{MyApp.Schema1, :encryption_version},
+                 {MyApp.Schema2, :encryption_version}]
 
   ## Usage
 
       mix cloak.migrate
 
-  The task allows you to customize the repo and models which will be migrated at
+  The task allows you to customize the repo and schemas which will be migrated at
   runtime.
 
-      mix cloak.migrate -m MyApp.Model -f encryption_version -r MyApp.Repo
+      mix cloak.migrate -m MyApp.Schema -f encryption_version -r MyApp.Repo
   """
 
   use Mix.Task
@@ -50,16 +50,16 @@ defmodule Mix.Tasks.Cloak.Migrate do
   @doc false
   def run(args) do
     _ = info("=== Starting Migration ===")
-    {repo, models} = parse(args)
+    {repo, schemas} = parse(args)
     Mix.Task.run("app.start", args)
-    Enum.each(models, &migrate(&1, repo))
+    Enum.each(schemas, &migrate(&1, repo))
     _ = info("=== Migration Complete ===")
 
     :ok
   end
 
   defp parse(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [m: :model, f: :field, r: :repo])
+    {opts, _, _} = OptionParser.parse(args, aliases: [m: :schema, f: :field, r: :repo])
 
     repo =
       case opts[:repo] do
@@ -67,53 +67,53 @@ defmodule Mix.Tasks.Cloak.Migrate do
         repo -> to_module(repo)
       end
 
-    models =
-      case opts[:model] do
-        nil -> Application.get_env(:cloak, :migration)[:models]
-        model -> [{to_module(model), String.to_atom(opts[:field])}]
+    schemas =
+      case opts[:schema] do
+        nil -> Application.get_env(:cloak, :migration)[:schemas]
+        schema -> [{to_module(schema), String.to_atom(opts[:field])}]
       end
 
-    validate!(repo, models)
+    validate!(repo, schemas)
 
-    {repo, models}
+    {repo, schemas}
   end
 
   defp validate!(repo, [h | _t]) when repo == nil or not is_tuple(h) do
     raise ArgumentError, """
-    You must specify which models you wish to migrate and which repo to use.
+    You must specify which schemas you wish to migrate and which repo to use.
 
     You can do this in your Mix config, like so:
 
         config :cloak, :migration,
           repo: MyApp.Repo,
-          models: [{MyApp.Model1, :encryption_version},
-                   {MyApp.Model2, :encryption_version}]
+          schemas: [{MyApp.Schema1, :encryption_version},
+                   {MyApp.Schema2, :encryption_version}]
 
-    Alternatively, you can pass in the model, field, and repo as command line
+    Alternatively, you can pass in the schema, field, and repo as command line
     arguments to `mix cloak.migrate`:
 
-        mix cloak.migrate -r Repo -m ModelName -f encryption_version_field
+        mix cloak.migrate -r Repo -m SchemaName -f encryption_version_field
     """
   end
 
-  defp validate!(_repo, _models), do: :ok
+  defp validate!(_repo, _schemas), do: :ok
 
-  defp migrate({model, field}, repo) do
-    _ = info("--- Migrating #{inspect(model)} Model ---")
-    ids = ids_for({model, field}, repo)
+  defp migrate({schema, field}, repo) do
+    _ = info("--- Migrating #{inspect(schema)} Schema ---")
+    ids = ids_for({schema, field}, repo)
     _ = info("#{length(ids)} records found needing migration")
 
     for id <- ids do
-      model
+      schema
       |> repo.get(id)
       |> migrate_row(repo, field)
     end
   end
 
-  defp ids_for({model, field}, repo) do
+  defp ids_for({schema, field}, repo) do
     query =
       from(
-        m in model,
+        m in schema,
         where: field(m, ^field) != ^Cloak.version(),
         select: m.id
       )

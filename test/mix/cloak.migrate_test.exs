@@ -50,7 +50,7 @@ defmodule Cloak.MigrateTest do
       :cloak,
       :migration,
       repo: Repo,
-      models: [{Schema, :encryption_version}]
+      schemas: [{Schema, :encryption_version}]
     )
 
     run("cloak.migrate", [])
