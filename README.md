@@ -53,9 +53,9 @@ defmodule MyApp.Schema do
     field :encryption_version, :binary
   end
 
-  def changeset(schema, params \\ :empty) do
+  def changeset(schema, params \\ %{}) do
     schema
-    |> cast(params, ~w(secret_key), ~w(encryption_version))
+    |> cast(params, ~w(secret_key))
     |> put_change(:encryption_version, Cloak.version)
   end
 end
@@ -71,7 +71,7 @@ Add `cloak` to your hex dependencies:
 
 ```elixir
 defp deps do
-  [{:cloak, "~> 0.3.3"}]
+  [{:cloak, "~> 0.4.0"}]
 end
 ```
 
