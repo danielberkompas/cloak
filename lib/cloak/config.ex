@@ -2,13 +2,13 @@ defmodule Cloak.Config do
   @moduledoc false
 
   @spec all() :: Keyword.t
-  def all do
+  def all() do
     Enum.reject Application.get_all_env(:cloak), fn({key, _}) ->
       key in [:migration, :included_applications]
     end
   end
 
-  @spec cipher(String.t) :: Keyword.t
+  @spec cipher(String.t) :: {module, Keyword.t}
   def cipher(tag) do
     # TODO Should we throw here if we can't find?
     Enum.find all(), fn({_cipher, opts}) ->
@@ -16,8 +16,8 @@ defmodule Cloak.Config do
     end
   end
 
-  @spec default_cipher() :: Keyword.t
-  def default_cipher do
+  @spec default_cipher() :: {module, Keyword.t}
+  def default_cipher() do
     cipher = Enum.find all(), fn({_cipher, opts}) ->
       opts[:default] == true
     end

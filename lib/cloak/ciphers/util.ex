@@ -8,23 +8,28 @@ defmodule Cloak.Ciphers.Util do
     Application.get_env(:cloak, cipher_module)
   end
 
-  @spec config(module, String.t) :: map
+  @spec config(module, String.t | nil) :: map | nil
   def config(cipher_module, tag) do
     cipher_module
-    |> config()
-    |> Keyword.get(:keys)
-    |> Enum.find(fn(key) -> key.tag == tag end)
+    |> keys()
+    |> Enum.find(fn key -> key.tag == tag end)
   end
 
-  @spec default_key(module) :: String.t
+  @spec default_key(module) :: map
   def default_key(cipher_module) do
+    cipher_module
+    |> keys()
+    |> Enum.find(fn key -> key.default end)
+  end
+
+  @spec keys(module) :: [map]
+  defp keys(cipher_module) do
     cipher_module
     |> config()
     |> Keyword.get(:keys)
-    |> Enum.find(fn(key) -> key.default end)
   end
 
-  @spec key_value(map) :: String.t
+  @spec key_value(map) :: String.t | no_return
   def key_value(key_config) do
     case key_config.key do
       {:system, env_var} ->
@@ -51,7 +56,7 @@ defmodule Cloak.Ciphers.Util do
     end
   end
 
-  @spec validate_key!(String.t, String.t) :: String.t | no_return
+  @spec validate_key!(String.t | nil, String.t | atom) :: String.t | no_return
   defp validate_key!(key, env_var) when key in [nil, ""] do
     raise "Expect env variable #{env_var} to define a key, but is empty."
   end
