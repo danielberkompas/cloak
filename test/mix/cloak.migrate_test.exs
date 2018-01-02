@@ -5,7 +5,7 @@ defmodule Cloak.MigrateTest do
     use Ecto.Schema
 
     schema "schemas" do
-      field :encryption_version, :binary
+      field(:encryption_version, :binary)
     end
   end
 
@@ -23,30 +23,35 @@ defmodule Cloak.MigrateTest do
     end
 
     def update!(changeset) do
-      send self(), {:changeset, changeset}
+      send(self(), {:changeset, changeset})
     end
   end
 
   setup do
-    Logger.disable( self() )
+    Logger.disable(self())
     :ok
   end
 
   test "migrates existing rows to new version" do
     run("cloak.migrate", [
-      "-r", "Cloak.MigrateTest.Repo",
-      "-m", "Cloak.MigrateTest.Schema",
-      "-f", "encryption_version"
+      "-r",
+      "Cloak.MigrateTest.Repo",
+      "-m",
+      "Cloak.MigrateTest.Schema",
+      "-f",
+      "encryption_version"
     ])
 
     assert_changed_version()
   end
 
   test "uses cloak configuration if present" do
-    Application.put_env(:cloak, :migration, [
+    Application.put_env(
+      :cloak,
+      :migration,
       repo: Repo,
       models: [{Schema, :encryption_version}]
-    ])
+    )
 
     run("cloak.migrate", [])
 
@@ -55,7 +60,7 @@ defmodule Cloak.MigrateTest do
 
   defp assert_changed_version do
     assert_received {:changeset, changeset}
-    assert Ecto.Changeset.get_change(changeset, :encryption_version) == Cloak.version
+    assert Ecto.Changeset.get_change(changeset, :encryption_version) == Cloak.version()
   end
 
   defp run(task, args) do

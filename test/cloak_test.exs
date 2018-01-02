@@ -5,7 +5,6 @@ defmodule CloakTest do
   doctest Cloak
 
   describe "default cipher tests" do
-
     test "Cloak.encrypt/1 can encrypt a value" do
       refute encrypt("value") == "value"
     end
@@ -28,7 +27,10 @@ defmodule CloakTest do
       @behaviour Cloak.Cipher
 
       def encrypt(plaintext, key_tag \\ nil) do
-        key = Cloak.Ciphers.Util.config(__MODULE__, key_tag) || Cloak.Ciphers.Util.default_key(__MODULE__)
+        key =
+          Cloak.Ciphers.Util.config(__MODULE__, key_tag) ||
+            Cloak.Ciphers.Util.default_key(__MODULE__)
+
         key.tag <> Base.encode64(plaintext)
       end
 
@@ -44,14 +46,15 @@ defmodule CloakTest do
         default: false,
         tag: "TEST",
         keys: [
-          %{tag: <<1>>, key: "abc123xyz456", default: true},
+          %{tag: <<1>>, key: "abc123xyz456", default: true}
         ]
       ]
+
       Application.put_env(:cloak, TestCipher, non_default_cipher)
 
-      on_exit fn ->
+      on_exit(fn ->
         Application.delete_env(:cloak, TestCipher)
-      end
+      end)
     end
 
     test "Cloak.decrypt/1 can decrypt a value encrypted by a non-default encrypter" do
@@ -63,5 +66,4 @@ defmodule CloakTest do
       assert <<"TEST", 1>> = version("TEST")
     end
   end
-
 end

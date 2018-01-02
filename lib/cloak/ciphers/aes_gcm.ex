@@ -119,12 +119,13 @@ defmodule Cloak.AES.GCM do
   end
 
   defp perform_encryption(plaintext, iv, key) do
-    {ciphertext, ciphertag} = :crypto.block_encrypt(
-      :aes_gcm,
-      Cloak.Ciphers.Util.key_value(key),
-      iv,
-      {@aad, plaintext}
-    )
+    {ciphertext, ciphertag} =
+      :crypto.block_encrypt(
+        :aes_gcm,
+        Cloak.Ciphers.Util.key_value(key),
+        iv,
+        {@aad, plaintext}
+      )
 
     encode(key.tag) <> iv <> ciphertag <> ciphertext
   end

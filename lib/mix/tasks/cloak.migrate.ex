@@ -51,7 +51,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
   def run(args) do
     _ = info("=== Starting Migration ===")
     {repo, models} = parse(args)
-    Mix.Task.run "app.start", args
+    Mix.Task.run("app.start", args)
     Enum.each(models, &migrate(&1, repo))
     _ = info("=== Migration Complete ===")
 
@@ -59,25 +59,26 @@ defmodule Mix.Tasks.Cloak.Migrate do
   end
 
   defp parse(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [m: :model,
-                                                      f: :field,
-                                                      r: :repo])
-    repo = case opts[:repo] do
-      nil  -> Application.get_env(:cloak, :migration)[:repo]
-      repo -> to_module(repo)
-    end
+    {opts, _, _} = OptionParser.parse(args, aliases: [m: :model, f: :field, r: :repo])
 
-    models = case opts[:model] do
-      nil   -> Application.get_env(:cloak, :migration)[:models]
-      model -> [{to_module(model), String.to_atom(opts[:field])}]
-    end
+    repo =
+      case opts[:repo] do
+        nil -> Application.get_env(:cloak, :migration)[:repo]
+        repo -> to_module(repo)
+      end
+
+    models =
+      case opts[:model] do
+        nil -> Application.get_env(:cloak, :migration)[:models]
+        model -> [{to_module(model), String.to_atom(opts[:field])}]
+      end
 
     validate!(repo, models)
 
     {repo, models}
   end
 
-  defp validate!(repo, [h|_t]) when repo == nil or not is_tuple(h) do
+  defp validate!(repo, [h | _t]) when repo == nil or not is_tuple(h) do
     raise ArgumentError, """
     You must specify which models you wish to migrate and which repo to use.
 
@@ -94,10 +95,11 @@ defmodule Mix.Tasks.Cloak.Migrate do
         mix cloak.migrate -r Repo -m ModelName -f encryption_version_field
     """
   end
+
   defp validate!(_repo, _models), do: :ok
 
   defp migrate({model, field}, repo) do
-    _ = info("--- Migrating #{inspect model} Model ---")
+    _ = info("--- Migrating #{inspect(model)} Model ---")
     ids = ids_for({model, field}, repo)
     _ = info("#{length(ids)} records found needing migration")
 
@@ -109,9 +111,12 @@ defmodule Mix.Tasks.Cloak.Migrate do
   end
 
   defp ids_for({model, field}, repo) do
-    query = from m in model,
-              where: field(m, ^field) != ^Cloak.version,
-              select: m.id
+    query =
+      from(
+        m in model,
+        where: field(m, ^field) != ^Cloak.version(),
+        select: m.id
+      )
 
     repo.all(query)
   end
@@ -119,10 +124,10 @@ defmodule Mix.Tasks.Cloak.Migrate do
   defp migrate_row(row, repo, field) do
     version = Map.get(row, field)
 
-    if version != Cloak.version do
+    if version != Cloak.version() do
       row
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_change(field, Cloak.version)
+      |> Ecto.Changeset.change()
+      |> Ecto.Changeset.put_change(field, Cloak.version())
       |> repo.update!
     end
   end

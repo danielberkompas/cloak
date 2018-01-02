@@ -5,14 +5,14 @@ defmodule Cloak.EncryptedMapFieldTest do
   @map %{"key" => "value"}
 
   test ".type is :binary" do
-    assert Field.type == :binary
+    assert Field.type() == :binary
   end
 
   test ".cast rejects invalid types" do
     assert :error = Field.cast("binary")
     assert :error = Field.cast(123)
     assert :error = Field.cast(123.0)
-    assert :error = Field.cast([hello: :world])
+    assert :error = Field.cast(hello: :world)
   end
 
   test ".cast accepts maps" do

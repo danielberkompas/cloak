@@ -3,12 +3,12 @@ defmodule Cloak.Ciphers.Util do
   Centralized utility module for cipher config related operations.
   """
 
-  @spec config(module) :: Keyword.t
+  @spec config(module) :: Keyword.t()
   def config(cipher_module) do
     Application.get_env(:cloak, cipher_module)
   end
 
-  @spec config(module, String.t | nil) :: map | nil
+  @spec config(module, String.t() | nil) :: map | nil
   def config(cipher_module, tag) do
     cipher_module
     |> keys()
@@ -29,7 +29,7 @@ defmodule Cloak.Ciphers.Util do
     |> Keyword.get(:keys)
   end
 
-  @spec key_value(map) :: String.t | no_return
+  @spec key_value(map) :: String.t() | no_return
   def key_value(key_config) do
     case key_config.key do
       {:system, env_var} ->
@@ -48,7 +48,7 @@ defmodule Cloak.Ciphers.Util do
     end
   end
 
-  @spec decode_key!(String.t, String.t) :: String.t | no_return
+  @spec decode_key!(String.t(), String.t()) :: String.t() | no_return
   defp decode_key!(key, env_var) do
     case Base.decode64(key) do
       {:ok, decoded_key} -> decoded_key
@@ -56,10 +56,10 @@ defmodule Cloak.Ciphers.Util do
     end
   end
 
-  @spec validate_key!(String.t | nil, String.t | atom) :: String.t | no_return
+  @spec validate_key!(String.t() | nil, String.t() | atom) :: String.t() | no_return
   defp validate_key!(key, env_var) when key in [nil, ""] do
     raise "Expect env variable #{env_var} to define a key, but is empty."
   end
-  defp validate_key!(key, _), do: key
 
+  defp validate_key!(key, _), do: key
 end

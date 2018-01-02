@@ -3,7 +3,7 @@ defmodule Cloak.EncryptedFloatFieldTest do
   alias Cloak.EncryptedFloatField, as: Field
 
   test ".type is :binary" do
-    assert Field.type == :binary
+    assert Field.type() == :binary
   end
 
   test ".cast rejects invalid input" do

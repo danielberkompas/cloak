@@ -154,5 +154,4 @@ defmodule Cloak.AES.CTR do
   defp default_key do
     Cloak.Ciphers.Util.default_key(__MODULE__)
   end
-
 end

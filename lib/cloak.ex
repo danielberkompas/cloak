@@ -140,11 +140,13 @@ defmodule Cloak do
       Cloak.encrypt("Hello, World!", "AES")
       <<"AES", ...>>
   """
-  @spec encrypt(term, String.t | nil) :: String.t
+  @spec encrypt(term, String.t() | nil) :: String.t()
   def encrypt(plaintext, tag \\ nil)
+
   def encrypt(plaintext, nil) do
     default_tag() <> default_cipher().encrypt(plaintext)
   end
+
   def encrypt(plaintext, tag) do
     tag <> cipher(tag).encrypt(plaintext)
   end
@@ -186,10 +188,11 @@ defmodule Cloak do
       end)
 
     case plaintexts do
-      [plaintext|_] ->
+      [plaintext | _] ->
         plaintext
+
       _ ->
-        raise ArgumentError, "No cipher found to decrypt #{inspect ciphertext}."
+        raise ArgumentError, "No cipher found to decrypt #{inspect(ciphertext)}."
     end
   end
 
@@ -202,7 +205,7 @@ defmodule Cloak do
   encryption key, because you'd be able to query your database to find records
   that need to be migrated.
   """
-  @spec version() :: String.t
+  @spec version() :: String.t()
   def version() do
     default_tag() <> default_cipher().version()
   end
@@ -213,18 +216,18 @@ defmodule Cloak do
     cipher
   end
 
-  @spec default_tag() :: String.t
+  @spec default_tag() :: String.t()
   defp default_tag do
     {_cipher, config} = Cloak.Config.default_cipher()
     config[:tag]
   end
 
-  @spec version(String.t) :: String.t
+  @spec version(String.t()) :: String.t()
   def version(tag) do
     tag <> cipher(tag).version()
   end
 
-  @spec cipher(String.t) :: module
+  @spec cipher(String.t()) :: module
   defp cipher(tag) do
     {cipher, _config} = Cloak.Config.cipher(tag)
     cipher

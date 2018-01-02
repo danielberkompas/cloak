@@ -13,7 +13,9 @@ defmodule Cloak.AES.GCMTest do
   end
 
   test ".encrypt returns ciphertext in the format key_tag <> iv <> ciphertag <> ciphertext" do
-    assert <<1, iv::binary-16, ciphertag::binary-16, ciphertext::binary>> = encrypt("value", <<1>>)
+    assert <<1, iv::binary-16, ciphertag::binary-16, ciphertext::binary>> =
+             encrypt("value", <<1>>)
+
     assert byte_size(iv) == 16
     assert byte_size(ciphertag) == 16
     assert String.length(ciphertext) > 0
@@ -26,8 +28,41 @@ defmodule Cloak.AES.GCMTest do
   end
 
   test ".encrypt can encrypt a value using an OTP environment variable as key" do
-    encryption_key = <<54, 27, 13, 86, 75, 45, 117, 165, 34, 92, 136, 122, 124, 86, 90, 70, 239,
-   142, 234, 2, 191, 167, 208, 189, 44, 162, 107, 222, 73, 4, 88, 208>>
+    encryption_key = <<
+      54,
+      27,
+      13,
+      86,
+      75,
+      45,
+      117,
+      165,
+      34,
+      92,
+      136,
+      122,
+      124,
+      86,
+      90,
+      70,
+      239,
+      142,
+      234,
+      2,
+      191,
+      167,
+      208,
+      189,
+      44,
+      162,
+      107,
+      222,
+      73,
+      4,
+      88,
+      208
+    >>
+
     Application.put_env(:testapp, :encryption_key, encryption_key)
 
     assert encrypt("value", <<4>>) != "value"
