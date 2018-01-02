@@ -22,8 +22,8 @@ defmodule Cloak.Mixfile do
 
   defp deps do
     [
-      {:poison, ">= 1.5.0"},
       {:ecto, ">= 1.0.0"},
+      {:poison, ">= 1.5.0", optional: true},
       {:ex_doc, ">= 0.0.0", only: [:dev, :docs]},
       {:inch_ex, ">= 0.0.0", only: :docs}
     ]

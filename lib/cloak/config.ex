@@ -4,8 +4,13 @@ defmodule Cloak.Config do
   @spec all() :: Keyword.t()
   def all() do
     Enum.reject(Application.get_all_env(:cloak), fn {key, _} ->
-      key in [:migration, :included_applications]
+      key in [:migration, :included_applications, :json_library]
     end)
+  end
+
+  @spec json_library :: module
+  def json_library do
+    Application.get_env(:cloak, :json_library, Poison)
   end
 
   @spec cipher(String.t()) :: {module, Keyword.t()}
