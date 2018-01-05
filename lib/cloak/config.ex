@@ -42,8 +42,10 @@ defmodule Cloak.Config do
     case Code.ensure_loaded(module) do
       {:module, _} ->
         function_exported?(module, :__info__, 1) &&
-        Cloak.Cipher in Keyword.get(module.__info__(:attributes), :behaviour, [])
-      _ -> false
+          Cloak.Cipher in Keyword.get(module.__info__(:attributes), :behaviour, [])
+
+      _ ->
+        false
     end
   end
 end

@@ -3,9 +3,10 @@ defmodule Cloak.ConfigTest do
 
   describe "#all" do
     setup do
-      modules = Cloak.Config.all()
-      |> Enum.map(fn {key, _} -> key end)
-      |> MapSet.new()
+      modules =
+        Cloak.Config.all()
+        |> Enum.map(fn {key, _} -> key end)
+        |> MapSet.new()
 
       {:ok, modules: modules}
     end
