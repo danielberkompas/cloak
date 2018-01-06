@@ -1,30 +1,35 @@
 defmodule Cloak.Tags.Encoder do
-  @moduledoc """
-  An encoder that allows us to specify tags of arbitrary length.
+  # An encoder that allows us to specify tags of arbitrary length.
+  #
+  # This scheme follows a Type, Length, Value triplet and is based on DER
+  # encoding for certificates. https://en.wikipedia.org/wiki/X.690#DER_encoding
+  #
+  # If the value field (tag) is less than 128 bytes, the Length field only
+  # requires 1 byte.
+  #
+  # If the Value field contains more than 127 bytes, bit 7 of the Length field
+  # is one (1) and the remaining bits identify the number of bytes needed to
+  # contain the length.
+  #
+  # Examples are shown in the following illustration.
+  #
+  #     +---+---+---+---+---+---+---+---+----------------+
+  #     | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 52 value bytes |
+  #     +---+---+---+---+---+---+---+---+----------------+
+  #     <===   Length Bytes == 52  ====>
+  #
+  #
+  #     +---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---+------------------+
+  #     | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 || 0 | 0 | 0 | 1 | 0 | 0 | 1 | 1 || 0 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 4934 value bytes |
+  #     +---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---+------------------+
+  #     <===   Length Bytes == 2  ====>   <=====         Number of Value Bytes == 4934              =====>
+  #
+  # We reserve the first byte for potential use in the future, as it represents
+  # the tag in the TLV triplet.
 
-  This scheme follows a Type, Length, Value triplet and is based on DER encoding for certificates
-  https://en.wikipedia.org/wiki/X.690#DER_encoding
-
-  If the value field (tag) is less than 128 bytes, the Length field only requires 1 byte
-
-  If the Value field contains more than 127 bytes, bit 7 of the Length field is one (1)
-  and the remaining bits identify the number of bytes needed to contain the length.
-
-  Examples are shown in the following illustration.
-
-  +---+---+---+---+---+---+---+---+----------------+
-  | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 0 | 52 value bytes |
-  +---+---+---+---+---+---+---+---+----------------+
-  <===   Length Bytes == 52  ====>
-
-
-  +---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---+------------------+
-  | 1 | 0 | 0 | 0 | 0 | 0 | 1 | 0 || 0 | 0 | 0 | 1 | 0 | 0 | 1 | 1 || 0 | 1 | 0 | 0 | 0 | 1 | 1 | 0 | 4934 value bytes |
-  +---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---++---+---+---+---+---+---+---+---+------------------+
-  <===   Length Bytes == 2  ====>   <=====         Number of Value Bytes == 4934              =====>
-
-  We reserve the first byte for potential use in the future, as it represents the tag in the TLV triplet
-  """
+  # Exclude this module from public documentation as it should only be used
+  # internally by Cloak
+  @moduledoc false
 
   @reserved <<1>>
   @byte_length 256

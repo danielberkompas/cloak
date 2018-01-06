@@ -1,32 +1,35 @@
 defmodule Cloak.AES.GCM do
   @moduledoc """
-  A `Cloak.Cipher` which encrypts values with the AES cipher in GCM (block) mode
+  A `Cloak.Cipher` which encrypts values with the AES cipher in GCM (block) mode.
+  Internally relies on Erlang's `:crypto.block_encrypt/4`.
 
   ## Configuration
 
   In addition to the normal `:default` and `tag` configuration options, this
   cipher take a `:keys` option to support using multiple AES keys at the same time.
 
-    config :cloak, Cloak.AES.GCM,
-      default: true,
-      tag: "GCM",
-      keys: [
-        %{tag: <<1>>, key: Base.decode64!("..."), default: false},
-        %{tag: <<2>>, key: Base.decode64!("..."), default: true}
-      ]
+      config :cloak, Cloak.AES.GCM,
+        default: true,
+        tag: "GCM",
+        keys: [
+          %{tag: <<1>>, key: Base.decode64!("..."), default: false},
+          %{tag: <<2>>, key: Base.decode64!("..."), default: true}
+        ]
 
   If you want to store your key in the environment variable, you can use
-    `{:system, "VAR"}` syntax:
-        config :cloak, Cloak.AES.GCM,
-          default: true,
-          tag: "GCM",
-          keys: [
-            %{tag: <<1>>, key: {:system, "CLOAK_KEY_PRIMARY"}, default: true},
-            %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDARY"}, default: false}
-          ]
+  `{:system, "VAR"}` syntax:
+
+      config :cloak, Cloak.AES.GCM,
+        default: true,
+        tag: "GCM",
+        keys: [
+          %{tag: <<1>>, key: {:system, "CLOAK_KEY_PRIMARY"}, default: true},
+          %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDARY"}, default: false}
+        ]
 
   If you want to store your key in the OTP app environment, you can use
   `{:app_env, :otp_app, :env_key}` syntax:
+
       config :cloak, Cloak.AES.GCM,
         default: true,
         tag: "GCM",
@@ -79,20 +82,20 @@ defmodule Cloak.AES.GCM do
   Generates a random IV for every encryption, and prepends the key tag, IV, and Ciphertag to
   the beginning of the ciphertext. The format can be diagrammed like this:
 
-  +----------------------------------------------------------+----------------------+
-  |                          HEADER                          |         BODY         |
-  +-------------------+---------------+----------------------+----------------------+
-  | Key Tag (n bytes) | IV (16 bytes) | Ciphertag (16 bytes) | Ciphertext (n bytes) |
-  +-------------------+---------------+----------------------+----------------------+
+      +----------------------------------------------------------+----------------------+
+      |                          HEADER                          |         BODY         |
+      +-------------------+---------------+----------------------+----------------------+
+      | Key Tag (n bytes) | IV (16 bytes) | Ciphertag (16 bytes) | Ciphertext (n bytes) |
+      +-------------------+---------------+----------------------+----------------------+
 
   When this function is called through `Cloak.encrypt/1`, the module's `:tag`
   will be added, and the resulting binary will be in this format:
 
-  +---------------------------------------------------------------------------------+----------------------+
-  |                                       HEADER                                    |         BODY         |
-  +----------------------+-------------------+---------------+----------------------+----------------------+
-  | Module Tag (n bytes) | Key Tag (n bytes) | IV (16 bytes) | Ciphertag (16 bytes) | Ciphertext (n bytes) |
-  +----------------------+-------------------+---------------+----------------------+----------------------+
+      +---------------------------------------------------------------------------------+----------------------+
+      |                                       HEADER                                    |         BODY         |
+      +----------------------+-------------------+---------------+----------------------+----------------------+
+      | Module Tag (n bytes) | Key Tag (n bytes) | IV (16 bytes) | Ciphertag (16 bytes) | Ciphertext (n bytes) |
+      +----------------------+-------------------+---------------+----------------------+----------------------+
 
   The header information allows Cloak to know enough about each ciphertext to
   ensure a successful decryption. See `decrypt/1` for more details.
@@ -106,11 +109,12 @@ defmodule Cloak.AES.GCM do
   - `key_tag` - Optional. The tag of the key to use for encryption.
 
   ### Examples
-    iex> encrypt("The charge against me is a...") != "The charge against me is a..."
-    true
 
-    iex> encrypt("The charge against me is a...") != encrypt("The charge against me is a...")
-    true
+      iex> encrypt("The charge against me is a...") != "The charge against me is a..."
+      true
+
+      iex> encrypt("The charge against me is a...") != encrypt("The charge against me is a...")
+      true
 
   """
 
@@ -143,8 +147,8 @@ defmodule Cloak.AES.GCM do
 
   ### Examples
 
-    iex> encrypt("Hello") |> decrypt
-    "Hello"
+      iex> encrypt("Hello") |> decrypt
+      "Hello"
   """
 
   def decrypt(message) do

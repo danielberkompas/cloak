@@ -32,7 +32,15 @@ defmodule Cloak.Mixfile do
   defp docs do
     [
       readme: "README.md",
-      main: Cloak
+      main: Cloak,
+      groups_for_modules: [
+        Ciphers: [
+          Cloak.Cipher,
+          Cloak.AES.CTR,
+          Cloak.AES.GCM
+        ],
+        "Ecto Types": ~r/Field/
+      ]
     ]
   end
 

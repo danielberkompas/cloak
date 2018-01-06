@@ -64,12 +64,12 @@ defmodule Cloak.Cipher do
   Encrypt a value. Your function should include any information it will need for
   decryption with the output.
   """
-  @callback encrypt(any) :: String.t()
+  @callback encrypt(plaintext :: any) :: binary
 
   @doc """
   Decrypt a value.
   """
-  @callback decrypt(String.t()) :: String.t()
+  @callback decrypt(ciphertext :: binary) :: binary
 
   @doc """
   Must return a string representing the default settings of your module as it is
