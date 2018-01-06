@@ -1,5 +1,22 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.4.0...HEAD)
+
+**Closed issues:**
+
+- Migrations in multi tenant applications [\#43](https://github.com/danielberkompas/cloak/issues/43)
+- Proposal AES GCM cipher as default Cipher [\#33](https://github.com/danielberkompas/cloak/issues/33)
+
+**Merged pull requests:**
+
+- Add EncryptedTimeField [\#50](https://github.com/danielberkompas/cloak/pull/50) ([danielberkompas](https://github.com/danielberkompas))
+- Update the documentation sidebar [\#49](https://github.com/danielberkompas/cloak/pull/49) ([danielberkompas](https://github.com/danielberkompas))
+- Add DateTime field, better docs [\#48](https://github.com/danielberkompas/cloak/pull/48) ([danielberkompas](https://github.com/danielberkompas))
+- refactor\(Cloak.Config.all/0\): Find ciphers by checking if the module … [\#47](https://github.com/danielberkompas/cloak/pull/47) ([tomciopp](https://github.com/tomciopp))
+- feat\(Date Types\): add EncryptedDateField, and EncryptedNaiveDatetimeF… [\#46](https://github.com/danielberkompas/cloak/pull/46) ([tomciopp](https://github.com/tomciopp))
+
 ## [v0.4.0](https://github.com/danielberkompas/cloak/tree/v0.4.0) (2018-01-02)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.3...v0.4.0)
 
