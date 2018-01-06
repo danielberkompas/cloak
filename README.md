@@ -18,6 +18,16 @@ Cloak makes it easy to use encryption with Ecto.
     - Multiple keys in memory at once
     - Migration task to proactively migrate rows to a new key
 
+## Installation
+
+Add `cloak` to your hex dependencies:
+
+```elixir
+defp deps do
+  [{:cloak, "~> 0.5.0"}]
+end
+```
+
 ## Example
 
 ```elixir
@@ -65,16 +75,6 @@ end
 # Query
 MyApp.Repo.one(MyApp.Schema)
 # => %MyApp.Schema{secret_key: "Decrypted value", encryption_version: <<"AES", 1>>}
-```
-
-## Installation
-
-Add `cloak` to your hex dependencies:
-
-```elixir
-defp deps do
-  [{:cloak, "~> 0.4.0"}]
-end
 ```
 
 ## Documentation
