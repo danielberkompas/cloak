@@ -1,15 +1,15 @@
 defmodule Cloak.EncryptedDateField do
   @moduledoc """
-  An `Ecto.Type` to encrypt date fields
+  An `Ecto.Type` to encrypt `Date` fields.
 
   ## Usage
 
   You should create the field with the type `:binary`.
-  Values will be converted back to dates on decryption
+  Values will be converted back to `Date`s on decryption.
 
-    schema "table" do
-      field :field_name, Cloak.EncryptedDateField
-    end
+      schema "table" do
+        field :field_name, Cloak.EncryptedDateField
+      end
   """
 
   use Cloak.EncryptedField
