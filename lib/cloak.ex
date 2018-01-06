@@ -3,10 +3,10 @@ defmodule Cloak do
   Cloak makes it easy to encrypt and decrypt database fields using
   [Ecto](http://hexdocs.pm/ecto).
 
-  This `Cloak` module is Cloak's main entry point. It wraps the encryption and
-  decryption process, ensuring that everything works smoothly without downtime
-  even when there are multiple encryption ciphers and keys in play at the same
-  time.
+  This `Cloak` module is Cloak's main entry point. It wraps the encryption
+  and decryption process, ensuring that everything works smoothly without
+  downtime, even when there are multiple encryption ciphers and keys in play
+  at the same time.
 
   ## Configuration
 
@@ -59,6 +59,7 @@ defmodule Cloak do
 
   ## Provided Ciphers
 
+  - `Cloak.AES.GCM` (recommended) - AES encryption in Galois Counter Mode (GCM).
   - `Cloak.AES.CTR` - AES encryption in CTR stream mode.
 
   If you don't see what you need here, you can use your own cipher module,

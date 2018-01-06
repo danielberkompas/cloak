@@ -1,7 +1,5 @@
 defmodule Cloak.Ciphers.Util do
-  @moduledoc """
-  Centralized utility module for cipher config related operations.
-  """
+  @moduledoc false
 
   @spec config(module) :: Keyword.t()
   def config(cipher_module) do

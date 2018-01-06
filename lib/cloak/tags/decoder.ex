@@ -1,13 +1,16 @@
 defmodule Cloak.Tags.Decoder do
-  @moduledoc """
-  A decoder that will let us read tags specified in the Format specified by the `Cloak.Tags.Encoder`
+  # A decoder that will let us read tags specified in the Format specified by
+  # the `Cloak.Tags.Encoder`
+  #
+  # This scheme follows a Type, Length, Value triplet and is based on DER
+  # encoding for certificates https://en.wikipedia.org/wiki/X.690#DER_encoding
+  #
+  # It returns a map containing the key_tag and the remainder of the binary
+  # which we can use to decode the ciphertext.
 
-  This scheme follows a Type, Length, Value triplet and is based on DER encoding for certificates
-  https://en.wikipedia.org/wiki/X.690#DER_encoding
-
-  It returns a map containing the key_tag and the remainder of the binary which we can use
-  to decode the ciphertext.
-  """
+  # Exclude this module from public documentation as it should only be used
+  # internally by Cloak
+  @moduledoc false
 
   @offset 2
   @byte_length 256
