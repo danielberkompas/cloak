@@ -3,8 +3,8 @@ defmodule Cloak.Config do
 
   @spec all() :: Keyword.t()
   def all() do
-    Enum.reject(Application.get_all_env(:cloak), fn {key, _} ->
-      key in [:migration, :included_applications, :json_library]
+    Enum.filter(Application.get_all_env(:cloak), fn {key, _} ->
+      cipher?(key)
     end)
   end
 
@@ -36,5 +36,14 @@ defmodule Cloak.Config do
     end
 
     cipher
+  end
+
+  defp cipher?(module) do
+    case Code.ensure_loaded(module) do
+      {:module, _} ->
+        function_exported?(module, :__info__, 1) &&
+        Cloak.Cipher in Keyword.get(module.__info__(:attributes), :behaviour, [])
+      _ -> false
+    end
   end
 end

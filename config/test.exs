@@ -35,3 +35,5 @@ config :cloak, Cloak.AES.GCM,
     %{tag: <<3>>, key: {:system, "CLOAK_THIRD_KEY"}, default: false},
     %{tag: <<4>>, key: {:app_env, :testapp, :encryption_key}, default: false}
   ]
+
+config :cloak, json_library: Poison
