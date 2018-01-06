@@ -8,6 +8,8 @@ Cloak
 
 Cloak makes it easy to use encryption with Ecto.
 
+[Read the docs](https://hexdocs.pm/cloak)
+
 ## Features
 
 - Transparent encryption/decryption of fields
