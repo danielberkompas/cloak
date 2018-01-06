@@ -81,6 +81,7 @@ defmodule Cloak do
   | `Integer`       | `:integer`            | `Cloak.EncryptedIntegerField`       |
   | `Map`           | `:map`                | `Cloak.EncryptedMapField`           |
   | `NaiveDateTime` | `:naive_datetime`     | `Cloak.EncryptedNaiveDateTimeField` |
+  | `Time`          | `:time`               | `Cloak.EncryptedTimeField`          |
 
   You can also use the following `Ecto.Type` modules in order to hash fields:
 
