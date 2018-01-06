@@ -71,11 +71,21 @@ defmodule Cloak do
   Once Cloak is configured with a Cipher module, you can use it seamlessly with
   [Ecto](http://hex.pm/ecto) with these `Ecto.Type` modules:
 
-  - `Cloak.EncryptedBinaryField`
-  - `Cloak.EncryptedFloatField`
-  - `Cloak.EncryptedIntegerField`
-  - `Cloak.EncryptedMapField`
-  - `Cloak.SHA256Field`
+  | Type            | Ecto Type             | Field                               |
+  | --------------- | --------------------- | ----------------------------------- |
+  | `String`        | `:string` / `:binary` | `Cloak.EncryptedBinaryField`        |
+  | `Date`          | `:date`               | `Cloak.EncryptedDateField`          |
+  | `DateTime`      | `:utc_datetime`       | `Cloak.EncryptedDateTimeField`      |
+  | `Float`         | `:float`              | `Cloak.EncryptedFloatField`         |
+  | `Integer`       | `:integer`            | `Cloak.EncryptedIntegerField`       |
+  | `Map`           | `:map`                | `Cloak.EncryptedMapField`           |
+  | `NaiveDateTime` | `:naive_datetime`     | `Cloak.EncryptedNaiveDateTimeField` |
+
+  You can also use the following `Ecto.Type` modules in order to hash fields:
+
+  | Type      | Ecto Type              | Field               | 
+  | --------- | ---------------------- | ------------------- |
+  | `String`  | `:string` / `:binary`  | `Cloak.SHA265Field` |
 
   For example, to encrypt a binary field, change your schema from this:
 

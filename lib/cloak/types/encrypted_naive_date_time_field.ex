@@ -1,15 +1,15 @@
 defmodule Cloak.EncryptedNaiveDateTimeField do
   @moduledoc """
-  An `Ecto.Type` to encrypt naive datetime fields
+  An `Ecto.Type` to encrypt `NaiveDateTime` fields.
 
   ## Usage
 
   You should create the field with the type `:binary`.
-  Values will be converted back to a datetime on decryption
+  Values will be converted back to a `NaiveDateTime` on decryption.
 
-    schema "table" do
-      field :field_name, Cloak.EncryptedNaiveDaTetimeField
-    end
+      schema "table" do
+        field :field_name, Cloak.EncryptedNaiveDateTimeField
+      end
   """
 
   use Cloak.EncryptedField
