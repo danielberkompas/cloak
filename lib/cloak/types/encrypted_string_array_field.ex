@@ -11,7 +11,7 @@ defmodule Cloak.EncryptedStringArrayField do
   will first be converted to JSON using the configured `:json_library`, and
   then encrypted. On decryption, the `:json_library` will be used to convert
   it back to a list of strings.
-  
+
   This means that on decryption, atom members of the list will become strings.
       ["hello", :world]
   Will become:
