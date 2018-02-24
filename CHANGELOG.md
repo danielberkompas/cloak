@@ -1,5 +1,14 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.5.0...HEAD)
+
+**Merged pull requests:**
+
+- Add support for encrypted Ecto String and Integer Array types [\#53](https://github.com/danielberkompas/cloak/pull/53) ([boydm](https://github.com/boydm))
+- perf\(Cloak.Config.all/0\): remove calls to ensure\_loaded when checking… [\#51](https://github.com/danielberkompas/cloak/pull/51) ([tomciopp](https://github.com/tomciopp))
+
 ## [v0.5.0](https://github.com/danielberkompas/cloak/tree/v0.5.0) (2018-01-06)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.4.0...v0.5.0)
 
