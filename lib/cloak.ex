@@ -82,6 +82,8 @@ defmodule Cloak do
   | `Map`           | `:map`                | `Cloak.EncryptedMapField`           |
   | `NaiveDateTime` | `:naive_datetime`     | `Cloak.EncryptedNaiveDateTimeField` |
   | `Time`          | `:time`               | `Cloak.EncryptedTimeField`          |
+  | `List(Integer)` | `{:array, :integer}`  | `Cloak.EncryptedIntegerListField`   |
+  | `List(String)`  | `{:array, :string}`   | `Cloak.EncryptedStringListField`    |
 
   You can also use the following `Ecto.Type` modules in order to hash fields:
 
