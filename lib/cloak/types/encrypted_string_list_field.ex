@@ -1,25 +1,31 @@
-defmodule Cloak.EncryptedIntegerArrayField do
+defmodule Cloak.EncryptedStringListField do
   @moduledoc """
-  An `Ecto.Type` to encrypt an array (list) of integers.
+  An `Ecto.Type` to encrypt a list of strings.
 
   ## Configuration
-  You can customize the json library used for for converting maps.
+
+  You can customize the json library used for for converting lists.
   Default: `Poison`
+
       config :cloak, json_library: Jason
+
   ## Usage
+
   You should create the field with type `:binary`. On encryption, the list
   will first be converted to JSON using the configured `:json_library`, and
   then encrypted. On decryption, the `:json_library` will be used to convert
-  it back to a list of integer.
-        
+  it back to a list of strings.
+
   You can use this field type in your `schema` definition like this:
+
       schema "table" do
-        field :field_name, Cloak.EncryptedIntegerArrayField
+        field :field_name, Cloak.EncryptedStringArrayField
       end
 
   Use it where you would have normally done this:
+
       schema "table" do
-        field :field_name, {:array, :integer}
+        field :field_name, {:array, :string}
       end
   """
 
@@ -28,7 +34,7 @@ defmodule Cloak.EncryptedIntegerArrayField do
   alias Cloak.Config
 
   def cast(value) do
-    Ecto.Type.cast({:array, :integer}, value)
+    Ecto.Type.cast({:array, :string}, value)
   end
 
   def before_encrypt(value) do

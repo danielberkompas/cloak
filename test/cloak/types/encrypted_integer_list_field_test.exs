@@ -1,6 +1,6 @@
-defmodule Cloak.EncryptedIntegerArrayFieldTest do
+defmodule Cloak.EncryptedIntegerListFieldTest do
   use ExUnit.Case
-  alias Cloak.EncryptedIntegerArrayField, as: Field
+  alias Cloak.EncryptedIntegerListField, as: Field
 
   @list [1, 2, 3, 4, 5]
 
