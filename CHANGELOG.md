@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.0...HEAD)
+
+**Merged pull requests:**
+
+- bugfix\(cipher?\): Rescue from UndefinedFunctionError instead of using … [\#54](https://github.com/danielberkompas/cloak/pull/54) ([tomciopp](https://github.com/tomciopp))
+
 ## [v0.6.0](https://github.com/danielberkompas/cloak/tree/v0.6.0) (2018-02-24)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.5.0...v0.6.0)
 
