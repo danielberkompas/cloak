@@ -39,7 +39,14 @@ defmodule Cloak.Config do
   end
 
   defp cipher?(module) do
-    function_exported?(module, :__info__, 1) &&
-      Cloak.Cipher in Keyword.get(module.__info__(:attributes), :behaviour, [])
+    Cloak.Cipher in Keyword.get(attributes_for(module), :behaviour, [])
+  end
+
+  defp attributes_for(module) do
+    try do
+      module.__info__(:attributes)
+    rescue
+      UndefinedFunctionError -> []
+    end
   end
 end
