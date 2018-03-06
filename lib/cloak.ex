@@ -87,9 +87,9 @@ defmodule Cloak do
 
   You can also use the following `Ecto.Type` modules in order to hash fields:
 
-  | Type      | Ecto Type              | Field               | 
+  | Type      | Ecto Type              | Field               |
   | --------- | ---------------------- | ------------------- |
-  | `String`  | `:string` / `:binary`  | `Cloak.SHA265Field` |
+  | `String`  | `:string` / `:binary`  | `Cloak.SHA256Field` |
 
   For example, to encrypt a binary field, change your schema from this:
 
