@@ -28,7 +28,7 @@ defmodule Cloak do
         # ...
 
       config :cloak, CipherTwo,
-        default: true,
+        default: false,
         tag: "two",
         # ...
 
