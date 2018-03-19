@@ -1,5 +1,20 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.1...HEAD)
+
+**Closed issues:**
+
+- Is poison optional? [\#59](https://github.com/danielberkompas/cloak/issues/59)
+- Clarification on usage of 'default' in documents [\#58](https://github.com/danielberkompas/cloak/issues/58)
+- Argument error [\#57](https://github.com/danielberkompas/cloak/issues/57)
+- Use with mnesia? [\#55](https://github.com/danielberkompas/cloak/issues/55)
+
+**Merged pull requests:**
+
+- \[Documentation\] Fix small typo: SHA265 -\> SHA256 [\#56](https://github.com/danielberkompas/cloak/pull/56) ([connorlay](https://github.com/connorlay))
+
 ## [v0.6.1](https://github.com/danielberkompas/cloak/tree/v0.6.1) (2018-02-25)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.0...v0.6.1)
 
