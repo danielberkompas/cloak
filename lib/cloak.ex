@@ -14,5 +14,20 @@ defmodule Cloak do
 
   - `Mix.Tasks.Cloak.Migrate` - a task that will great simplify the process
     when you need to rotate your keys.
+
+  ## Guides
+  In addition to the API reference and module documentation, Cloak provides
+  the following guides:
+
+  ### How To
+
+  - [Install Cloak](install.html)
+  - [Encrypt Existing Data](encrypt_existing_data.html)
+  - [Rotate Keys](rotate_keys.html)
+
+  ### Upgrading
+
+  - [From **0.6.x** to **0.7.x**](0.6.x_to_0.7.x.html)
+
   """
 end

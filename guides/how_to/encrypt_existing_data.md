@@ -7,12 +7,13 @@ process, step by step.
 ## Create a Vault
 
 Make sure you've set up (and configured!) a vault as described in the
-`Cloak.Vault` documentation.
+`Cloak.Vault` documentation and [How to Install Cloak](install.html).
 
 ## Create Local Ecto Types
 
 Create local Ecto types for each kind of field you want to encrypt, as
-described in the `Cloak.Vault` documentation.
+described in the `Cloak.Vault` documentation and [How to Install
+Cloak](install.html).
 
 ## Add `encrypted_*` Fields
 
