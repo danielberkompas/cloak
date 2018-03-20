@@ -52,7 +52,7 @@ defmodule Cloak.Cipher.Deprecated.AES.CTR do
 
   @impl Cloak.Cipher
   def version(opts) do
-    opts[:module_tag] <> opts[:tag]
+    Keyword.fetch!(opts, :tag)
   end
 
   defp tag(opts) do

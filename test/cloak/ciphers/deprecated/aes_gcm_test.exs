@@ -1,12 +1,14 @@
-defmodule Cloak.Cipher.Deprecated.AES.CTRTest do
+defmodule Cloak.Cipher.Deprecated.AES.GCMTest do
   use ExUnit.Case
 
-  alias Cloak.Cipher.Deprecated.AES.CTR, as: Cipher
+  alias Cloak.Cipher.Deprecated.AES.GCM, as: Cipher
+  alias Cloak.Tags.Encoder
 
-  @opts [module_tag: "AES.CTR", tag: "V1", key: :crypto.strong_rand_bytes(32)]
+  @aad "AES256GCM"
+  @opts [module_tag: "AES.GCM", tag: "V1", key: :crypto.strong_rand_bytes(32)]
 
   describe ".encrypt/2" do
-    test "raises error, preventing use" do
+    test "raises error" do
       assert_raise RuntimeError, fn ->
         Cipher.encrypt("plaintext", @opts)
       end
@@ -59,12 +61,15 @@ defmodule Cloak.Cipher.Deprecated.AES.CTRTest do
     end
   end
 
-  # Replicates the old format for AES.CTR, where the module tag
-  # and key tag were prepended to the iv and ciphertext.
   defp create_ciphertext(_) do
     iv = :crypto.strong_rand_bytes(16)
-    state = :crypto.stream_init(:aes_ctr, @opts[:key], iv)
-    {_state, ciphertext} = :crypto.stream_encrypt(state, "plaintext")
-    [ciphertext: @opts[:module_tag] <> @opts[:tag] <> iv <> ciphertext]
+
+    {ciphertext, ciphertag} =
+      :crypto.block_encrypt(:aes_gcm, @opts[:key], iv, {@aad, "plaintext"})
+
+    [
+      ciphertext:
+        @opts[:module_tag] <> Encoder.encode(@opts[:tag]) <> iv <> ciphertag <> ciphertext
+    ]
   end
 end
