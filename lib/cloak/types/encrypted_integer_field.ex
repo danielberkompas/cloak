@@ -1,22 +1,26 @@
 defmodule Cloak.EncryptedIntegerField do
   @moduledoc """
-  An `Ecto.Type` to encrypt integer fields. 
+  An `Ecto.Type` to encrypt integer fields.
 
   ## Usage
 
-  You should create the field with type `:binary`. Values will be converted 
-  back to integers on decryption.
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedIntegerField
+      defmodule MyApp.EncryptedIntegerField do
+        use Cloak.EncryptedIntegerField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  @doc false
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  def cast(value) do
-    Ecto.Type.cast(:integer, value)
+    quote do
+      use Cloak.EncryptedField, unquote(opts)
+
+      def cast(value) do
+        Ecto.Type.cast(:integer, value)
+      end
+
+      def after_decrypt(value), do: String.to_integer(value)
+    end
   end
-
-  def after_decrypt(value), do: String.to_integer(value)
 end

@@ -1,74 +1,12 @@
-defmodule Cloak.AES.CTR do
+defmodule Cloak.Cipher.AES.CTR do
   @moduledoc """
   A `Cloak.Cipher` which encrypts values with the AES cipher in CTR (stream) mode.
   Internally relies on Erlang's `:crypto.stream_encrypt/2`.
-
-  ## Configuration
-
-  In addition to the normal `:default` and `:tag` configuration options, this
-  cipher takes a `:keys` option to support using multiple AES keys at the same
-  time.
-
-      config :cloak, Cloak.AES.CTR,
-        default: true,
-        tag: "AES",
-        keys: [
-          %{tag: <<1>>, key: Base.decode64!("..."), default: true},
-          %{tag: <<2>>, key: Base.decode64!("..."), default: false}
-        ]
-
-  If you want to store your key in the environment variable, you can use
-  `{:system, "VAR"}` syntax:
-
-      config :cloak, Cloak.AES.CTR,
-        default: true,
-        tag: "AES",
-        keys: [
-          %{tag: <<1>>, key: {:system, "CLOAK_KEY_PRIMARY"}, default: true},
-          %{tag: <<2>>, key: {:system, "CLOAK_KEY_SECONDARY"}, default: false}
-        ]
-  If you want to store your key in the OTP app environment, you can use
-  `{:app_env, :otp_app, :env_key}` syntax:
-
-      config :cloak, Cloak.AES.CTR,
-        default: true,
-        tag: "AES",
-        keys: [
-          %{tag: <<1>>, key: {:app_env, :my_app, :env_primary_key}, default: true},
-          %{tag: <<2>>, key: {:app_env, :my_app, :env_secondary_key}, default: false}
-        ]
-
-  ### Key Configuration Options
-
-  A key may have the following attributes:
-
-  - `:tag` - The ID of the key. This is included in the ciphertext, and should be
-    only a single byte. See `encrypt/2` for more details.
-
-  - `:key` - The AES key to use, in binary. If you store your keys in Base64
-    format you will need to decode them first. The key must be 128, 192, or 256 bits
-    long (16, 24 or 32 bytes, respectively).
-
-  - `:default` - Boolean. Whether to use this key by default or not.
-
-  ## Upgrading to a New Key
-
-  To upgrade to a new key, simply add the key to the `:keys` array, and set it
-  as `default: true`.
-
-      keys: [
-        %{tag: <<1>>, key: "old key", default: false},
-        %{tag: <<2>>, key: "new key", default: true}
-      ]
-
-  After this, your new key will automatically be used for all new encyption,
-  while the old key will be used to decrypt legacy values.
-
-  To migrate everything proactively to the new key, see the `mix cloak.migrate`
-  mix task defined in `Mix.Tasks.Cloak.Migrate`.
   """
 
   @behaviour Cloak.Cipher
+
+  alias Cloak.Tags.{Encoder, Decoder}
 
   @doc """
   Callback implementation for `Cloak.Cipher.encrypt`. Encrypts a value using
@@ -82,42 +20,24 @@ defmodule Cloak.AES.CTR do
       +------------------+---------------+----------------------+
       | Key Tag (1 byte) | IV (16 bytes) | Ciphertext (n bytes) |
       +------------------+---------------+----------------------+
+      |                  |__________________________________
+      |                                                     |
+      +---------------+-----------------+-------------------+
+      | Type (1 byte) | Length (1 byte) | Key Tag (n bytes) |
+      +---------------+-----------------+-------------------+
 
-  When this function is called through `Cloak.encrypt/1`, the module's `:tag`
-  will be added, and the resulting binary will be in this format:
-
-      +---------------------------------------------------------+----------------------+
-      |                         HEADER                          |         BODY         |
-      +----------------------+------------------+---------------+----------------------+
-      | Module Tag (n bytes) | Key Tag (1 byte) | IV (16 bytes) | Ciphertext (n bytes) |
-      +----------------------+------------------+---------------+----------------------+
-
-  The header information allows Cloak to know enough about each ciphertext to
-  ensure a successful decryption. See `decrypt/1` for more details.
-
-  **Important**: Because a random IV is used for every encryption, `encrypt/2`
-  will not produce the same ciphertext twice for the same value.
-
-  ### Parameters
-
-  - `plaintext` - Any type of value to encrypt.
-  - `key_tag` - Optional. The tag of the key to use for encryption.
-
-  ### Example
-
-      iex> encrypt("Hello") != "Hello"
-      true
-
-      iex> encrypt("Hello") != encrypt("Hello")
-      true
+  The `Key Tag` component of the header breaks down into a `Type`, `Length`,
+  and `Value` triplet for easy decoding.
   """
-  def encrypt(plaintext, key_tag \\ nil) do
+  def encrypt(plaintext, opts) when is_binary(plaintext) do
+    key = Keyword.fetch!(opts, :key)
+    tag = Keyword.fetch!(opts, :tag)
+
     iv = :crypto.strong_rand_bytes(16)
-    key = Cloak.Ciphers.Util.config(__MODULE__, key_tag) || default_key()
-    state = :crypto.stream_init(:aes_ctr, Cloak.Ciphers.Util.key_value(key), iv)
+    state = :crypto.stream_init(:aes_ctr, key, iv)
 
     {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
-    key.tag <> iv <> ciphertext
+    {:ok, Encoder.encode(tag) <> iv <> ciphertext}
   end
 
   @doc """
@@ -136,23 +56,39 @@ defmodule Cloak.AES.CTR do
       iex> encrypt("Hello") |> decrypt
       "Hello"
   """
-  def decrypt(<<key_tag::binary-1, iv::binary-16, ciphertext::binary>> = _ciphertext) do
-    key = Cloak.Ciphers.Util.config(__MODULE__, key_tag)
-    state = :crypto.stream_init(:aes_ctr, Cloak.Ciphers.Util.key_value(key), iv)
+  def decrypt(ciphertext, opts) when is_binary(ciphertext) do
+    if can_decrypt?(ciphertext, opts) do
+      key = Keyword.fetch!(opts, :key)
+      %{remainder: <<iv::binary-16, ciphertext::binary>>} = Decoder.decode(ciphertext)
+      state = :crypto.stream_init(:aes_ctr, key, iv)
+      {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
+      {:ok, plaintext}
+    else
+      :error
+    end
+  end
 
-    {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
-    plaintext
+  @doc """
+  Callback implementation for `Cloak.Cipher.can_decrypt?2`. Determines if
+  a ciphertext can be decrypted with this cipher.
+  """
+  def can_decrypt?(ciphertext, opts) when is_binary(ciphertext) do
+    tag = Keyword.fetch!(opts, :tag)
+
+    case Decoder.decode(ciphertext) do
+      %{tag: ^tag, remainder: <<_iv::binary-16, _ciphertext::binary>>} ->
+        true
+
+      _other ->
+        false
+    end
   end
 
   @doc """
   Callback implementation for `Cloak.Cipher.version/0`. Returns the tag of the
   current default key.
   """
-  def version do
-    default_key().tag
-  end
-
-  defp default_key do
-    Cloak.Ciphers.Util.default_key(__MODULE__)
+  def version(opts) do
+    Keyword.fetch!(opts, :tag)
   end
 end

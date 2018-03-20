@@ -1,6 +1,9 @@
 defmodule Cloak.EncryptedFloatFieldTest do
   use ExUnit.Case
-  alias Cloak.EncryptedFloatField, as: Field
+
+  defmodule Field do
+    use Cloak.EncryptedFloatField, vault: Cloak.TestVault
+  end
 
   test ".type is :binary" do
     assert Field.type() == :binary

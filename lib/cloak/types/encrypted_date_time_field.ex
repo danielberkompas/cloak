@@ -4,29 +4,32 @@ defmodule Cloak.EncryptedDateTimeField do
 
   ## Usage
 
-  You should create the field with the type `:binary`.
-  Values will be converted back to a `DateTime` on decryption.
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedDateTimeField
+      defmodule MyApp.EncryptedDateTimeField do
+        use Cloak.EncryptedDateTimeField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  def cast(value), do: Ecto.Type.cast(:utc_datetime, value)
+    quote do
+      use Cloak.EncryptedField, unquote(opts)
 
-  def before_encrypt(value) do
-    case Ecto.Type.cast(:utc_datetime, value) do
-      {:ok, dt} -> to_string(dt)
-      _error -> :error
-    end
-  end
+      def cast(value), do: Ecto.Type.cast(:utc_datetime, value)
 
-  def after_decrypt(value) do
-    case DateTime.from_iso8601(value) do
-      {:ok, dt, _offset} -> dt
-      _error -> :error
+      def before_encrypt(value) do
+        case Ecto.Type.cast(:utc_datetime, value) do
+          {:ok, dt} -> to_string(dt)
+          _error -> :error
+        end
+      end
+
+      def after_decrypt(value) do
+        case DateTime.from_iso8601(value) do
+          {:ok, dt, _offset} -> dt
+          _error -> :error
+        end
+      end
     end
   end
 end

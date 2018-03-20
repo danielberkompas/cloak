@@ -4,12 +4,16 @@ defmodule Cloak.EncryptedMapField do
 
   ## Configuration
 
-  You can customize the json library used for for converting maps.
-  Default: `Poison`
+  You can customize the json library used for for converting the lists.
 
-      config :cloak, json_library: Jason
+      config :my_app, MyApp.Vault,
+        json_library: Jason
 
   ## Usage
+
+      defmodule MyApp.EncryptedMapField do
+        use Cloak.EncryptedMapField, vault: MyApp.Vault
+      end
 
   You should create the field with type `:binary`. On encryption, the map
   will first be converted to JSON using the configured `:json_library`, and
@@ -23,27 +27,27 @@ defmodule Cloak.EncryptedMapField do
   Will become:
 
       %{"hello" => "world"}
-
-  You can use this field type in your `schema` definition like this:
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedMapField
-      end
   """
 
-  use Cloak.EncryptedField
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  alias Cloak.Config
+    quote location: :keep do
+      use Cloak.EncryptedField, unquote(opts)
 
-  def cast(value) do
-    Ecto.Type.cast(:map, value)
-  end
+      alias Cloak.Config
 
-  def before_encrypt(value) do
-    Config.json_library().encode!(value)
-  end
+      def cast(value) do
+        Ecto.Type.cast(:map, value)
+      end
 
-  def after_decrypt(json) do
-    Config.json_library().decode!(json)
+      def before_encrypt(value) do
+        Config.json_library().encode!(value)
+      end
+
+      def after_decrypt(json) do
+        Config.json_library().decode!(json)
+      end
+    end
   end
 end

@@ -1,6 +1,9 @@
 defmodule Cloak.EncryptedStringListFieldTest do
   use ExUnit.Case
-  alias Cloak.EncryptedStringListField, as: Field
+
+  defmodule Field do
+    use Cloak.EncryptedStringListField, vault: Cloak.TestVault
+  end
 
   @list ["A", "list", "of", "strings"]
 

@@ -5,7 +5,7 @@ defmodule Cloak.Tags.Decoder do
   # This scheme follows a Type, Length, Value triplet and is based on DER
   # encoding for certificates https://en.wikipedia.org/wiki/X.690#DER_encoding
   #
-  # It returns a map containing the key_tag and the remainder of the binary
+  # It returns a map containing the tag and the remainder of the binary
   # which we can use to decode the ciphertext.
 
   # Exclude this module from public documentation as it should only be used
@@ -18,9 +18,14 @@ defmodule Cloak.Tags.Decoder do
 
   def decode(message) do
     length = tag_length(message)
-    <<tlv::binary-size(length), remainder::binary>> = message
 
-    %{key_tag: key_tag(tlv), remainder: remainder}
+    case message do
+      <<tlv::binary-size(length), remainder::binary>> ->
+        %{tag: tag(tlv), remainder: remainder}
+
+      _other ->
+        :error
+    end
   end
 
   defp tag_length(message) do
@@ -35,15 +40,15 @@ defmodule Cloak.Tags.Decoder do
 
   defp tag_length(num, _list), do: @offset + num
 
-  defp key_tag(<<_type::size(8), len::size(8), rest::binary>>) when len >= @half_byte do
+  defp tag(<<_type::size(8), len::size(8), rest::binary>>) when len >= @half_byte do
     size = len - @half_byte
-    <<_value_bytes::binary-size(size), key_tag::binary>> = rest
+    <<_value_bytes::binary-size(size), tag::binary>> = rest
 
-    key_tag
+    tag
   end
 
-  defp key_tag(<<_type::size(8), _len::size(8), key_tag::binary>>) do
-    key_tag
+  defp tag(<<_type::size(8), _len::size(8), tag::binary>>) do
+    tag
   end
 
   defp value_bytes(list, num_bytes) do

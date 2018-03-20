@@ -4,7 +4,7 @@ defmodule Cloak.Mixfile do
   def project do
     [
       app: :cloak,
-      version: "0.6.2",
+      version: "0.7.0",
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -12,7 +12,8 @@ defmodule Cloak.Mixfile do
       description: "Encrypted fields for Ecto.",
       package: package(),
       deps: deps(),
-      docs: docs()
+      docs: docs(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -36,8 +37,8 @@ defmodule Cloak.Mixfile do
       groups_for_modules: [
         Ciphers: [
           Cloak.Cipher,
-          Cloak.AES.CTR,
-          Cloak.AES.GCM
+          Cloak.Cipher.AES.CTR,
+          Cloak.Cipher.AES.GCM
         ],
         "Ecto Types": ~r/Field/
       ]
@@ -54,4 +55,7 @@ defmodule Cloak.Mixfile do
       }
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

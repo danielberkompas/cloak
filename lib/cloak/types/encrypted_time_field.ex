@@ -4,29 +4,32 @@ defmodule Cloak.EncryptedTimeField do
 
   ## Usage
 
-  You should create the field with the type `:binary`.
-  Values will be converted back to a `Time` on decryption.
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedTimeField
+      defmodule MyApp.EncryptedTimeField do
+        use Cloak.EncryptedTimeField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  def cast(value), do: Ecto.Type.cast(:time, value)
+    quote location: :keep do
+      use Cloak.EncryptedField, unquote(opts)
 
-  def before_encrypt(value) do
-    case Ecto.Type.cast(:time, value) do
-      {:ok, time} -> to_string(time)
-      _error -> :error
-    end
-  end
+      def cast(value), do: Ecto.Type.cast(:time, value)
 
-  def after_decrypt(value) do
-    case Time.from_iso8601(value) do
-      {:ok, time} -> time
-      _error -> :error
+      def before_encrypt(value) do
+        case Ecto.Type.cast(:time, value) do
+          {:ok, time} -> to_string(time)
+          _error -> :error
+        end
+      end
+
+      def after_decrypt(value) do
+        case Time.from_iso8601(value) do
+          {:ok, time} -> time
+          _error -> :error
+        end
+      end
     end
   end
 end
