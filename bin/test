@@ -4,6 +4,6 @@
 #
 # This script contains all the test commands for this app, which will be run
 # on the continuous integration server.
+MIX_ENV=test mix format --check-formatted || { echo 'Code was not formatted!'; exit 1; }
 MIX_ENV=test mix compile --force --warnings-as-errors || { echo 'Please fix all compiler warnings.'; exit 1; }
 MIX_ENV=test mix test || { echo 'Tests failed!'; exit 1; }
-MIX_ENV=test mix format --check-formatted || { echo 'Code was not formatted!'; exit 1; }

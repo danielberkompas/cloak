@@ -4,10 +4,17 @@ defmodule Cloak.EncryptedBinaryField do
 
   ## Usage
 
-      schema "table" do
-        field :field_name, Cloak.EncryptedBinaryField
+      defmodule MyApp.EncryptedBinaryField do
+        use Cloak.EncryptedBinaryField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  @doc false
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
+
+    quote location: :keep do
+      use Cloak.EncryptedField, unquote(opts)
+    end
+  end
 end

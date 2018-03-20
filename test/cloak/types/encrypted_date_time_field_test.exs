@@ -1,6 +1,9 @@
 defmodule Cloak.EncryptedDateTimeFieldTest do
   use ExUnit.Case, async: true
-  alias Cloak.EncryptedDateTimeField, as: Field
+
+  defmodule Field do
+    use Cloak.EncryptedDateTimeField, vault: Cloak.TestVault
+  end
 
   setup_all do
     atom_map = %{year: 2017, month: 1, day: 5, hour: 12, minute: 0, second: 0}

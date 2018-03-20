@@ -4,29 +4,32 @@ defmodule Cloak.EncryptedNaiveDateTimeField do
 
   ## Usage
 
-  You should create the field with the type `:binary`.
-  Values will be converted back to a `NaiveDateTime` on decryption.
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedNaiveDateTimeField
+      defmodule MyApp.EncryptedNaiveDateTimeField do
+        use Cloak.EncryptedNaiveDateTimeField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  def cast(value), do: Ecto.Type.cast(:naive_datetime, value)
+    quote location: :keep do
+      use Cloak.EncryptedField, unquote(opts)
 
-  def before_encrypt(value) do
-    case Ecto.Type.cast(:naive_datetime, value) do
-      {:ok, dt} -> to_string(dt)
-      _error -> :error
-    end
-  end
+      def cast(value), do: Ecto.Type.cast(:naive_datetime, value)
 
-  def after_decrypt(value) do
-    case NaiveDateTime.from_iso8601(value) do
-      {:ok, naive_dt} -> naive_dt
-      _error -> :error
+      def before_encrypt(value) do
+        case Ecto.Type.cast(:naive_datetime, value) do
+          {:ok, dt} -> to_string(dt)
+          _error -> :error
+        end
+      end
+
+      def after_decrypt(value) do
+        case NaiveDateTime.from_iso8601(value) do
+          {:ok, naive_dt} -> naive_dt
+          _error -> :error
+        end
+      end
     end
   end
 end

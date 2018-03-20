@@ -11,7 +11,7 @@ defmodule Cloak.MigrateTest do
 
   defmodule Repo do
     @schema %Schema{
-      encryption_version: <<"AES", 5>>
+      encryption_version: "AES"
     }
 
     def get(_, _id) do
@@ -27,40 +27,40 @@ defmodule Cloak.MigrateTest do
     end
   end
 
+  import ExUnit.CaptureIO
+
   setup do
     Logger.disable(self())
     :ok
   end
 
   test "migrates existing rows to new version" do
-    run("cloak.migrate", [
-      "-r",
-      "Cloak.MigrateTest.Repo",
-      "-m",
-      "Cloak.MigrateTest.Schema",
-      "-f",
-      "encryption_version"
-    ])
+    output =
+      capture_io(fn ->
+        run("cloak.migrate", [
+          "-v",
+          "Cloak.TestVault",
+          "-r",
+          "Cloak.MigrateTest.Repo",
+          "-m",
+          "Cloak.MigrateTest.Schema",
+          "-f",
+          "encryption_version"
+        ])
+      end)
 
-    assert_changed_version()
-  end
+    assert output == """
+           Migrating Cloak.MigrateTest.Schema using:
 
-  test "uses cloak configuration if present" do
-    Application.put_env(
-      :cloak,
-      :migration,
-      repo: Repo,
-      schemas: [{Schema, :encryption_version}]
-    )
+             vault: Cloak.TestVault
+             repo:  Cloak.MigrateTest.Repo
+             field: :encryption_version
 
-    run("cloak.migrate", [])
+           #{IO.ANSI.green()}Migration complete!#{IO.ANSI.reset()}
+           """
 
-    assert_changed_version()
-  end
-
-  defp assert_changed_version do
     assert_received {:changeset, changeset}
-    assert Ecto.Changeset.get_change(changeset, :encryption_version) == Cloak.version()
+    assert Ecto.Changeset.get_change(changeset, :encryption_version) == Cloak.TestVault.version()
   end
 
   defp run(task, args) do

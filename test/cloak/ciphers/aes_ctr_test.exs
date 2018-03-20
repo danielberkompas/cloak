@@ -1,75 +1,93 @@
-defmodule Cloak.AES.CTRTest do
+defmodule Cloak.Cipher.AES.CTRTest do
   use ExUnit.Case
-  import Cloak.AES.CTR
 
-  doctest Cloak.AES.CTR
+  alias Cloak.Cipher.AES.CTR, as: Cipher
 
-  test ".encrypt can encrypt a value" do
-    assert encrypt("value") != "value"
+  @opts [tag: "AES.CTR.V1", key: :crypto.strong_rand_bytes(32)]
+
+  describe ".encrypt/2" do
+    test "encrypts plaintext" do
+      assert {:ok, ciphertext} = Cipher.encrypt("plaintext", @opts)
+      assert ciphertext != "plaintext"
+    end
+
+    test "produces ciphertext in the format tag <> iv <> ciphertext" do
+      assert {:ok,
+              <<_type::binary-1, _length::binary-1, "AES.CTR.V1", iv::binary-16,
+                ciphertext::binary>>} = Cipher.encrypt("plaintext", @opts)
+
+      assert byte_size(iv) == 16
+      assert String.length(ciphertext) > 0
+    end
+
+    test "produces a different ciphertext each time" do
+      assert {:ok, ciphertext1} = Cipher.encrypt("plaintext", @opts)
+      assert {:ok, ciphertext2} = Cipher.encrypt("plaintext", @opts)
+      assert ciphertext1 != ciphertext2
+    end
+
+    test "raises error if :key not passed" do
+      assert_raise KeyError, fn ->
+        Cipher.encrypt("plaintext", tag: @opts[:tag])
+      end
+    end
+
+    test "raises error if :tag not passed" do
+      assert_raise KeyError, fn ->
+        Cipher.encrypt("plaintext", key: @opts[:key])
+      end
+    end
   end
 
-  test ".encrypt can encrypt a value with different keys" do
-    assert encrypt("value", <<1>>) != encrypt("value", <<2>>)
+  describe ".decrypt/2" do
+    setup :create_ciphertext
+
+    test "decrypts ciphertext", %{ciphertext: ciphertext} do
+      assert {:ok, plaintext} = Cipher.decrypt(ciphertext, @opts)
+      assert plaintext == "plaintext"
+    end
+
+    test "returns error if given invalid ciphertext" do
+      assert :error == Cipher.decrypt(<<0, 1>>, @opts)
+    end
+
+    test "raises error if :key not passed", %{ciphertext: ciphertext} do
+      assert_raise KeyError, fn ->
+        Cipher.decrypt(ciphertext, tag: @opts[:tag])
+      end
+    end
+
+    test "raises error if :tag not passed", %{ciphertext: ciphertext} do
+      assert_raise KeyError, fn ->
+        Cipher.decrypt(ciphertext, key: @opts[:key])
+      end
+    end
   end
 
-  test ".encrypt returns ciphertext in the format key_tag <> iv <> ciphertext" do
-    assert <<1, iv::binary-16, ciphertext::binary>> = encrypt("value", <<1>>)
-    assert byte_size(iv) == 16
-    assert String.length(ciphertext) > 0
+  describe ".can_decrypt?/2" do
+    setup :create_ciphertext
+
+    test "returns true if tag and format matches", %{ciphertext: ciphertext} do
+      assert Cipher.can_decrypt?(ciphertext, @opts)
+    end
+
+    test "returns false if tag does not match", %{ciphertext: ciphertext} do
+      refute Cipher.can_decrypt?(ciphertext, tag: "OtherTag", key: @opts[:key])
+    end
+
+    test "returns false if tag matches but format does not" do
+      refute Cipher.can_decrypt?(<<1, 10, "AES.CTR.V1", 0, 0>>, @opts)
+    end
   end
 
-  test ".encrypt can encrypt a value using an environment variable as key" do
-    System.put_env("CLOAK_THIRD_KEY", "NhsNVkstdaUiXIh6fFZaRu+O6gK/p9C9LKJr3kkEWNA=")
-
-    assert encrypt("value", <<3>>) != "value"
+  describe ".version/1" do
+    test "returns the current tag" do
+      assert Cipher.version(@opts) == @opts[:tag]
+    end
   end
 
-  test ".encrypt can encrypt a value using an OTP environment variable as key" do
-    encryption_key = <<
-      54,
-      27,
-      13,
-      86,
-      75,
-      45,
-      117,
-      165,
-      34,
-      92,
-      136,
-      122,
-      124,
-      86,
-      90,
-      70,
-      239,
-      142,
-      234,
-      2,
-      191,
-      167,
-      208,
-      189,
-      44,
-      162,
-      107,
-      222,
-      73,
-      4,
-      88,
-      208
-    >>
-
-    Application.put_env(:testapp, :encryption_key, encryption_key)
-
-    assert encrypt("value", <<4>>) != "value"
-  end
-
-  test ".decrypt can decrypt a value" do
-    assert encrypt("value") |> decrypt == "value"
-  end
-
-  test ".decrypt can decrypt a value encrypted with a non-default key" do
-    assert encrypt("value", <<2>>) |> decrypt == "value"
+  defp create_ciphertext(_) do
+    {:ok, ciphertext} = Cipher.encrypt("plaintext", @opts)
+    [ciphertext: ciphertext]
   end
 end

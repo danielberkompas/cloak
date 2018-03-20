@@ -4,19 +4,23 @@ defmodule Cloak.EncryptedFloatField do
 
   ## Usage
 
-  You should create the field with type `:binary`. Values will be converted 
-  back to floats on decryption.
-
-      schema "table" do
-        field :field_name, Cloak.EncryptedFloatField
+      defmodule MyApp.EncryptedFloatField do
+        use Cloak.EncryptedFloatField, vault: MyApp.Vault
       end
   """
 
-  use Cloak.EncryptedField
+  @doc false
+  defmacro __using__(opts) do
+    opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-  def cast(value) do
-    Ecto.Type.cast(:float, value)
+    quote do
+      use Cloak.EncryptedField, unquote(opts)
+
+      def cast(value) do
+        Ecto.Type.cast(:float, value)
+      end
+
+      def after_decrypt(value), do: String.to_float(value)
+    end
   end
-
-  def after_decrypt(value), do: String.to_float(value)
 end

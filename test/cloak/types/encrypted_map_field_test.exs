@@ -1,6 +1,9 @@
 defmodule Cloak.EncryptedMapFieldTest do
   use ExUnit.Case
-  alias Cloak.EncryptedMapField, as: Field
+
+  defmodule Field do
+    use Cloak.EncryptedMapField, vault: Cloak.TestVault
+  end
 
   @map %{"key" => "value"}
 
