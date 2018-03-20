@@ -166,7 +166,7 @@ defmodule Cloak.Vault do
 
   In your migration, create a `[field_name]_hash` field:
 
-      change table(:users) do
+      alter table(:users) do
         add :email_hash, :binary
       end
 

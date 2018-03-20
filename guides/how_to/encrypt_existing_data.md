@@ -19,7 +19,7 @@ described in the `Cloak.Vault` documentation.
 You'll need to create a duplicate version of each field you want to encrypt,
 perhaps with the `encrypted_` prefix.
 
-    change table(:users) do
+    alter table(:users) do
       add :encrypted_name, :binary
       add :encrypted_metadata, :binary
       add :encryption_version, :binary
@@ -79,7 +79,7 @@ In a one-off mix task, run the following:
 Once you're confident that all the data has migrated successfully to the new
 fields, you can write a migration to remove the old, unencrypted fields.
 
-    change table(:users) do
+    alter table(:users) do
       remove :name
       remove :metadata
     end
