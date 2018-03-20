@@ -35,9 +35,11 @@ defmodule Cloak.Mixfile do
       readme: "README.md",
       main: Cloak,
       extras: [
+        "guides/how_to/encrypt_existing_data.md": [title: "Encrypt Existing Data"],
         "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]
       ],
       groups_for_extras: [
+        "How To": ~r/how_to/,
         Upgrading: ~r/upgrading/
       ],
       groups_for_modules: [
