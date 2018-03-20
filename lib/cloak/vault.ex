@@ -265,6 +265,12 @@ defmodule Cloak.Vault do
   """
   @callback version(label :: atom) :: binary
 
+  @doc """
+  The JSON library the vault uses to convert maps and lists into
+  JSON binaries before encryption.
+  """
+  @callback json_library :: module
+
   @doc false
   defmacro __using__(opts) do
     otp_app = Keyword.fetch!(opts, :otp_app)
@@ -300,6 +306,11 @@ defmodule Cloak.Vault do
       @impl Cloak.Vault
       def version(label) do
         Cloak.Vault.version(build_config(), label)
+      end
+
+      @impl Cloak.Vault
+      def json_library do
+        Keyword.get(build_config(), :json_library, Poison)
       end
 
       defp build_config do

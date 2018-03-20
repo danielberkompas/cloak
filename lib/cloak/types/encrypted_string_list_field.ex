@@ -35,11 +35,11 @@ defmodule Cloak.EncryptedStringListField do
       end
 
       def before_encrypt(value) do
-        Config.json_library().encode!(value)
+        unquote(opts[:vault]).json_library().encode!(value)
       end
 
       def after_decrypt(json) do
-        Config.json_library().decode!(json)
+        unquote(opts[:vault]).json_library().decode!(json)
       end
     end
   end
