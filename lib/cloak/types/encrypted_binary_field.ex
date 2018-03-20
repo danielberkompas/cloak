@@ -13,7 +13,7 @@ defmodule Cloak.EncryptedBinaryField do
   defmacro __using__(opts) do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
-    quote do
+    quote location: :keep do
       use Cloak.EncryptedField, unquote(opts)
     end
   end

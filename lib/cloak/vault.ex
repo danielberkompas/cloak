@@ -117,6 +117,8 @@ defmodule Cloak.Vault do
       MyApp.Vault.decrypt(ciphertext)
       # => {:ok, "plaintext"}
 
+  See the documented callbacks below for the functions you can call.
+
   ### With Schemas
 
   Once you have configured your types, you can use them in your `Ecto.Schema`s.
@@ -215,6 +217,12 @@ defmodule Cloak.Vault do
   See `Mix.Tasks.Cloak.Migrate` for instructions on how to rotate keys.
   """
 
+  alias Cloak.MissingCipher
+
+  @type plaintext :: binary
+  @type ciphertext :: binary
+  @type label :: atom
+
   @doc """
   Accepts configuration from the vault's `:otp_app`, and returns updated
   configuration. Useful for changing configuration based on the runtime
@@ -237,19 +245,34 @@ defmodule Cloak.Vault do
   Encrypts a binary using the first configured cipher in the vault's
   configured `:ciphers` list.
   """
-  @callback encrypt(plaintext :: binary) :: {:ok, binary} | :error
+  @callback encrypt(plaintext) :: {:ok, ciphertext} | {:error, Exception.t()}
+
+  @doc """
+  Like `encrypt/1`, but raises any errors.
+  """
+  @callback encrypt!(plaintext) :: ciphertext | no_return
 
   @doc """
   Encrypts a binary using the vault's configured cipher with the
   corresponding label.
   """
-  @callback encrypt(plaintext :: binary, label :: atom) :: {:ok, binary} | :error
+  @callback encrypt(plaintext, label) :: {:ok, ciphertext} | {:error, Exception.t()}
+
+  @doc """
+  Like `encrypt/2`, but raises any errors.
+  """
+  @callback encrypt!(plaintext, label) :: ciphertext | no_return
 
   @doc """
   Decrypts a binary with the configured cipher that generated the binary.
   Automatically detects which cipher to use, based on the ciphertext.
   """
-  @callback decrypt(ciphertext :: binary) :: {:ok, String.t()} | :error
+  @callback decrypt(ciphertext) :: {:ok, String.t()} | {:error, Exception.t()}
+
+  @doc """
+  Like `decrypt/1`, but raises any errors.
+  """
+  @callback decrypt!(ciphertext) :: plaintext | no_return
 
   @doc """
   Returns the version of the first configured cipher in the vault's
@@ -263,7 +286,7 @@ defmodule Cloak.Vault do
   Returns the version of the vault's configured cipher with the
   corresponding label.
   """
-  @callback version(label :: atom) :: binary
+  @callback version(label) :: binary
 
   @doc """
   The JSON library the vault uses to convert maps and lists into
@@ -289,13 +312,28 @@ defmodule Cloak.Vault do
       end
 
       @impl Cloak.Vault
+      def encrypt!(plaintext) do
+        Cloak.Vault.encrypt!(build_config(), plaintext)
+      end
+
+      @impl Cloak.Vault
       def encrypt(plaintext, label) do
         Cloak.Vault.encrypt(build_config(), plaintext, label)
       end
 
       @impl Cloak.Vault
+      def encrypt!(plaintext, label) do
+        Cloak.Vault.encrypt!(build_config(), plaintext, label)
+      end
+
+      @impl Cloak.Vault
       def decrypt(ciphertext) do
         Cloak.Vault.decrypt(build_config(), ciphertext)
+      end
+
+      @impl Cloak.Vault
+      def decrypt!(ciphertext) do
+        Cloak.Vault.decrypt!(build_config(), ciphertext)
       end
 
       @impl Cloak.Vault
@@ -328,19 +366,64 @@ defmodule Cloak.Vault do
   end
 
   @doc false
+  def encrypt!(config, plaintext) do
+    case encrypt(config, plaintext) do
+      {:ok, ciphertext} ->
+        ciphertext
+
+      {:error, error} ->
+        raise error
+    end
+  end
+
+  @doc false
   def encrypt(config, plaintext, label) do
-    {module, opts} = config[:ciphers][label]
-    module.encrypt(plaintext, opts)
+    case config[:ciphers][label] do
+      nil ->
+        {:error, MissingCipher.exception(vault: config[:vault], label: label)}
+
+      {module, opts} ->
+        module.encrypt(plaintext, opts)
+    end
+  end
+
+  @doc false
+  def encrypt!(config, plaintext, label) do
+    case encrypt(config, plaintext, label) do
+      {:ok, ciphertext} ->
+        ciphertext
+
+      {:error, error} ->
+        raise error
+    end
   end
 
   @doc false
   def decrypt(config, ciphertext) do
-    {_label, {module, opts}} =
-      Enum.find(config[:ciphers], fn {_label, {module, opts}} ->
-        module.can_decrypt?(ciphertext, opts)
-      end)
+    case find_module_to_decrypt(config, ciphertext) do
+      nil ->
+        {:error, MissingCipher.exception(vault: config[:vault], ciphertext: ciphertext)}
 
-    module.decrypt(ciphertext, opts)
+      {_label, {module, opts}} ->
+        module.decrypt(ciphertext, opts)
+    end
+  end
+
+  @doc false
+  def decrypt!(config, ciphertext) do
+    case decrypt(config, ciphertext) do
+      {:ok, plaintext} ->
+        plaintext
+
+      {:error, error} ->
+        raise error
+    end
+  end
+
+  defp find_module_to_decrypt(config, ciphertext) do
+    Enum.find(config[:ciphers], fn {_label, {module, opts}} ->
+      module.can_decrypt?(ciphertext, opts)
+    end)
   end
 
   @doc false
@@ -360,6 +443,7 @@ defmodule Cloak.Vault do
     {:ok, config} =
       otp_app
       |> Application.get_env(vault, [])
+      |> Keyword.put(:vault, vault)
       |> vault.init()
 
     config

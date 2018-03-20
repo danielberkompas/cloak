@@ -16,9 +16,13 @@ defmodule Cloak.EncryptedField do
 
       @doc false
       def dump(value) do
-        value
-        |> before_encrypt()
-        |> encrypt()
+        with value <- before_encrypt(value),
+             {:ok, value} <- encrypt(value) do
+          {:ok, value}
+        else
+          _other ->
+            :error
+        end
       end
 
       @doc false
@@ -26,6 +30,9 @@ defmodule Cloak.EncryptedField do
         with {:ok, value} <- decrypt(value) do
           value = after_decrypt(value)
           {:ok, value}
+        else
+          _other ->
+            :error
         end
       end
 
