@@ -34,12 +34,19 @@ defmodule Cloak.Mixfile do
     [
       readme: "README.md",
       main: Cloak,
+      extras: [
+        "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]
+      ],
+      groups_for_extras: [
+        Upgrading: ~r/upgrading/
+      ],
       groups_for_modules: [
-        Ciphers: [
+        Behaviours: [
           Cloak.Cipher,
-          Cloak.Cipher.AES.CTR,
-          Cloak.Cipher.AES.GCM
+          Cloak.Vault
         ],
+        Ciphers: ~r/Cipher.AES/,
+        "Deprecated Ciphers": ~r/Cipher.Deprecated/,
         "Ecto Types": ~r/Field/
       ]
     ]

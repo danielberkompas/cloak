@@ -17,7 +17,7 @@ defmodule Cloak.Cipher.Deprecated.AES.CTR do
   component, and uses a new format as described in its docs. This cipher can
   assist in upgrading old ciphertext to the new format.
 
-  See the "Upgrading from 0.6.x" guide for usage.
+  See the [Upgrading from 0.6.x](0.6.x_to_0.7.x.html) guide for usage.
   """
 
   @behaviour Cloak.Cipher
