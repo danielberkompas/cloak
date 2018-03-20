@@ -44,7 +44,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
 
   ## Usage
 
-      mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -m MyApp.Schema -f encryption_version
+      mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema -f encryption_version
 
   You must specify the vault, repo, schema, and encryption version field.
 
@@ -73,8 +73,8 @@ defmodule Mix.Tasks.Cloak.Migrate do
       defp aliases do
         [
           "cloak.migrate_all": [
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -m MyApp.Schema1 -f encryption_version",
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -m MyApp.Schema2 -f encryption_version",
+            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema1 -f encryption_version",
+            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema2 -f encryption_version",
           ]
         ]
       end
@@ -83,7 +83,8 @@ defmodule Mix.Tasks.Cloak.Migrate do
   """
 
   use Mix.Task
-  import Ecto.Query, only: [from: 2]
+
+  import Ecto.Query, only: [from: 2, where: 3]
 
   @doc false
   def run(args) do
@@ -92,20 +93,19 @@ defmodule Mix.Tasks.Cloak.Migrate do
     opts = parse(args)
 
     Mix.shell().info("""
-    Migrating #{inspect(opts.schema)} using:
+    Migrating #{IO.ANSI.yellow()}#{inspect(opts.schema)}#{IO.ANSI.reset()} using:
 
-      vault: #{inspect(opts.vault)}
-      repo:  #{inspect(opts.repo)}
-      field: #{inspect(opts.field)}
+      vault: #{IO.ANSI.yellow()}#{inspect(opts.vault)}#{IO.ANSI.reset()}
+      repo:  #{IO.ANSI.yellow()}#{inspect(opts.repo)}#{IO.ANSI.reset()}
+      field: #{IO.ANSI.cyan()}#{inspect(opts.field)}#{IO.ANSI.reset()}
     """)
 
     ids = ids_for(opts.vault, opts.repo, opts.schema, opts.field)
 
-    for id <- ids do
-      opts.schema
-      |> opts.repo.get(id)
-      |> migrate_row(opts.vault, opts.repo, opts.field)
-    end
+    opts.schema
+    |> where([s], s.id in ^ids)
+    |> opts.repo.all()
+    |> Enum.map(&migrate_row(&1, opts.vault, opts.repo, opts.field))
 
     Mix.shell().info(IO.ANSI.green() <> "Migration complete!" <> IO.ANSI.reset())
 
@@ -113,7 +113,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
   end
 
   defp parse(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [v: :vault, m: :schema, f: :field, r: :repo])
+    {opts, _, _} = OptionParser.parse(args, aliases: [v: :vault, s: :schema, f: :field, r: :repo])
     validate!(opts)
   end
 
@@ -123,13 +123,13 @@ defmodule Mix.Tasks.Cloak.Migrate do
         vault: to_module(opts[:vault]),
         repo: to_module(opts[:repo]),
         schema: to_module(opts[:schema]),
-        field: String.to_existing_atom(opts[:field])
+        field: String.to_atom(opts[:field])
       }
     else
-      Mix.shell().error("""
+      Mix.raise("""
       You must specify which Vault, Repo, and Schema you wish to migrate:
 
-          mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -m MyApp.SchemaName -f encryption_version_field
+          mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.SchemaName -f encryption_version_field
       """)
     end
   end
@@ -139,6 +139,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
       from(
         m in schema,
         where: field(m, ^field) != ^vault.version(),
+        or_where: is_nil(field(m, ^field)),
         select: m.id
       )
 
@@ -150,9 +151,8 @@ defmodule Mix.Tasks.Cloak.Migrate do
 
     if version != vault.version() do
       row
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_change(field, vault.version())
-      |> repo.update!
+      |> Ecto.Changeset.change(%{field => vault.version()})
+      |> repo.update!()
     end
   end
 
