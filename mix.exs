@@ -36,6 +36,7 @@ defmodule Cloak.Mixfile do
       main: Cloak,
       extras: [
         "guides/how_to/encrypt_existing_data.md": [title: "Encrypt Existing Data"],
+        "guides/how_to/rotate_keys.md": [title: "Rotate Keys"],
         "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]
       ],
       groups_for_extras: [
