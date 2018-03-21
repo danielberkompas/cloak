@@ -1,0 +1,7 @@
+{
+  "skip_files": [
+    "lib/cloak.ex",
+    "lib/cloak/cipher.ex",
+    "test/*"
+  ]
+}

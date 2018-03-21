@@ -8,6 +8,13 @@ defmodule Cloak.Mixfile do
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
       source_url: "https://github.com/danielberkompas/cloak",
       description: "Encrypted fields for Ecto.",
       package: package(),
@@ -27,6 +34,7 @@ defmodule Cloak.Mixfile do
       {:ecto, ">= 1.0.0"},
       {:flow, "~> 0.13.0"},
       {:poison, ">= 1.5.0", optional: true},
+      {:excoveralls, "~> 0.8", only: :test},
       {:postgrex, ">= 0.0.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: [:dev, :docs]},
       {:inch_ex, ">= 0.0.0", only: :docs}
