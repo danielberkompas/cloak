@@ -6,6 +6,7 @@ otp_release:
 before_script:
   - mix local.hex --force
   - mix deps.get --only test
+  - export CI="true"
 script:
   - bin/test
 after_script:
