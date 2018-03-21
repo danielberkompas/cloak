@@ -1,5 +1,19 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.2...HEAD)
+
+**Closed issues:**
+
+- Cloak.AES.CTR `encrypt/2` not explicitly called? [\#38](https://github.com/danielberkompas/cloak/issues/38)
+- Recommendations for data migrations [\#29](https://github.com/danielberkompas/cloak/issues/29)
+
+**Merged pull requests:**
+
+- Rewrite mix.cloak.migrate [\#62](https://github.com/danielberkompas/cloak/pull/62) ([danielberkompas](https://github.com/danielberkompas))
+- Vaults [\#60](https://github.com/danielberkompas/cloak/pull/60) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v0.6.2](https://github.com/danielberkompas/cloak/tree/v0.6.2) (2018-03-19)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.1...v0.6.2)
 
@@ -125,7 +139,7 @@
 
 **Closed issues:**
 
-- Cloak.Fields.MapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
+- Cloak.EncryptedMapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
 - How to generate keys? [\#5](https://github.com/danielberkompas/cloak/issues/5)
 
 **Merged pull requests:**
