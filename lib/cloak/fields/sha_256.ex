@@ -41,6 +41,10 @@ defmodule Cloak.Fields.SHA256 do
   def type, do: :binary
 
   @doc false
+  def cast(nil) do
+    {:ok, nil}
+  end
+
   def cast(value) do
     {:ok, to_string(value)}
   end
