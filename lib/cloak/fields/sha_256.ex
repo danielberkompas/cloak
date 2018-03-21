@@ -2,6 +2,8 @@ defmodule Cloak.Fields.SHA256 do
   @moduledoc """
   An `Ecto.Type` which hashes the field value using the SHA256 algorithm.
 
+  For a more secure hashing method, see `Cloak.Fields.HMAC`.
+
   ## Why
 
   If you store a hash of a field's value, you can then query on it as a proxy
