@@ -35,6 +35,7 @@ defmodule Cloak.Ciphers.AES.GCM do
   **Important**: Because a random IV is used for every encryption, `encrypt/2`
   will not produce the same ciphertext twice for the same value.
   """
+  @impl true
   def encrypt(plaintext, opts) do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
@@ -55,6 +56,7 @@ defmodule Cloak.Ciphers.AES.GCM do
   Callback implementation for `Cloak.Cipher.decrypt/2`. Decrypts a value
   encrypted with AES in GCM mode.
   """
+  @impl true
   def decrypt(ciphertext, opts) do
     if can_decrypt?(ciphertext, opts) do
       key = Keyword.fetch!(opts, :key)
@@ -72,6 +74,7 @@ defmodule Cloak.Ciphers.AES.GCM do
   Callback implementation for `Cloak.Cipher.can_decrypt?/2`. Determines whether
   this module can decrypt the given ciphertext.
   """
+  @impl true
   def can_decrypt?(ciphertext, opts) do
     tag = Keyword.fetch!(opts, :tag)
 
@@ -85,10 +88,4 @@ defmodule Cloak.Ciphers.AES.GCM do
   end
 
   defp generate_iv, do: :crypto.strong_rand_bytes(16)
-
-  @doc """
-  Callback implementation for `Cloak.Cipher.version/0`. Returns the tag of the
-  current default key.
-  """
-  def version(opts), do: Keyword.fetch!(opts, :tag)
 end

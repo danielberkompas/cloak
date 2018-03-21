@@ -6,4 +6,9 @@
 # on the continuous integration server.
 MIX_ENV=test mix format --check-formatted || { echo 'Code was not formatted!'; exit 1; }
 MIX_ENV=test mix compile --force --warnings-as-errors || { echo 'Please fix all compiler warnings.'; exit 1; }
-MIX_ENV=test mix test || { echo 'Tests failed!'; exit 1; }
+
+if [ ! $CI ]; then
+  MIX_ENV=test mix test || { echo 'Tests failed!'; exit 1; }
+else
+  MIX_ENV=test mix coveralls.travis || { echo 'Tests failed!'; exit 1; }
+fi

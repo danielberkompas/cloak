@@ -47,18 +47,6 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTRTest do
     end
   end
 
-  describe ".version/1" do
-    test "returns :tag" do
-      assert Cipher.version(tag: "TAG") == "TAG"
-    end
-
-    test "raises error if :tag not given" do
-      assert_raise KeyError, fn ->
-        Cipher.version([])
-      end
-    end
-  end
-
   # Replicates the old format for AES.CTR, where the module tag
   # and key tag were prepended to the iv and ciphertext.
   defp create_ciphertext(_) do

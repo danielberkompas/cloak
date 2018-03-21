@@ -83,12 +83,6 @@ defmodule Cloak.Ciphers.AES.GCMTest do
     end
   end
 
-  describe ".version/1" do
-    test "returns the current tag" do
-      assert Cipher.version(@opts) == @opts[:tag]
-    end
-  end
-
   defp create_ciphertext(_) do
     {:ok, ciphertext} = Cipher.encrypt("plaintext", @opts)
     [ciphertext: ciphertext]

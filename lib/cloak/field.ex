@@ -1,11 +1,15 @@
 defmodule Cloak.Field do
   @moduledoc false
 
+  @callback __cloak__ :: Keyword.t()
+
   defmacro __using__(opts) do
     vault = Keyword.fetch!(opts, :vault)
     label = opts[:label]
 
     quote location: :keep do
+      @behaviour Cloak.Field
+
       @doc false
       def type, do: :binary
 
@@ -42,7 +46,12 @@ defmodule Cloak.Field do
       @doc false
       def after_decrypt(value), do: value
 
-      defoverridable Module.definitions_in(__MODULE__)
+      defoverridable type: 0, cast: 1, dump: 1, load: 1, before_encrypt: 1, after_decrypt: 1
+
+      @doc false
+      def __cloak__ do
+        [vault: unquote(vault), label: unquote(label)]
+      end
 
       defp encrypt(plaintext) do
         if unquote(label) do

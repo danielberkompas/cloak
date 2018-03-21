@@ -2,14 +2,45 @@ defmodule Mix.Tasks.Cloak.Migrate do
   @moduledoc """
   Migrates a schema table to a new encryption cipher.
 
-  While Cloak vaults will automatically decrypt rows which use an old
-  decryption cipher or key, this isn't usually enough. Usually, you want to
-  retire the old key, so it won't do to leave it configured indefinitely.
+  ## Rationale
 
-  This task allows you to proactively upgrade all rows in your database to the
-  new encryption configuration, so that you can remove the old key.
+  Cloak vaults will automatically decrypt fields which were encrypted
+  by a retired key, and reencrypt them with the new key when they change.
 
-  ## Before You Run This Task...
+  However, this usually is not enough for key rotation. Usually, you want
+  to proactively reencrypt all your fields with the new key, so that the
+  old key can be decommissioned.
+
+  This task allows you to do just that.
+
+  ## Strategy
+
+  This task will migrate a table following this strategy:
+
+  - Query for minimum ID in the table
+  - Query for maximum ID in the table
+  - For each ID between, attempt to:
+      - Fetch the row with that ID, locking it
+      - If present, reencrypt all Cloak fields with the new cipher
+      - Write the row, unlocking it
+
+  The queries are issued in parallel to maximize speed. Each row is fetched
+  and written back as quickly as possible to reduce the amount of time the
+  row is locked.
+
+  ## Warnings
+
+  1. **IMPORTANT: `mix cloak.migrate` only works on tables with an integer, sequential
+     `:id` field. This is the default setting for Ecto schemas, so it shouldn't be a
+     problem for most users.**
+
+  2. Because `mix cloak.migrate` issues queries in parallel, it can consume
+     all your database connections. For this reason, you may wish to use a
+     separate `Repo` with a limited `:pool` just for Cloak migrations. This will
+     allow you to prevent any performance impact by throttling Cloak to use only
+     a limited number of database connections.
+
+  ## Configuration
 
   Ensure that you have configured your vault to use the new cipher by default!
 
@@ -17,9 +48,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
 
       config :my_app, MyApp.Vault,
         ciphers: [
-          # This is the new key that you want to use
           default: {Cloak.Ciphers.AES.GCM, tag: "NEW", key: <<...>>},
-          # This is the old key that you want to retire
           retired: {Cloak.Ciphers.AES.CTR, tag: "OLD", key: <<...>>>}
         ]
 
@@ -32,9 +61,7 @@ defmodule Mix.Tasks.Cloak.Migrate do
         def init(config) do
           config =
             Keyword.put(config, :ciphers, [
-              # This is the new key that you want to use
               default: {Cloak.Ciphers.AES.GCM, tag: "NEW", key: <<...>>},
-              # This is the old key that you want to retire
               retired: {Cloak.Ciphers.AES.CTR, tag: "OLD", key: <<...>>>}
             ])
 
@@ -42,121 +69,43 @@ defmodule Mix.Tasks.Cloak.Migrate do
         end
       end
 
+  If you want to migrate multiple schemas at once, you may find it convenient
+  to specify the schemas in your `config/config.exs`:
+
+      config :my_app,
+        cloak_repo: [MyApp.Repo],
+        cloak_schemas: [MyApp.Schema1, MyApp.Schema2]
+
   ## Usage
 
-      mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema -f encryption_version
+  To run against only a specific repo and schema, use the `-r` and `-s` flags:
 
-  You must specify the vault, repo, schema, and encryption version field.
+      mix cloak.migrate -r MyApp.Repo -s MyApp.Schema
 
-  The version field is used to determine which rows need to be migrated to
-  the new key. It should be updated each time a row is changed, using your
-  changeset function:
+  If you've configured multiple schemas at once, as shown above, you can simply
+  run:
 
-      def changeset(struct, attrs \\ %{}) do
-        # ...
-        |> put_change(:encryption_version, MyApp.Vault.version())
-      end
-
-  ### Migrating Multiple Schemas at Once
-
-  You can migrate multiple schemas with one command using Mix aliases. Update
-  your `mix.exs` aliases like so:
-
-      # update your project/0 function:
-      def project do
-        [
-          # ...
-          aliases: aliases()
-        ]
-      end
-
-      defp aliases do
-        [
-          "cloak.migrate_all": [
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema1 -f encryption_version",
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema2 -f encryption_version",
-          ]
-        ]
-      end
-
-  Then run `mix cloak.migrate_all` to migrate all your schemas.
+      mix cloak.migrate
   """
 
   use Mix.Task
 
-  import Ecto.Query, only: [from: 2, where: 3]
+  import IO.ANSI, only: [yellow: 0, green: 0, reset: 0]
+
+  alias Cloak.Migrator
 
   @doc false
   def run(args) do
-    # Ensure repo is running
     Mix.Task.run("app.start", [])
-    opts = parse(args)
+    configs = Mix.Cloak.parse_config(args)
 
-    Mix.shell().info("""
-    Migrating #{IO.ANSI.yellow()}#{inspect(opts.schema)}#{IO.ANSI.reset()} using:
-
-      vault: #{IO.ANSI.yellow()}#{inspect(opts.vault)}#{IO.ANSI.reset()}
-      repo:  #{IO.ANSI.yellow()}#{inspect(opts.repo)}#{IO.ANSI.reset()}
-      field: #{IO.ANSI.cyan()}#{inspect(opts.field)}#{IO.ANSI.reset()}
-    """)
-
-    ids = ids_for(opts.vault, opts.repo, opts.schema, opts.field)
-
-    opts.schema
-    |> where([s], s.id in ^ids)
-    |> opts.repo.all()
-    |> Enum.map(&migrate_row(&1, opts.vault, opts.repo, opts.field))
-
-    Mix.shell().info(IO.ANSI.green() <> "Migration complete!" <> IO.ANSI.reset())
+    for {_app, config} <- configs,
+        schema <- config.schemas do
+      Mix.shell().info("Migrating #{yellow()}#{inspect(schema)}#{reset()}...")
+      Migrator.migrate(config.repo, schema)
+      Mix.shell().info(green() <> "Migration complete!" <> reset())
+    end
 
     :ok
-  end
-
-  defp parse(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [v: :vault, s: :schema, f: :field, r: :repo])
-    validate!(opts)
-  end
-
-  defp validate!(opts) do
-    if opts[:vault] && opts[:repo] && opts[:schema] && opts[:field] do
-      %{
-        vault: to_module(opts[:vault]),
-        repo: to_module(opts[:repo]),
-        schema: to_module(opts[:schema]),
-        field: String.to_atom(opts[:field])
-      }
-    else
-      Mix.raise("""
-      You must specify which Vault, Repo, and Schema you wish to migrate:
-
-          mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.SchemaName -f encryption_version_field
-      """)
-    end
-  end
-
-  defp ids_for(vault, repo, schema, field) do
-    query =
-      from(
-        m in schema,
-        where: field(m, ^field) != ^vault.version(),
-        or_where: is_nil(field(m, ^field)),
-        select: m.id
-      )
-
-    repo.all(query)
-  end
-
-  defp migrate_row(row, vault, repo, field) do
-    version = Map.get(row, field)
-
-    if version != vault.version() do
-      row
-      |> Ecto.Changeset.change(%{field => vault.version()})
-      |> repo.update!()
-    end
-  end
-
-  defp to_module(name) do
-    String.to_existing_atom("Elixir." <> name)
   end
 end

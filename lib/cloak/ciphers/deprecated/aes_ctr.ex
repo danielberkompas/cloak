@@ -50,11 +50,6 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTR do
     String.starts_with?(ciphertext, tag(opts))
   end
 
-  @impl Cloak.Cipher
-  def version(opts) do
-    Keyword.fetch!(opts, :tag)
-  end
-
   defp tag(opts) do
     Keyword.fetch!(opts, :module_tag) <> Keyword.fetch!(opts, :tag)
   end

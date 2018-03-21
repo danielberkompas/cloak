@@ -127,7 +127,6 @@ defmodule Cloak.Vault do
       # in your migration
       create table(:users) do
         add :email, :binary
-        add :encryption_version, :binary
       end
 
   Then, use the custom `Ecto.Type` you defined, as in this example:
@@ -139,21 +138,16 @@ defmodule Cloak.Vault do
 
         schema "users" do
           field :email, MyApp.Encrypted.Binary
-          field :encryption_version, :binary
         end
 
         def changeset(struct, attrs \\\\ %{}) do
           struct
           |> cast(attrs, [:email])
-          |> put_change(:encryption_version, MyApp.Vault.version())
         end
       end
 
   In this case, the `:email` field will now be transparently encrypted when
   written to the database and decrypted when loaded out of the database.
-
-  The `:encryption_version` field is important for migrating data when you
-  rotate keys. See `Mix.Tasks.Cloak.Migrate` for more details.
 
   ### Querying Encrypted Data
 
@@ -181,7 +175,6 @@ defmodule Cloak.Vault do
       schema "users" do
         field :email, MyApp.Encrypted.Binary
         field :email_hash, Cloak.Fields.SHA256
-        field :encryption_version, :binary
       end
 
   Finally, in your `changeset/2` function, ensure that the `_hash` field
@@ -191,7 +184,6 @@ defmodule Cloak.Vault do
         struct
         |> cast(attrs, [:email])
         |> put_hashed_fields()
-        |> put_change(:encryption_version, MyApp.Vault.version())
       end
 
       defp put_hashed_fields(changeset) do
@@ -208,8 +200,7 @@ defmodule Cloak.Vault do
       #      email_hash:
       #        <<151, 61, 254, 70, 62, 200, 87, 133, 245, 249, 90, 245, 186, 57,
       #        6, 238, 219, 45, 147, 28, 36, 230, 152, 36, 168, 158, 166, 93,
-      #        186, 78, 129, 59>>,
-      #      encryption_version: "AES.GCM.V1"
+      #        186, 78, 129, 59>>
       #    }
 
   ### Rotating Keys
@@ -275,20 +266,6 @@ defmodule Cloak.Vault do
   @callback decrypt!(ciphertext) :: plaintext | no_return
 
   @doc """
-  Returns the version of the first configured cipher in the vault's
-  configured `:ciphers` list, as this is the default.
-
-  This is used for key rotation. See `Mix.Tasks.Cloak.Migrate`.
-  """
-  @callback version :: binary
-
-  @doc """
-  Returns the version of the vault's configured cipher with the
-  corresponding label.
-  """
-  @callback version(label) :: binary
-
-  @doc """
   The JSON library the vault uses to convert maps and lists into
   JSON binaries before encryption.
   """
@@ -334,16 +311,6 @@ defmodule Cloak.Vault do
       @impl Cloak.Vault
       def decrypt!(ciphertext) do
         Cloak.Vault.decrypt!(build_config(), ciphertext)
-      end
-
-      @impl Cloak.Vault
-      def version do
-        Cloak.Vault.version(build_config())
-      end
-
-      @impl Cloak.Vault
-      def version(label) do
-        Cloak.Vault.version(build_config(), label)
       end
 
       @impl Cloak.Vault
@@ -424,18 +391,6 @@ defmodule Cloak.Vault do
     Enum.find(config[:ciphers], fn {_label, {module, opts}} ->
       module.can_decrypt?(ciphertext, opts)
     end)
-  end
-
-  @doc false
-  def version(config) do
-    [{_label, {module, opts}} | _] = config[:ciphers]
-    module.version(opts)
-  end
-
-  @doc false
-  def version(config, label) do
-    {module, opts} = config[:ciphers][label]
-    module.version(opts)
   end
 
   @doc false
