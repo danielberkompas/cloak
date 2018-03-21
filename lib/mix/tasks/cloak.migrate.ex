@@ -1,162 +1,200 @@
 defmodule Mix.Tasks.Cloak.Migrate do
   @moduledoc """
-  Migrates a schema table to a new encryption cipher.
+  Migrate all configured schemas to your new encryption configuration.
 
-  While Cloak vaults will automatically decrypt rows which use an old
-  decryption cipher or key, this isn't usually enough. Usually, you want to
-  retire the old key, so it won't do to leave it configured indefinitely.
+  While Cloak will automatically decrypt rows which use an old decryption cipher
+  or key, this isn't usually enough. Usually, you want to retire the old key, so
+  it won't do to leave it configured indefinitely.
 
   This task allows you to proactively upgrade all rows in your database to the
   new encryption configuration, so that you can remove the old key.
 
   ## Before You Run This Task...
 
-  Ensure that you have configured your vault to use the new cipher by default!
+  1. Ensure that you have configured your new encryption cipher.
+  2. Set the new cipher and/or key as the `:default`. Otherwise, running this
+  task will have no effect.
 
-      # If using mix configuration...
+  ## Configuration
 
-      config :my_app, MyApp.Vault,
-        ciphers: [
-          # This is the new key that you want to use
-          default: {Cloak.Cipher.AES.GCM, tag: "NEW", key: <<...>>},
-          # This is the old key that you want to retire
-          retired: {Cloak.Cipher.AES.CTR, tag: "OLD", key: <<...>>>}
-        ]
+  In order for the Mix task to update rows in the correct database, it must have
+  access to the correct repo, and a list of schemas to migrate.
 
-      # If configuring in the `init/1` callback:
+  Each schema should be specified in one of the following formats:
 
-      defmodule MyApp.Vault do
-        use Cloak.Vault, otp_app: :my_app
+      {schema_name}
+      {schema_name, :encrypted_field_name}
+      {schema_name, [:encrypted_field_name, :other_encrypted_field_name}
 
-        @impl Cloak.Vault
-        def init(config) do
-          config =
-            Keyword.put(config, :ciphers, [
-              # This is the new key that you want to use
-              default: {Cloak.Cipher.AES.GCM, tag: "NEW", key: <<...>>},
-              # This is the old key that you want to retire
-              retired: {Cloak.Cipher.AES.CTR, tag: "OLD", key: <<...>>>}
-            ])
+  Where `:encrypted_field_name` is a field that's of type the Cloak.Encrypted*
 
-          {:ok, config}
-        end
-      end
+      config :cloak, :migration,
+        repo: MyApp.Repo,
+        schemas: [{MyApp.Schema1},
+                  {MyApp.Schema2, :encryption_version},
+                  {MyApp.Schema2, [:encrypted_field_name, :other_encrypted_field_name]},
+                 ]
 
   ## Usage
 
-      mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema -f encryption_version
+      mix cloak.migrate
 
-  You must specify the vault, repo, schema, and encryption version field.
+  The task allows you to customize the repo and schemas which will be migrated at
+  runtime.
 
-  The version field is used to determine which rows need to be migrated to
-  the new key. It should be updated each time a row is changed, using your
-  changeset function:
-
-      def changeset(struct, attrs \\ %{}) do
-        # ...
-        |> put_change(:encryption_version, MyApp.Vault.version())
-      end
-
-  ### Migrating Multiple Schemas at Once
-
-  You can migrate multiple schemas with one command using Mix aliases. Update
-  your `mix.exs` aliases like so:
-
-      # update your project/0 function:
-      def project do
-        [
-          # ...
-          aliases: aliases()
-        ]
-      end
-
-      defp aliases do
-        [
-          "cloak.migrate_all": [
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema1 -f encryption_version",
-            "cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema2 -f encryption_version",
-          ]
-        ]
-      end
-
-  Then run `mix cloak.migrate_all` to migrate all your schemas.
+      mix cloak.migrate -m MyApp.Schema -f encryption_version -r MyApp.Repo
   """
 
-  use Mix.Task
+  @shortdoc """
+  Migrate all configured schemas to your new encryption configuration.
+  """
 
-  import Ecto.Query, only: [from: 2, where: 3]
+  use Mix.Task, only: [from: 2, ^: 1]
+  import Ecto.Query
+  import Logger, only: [info: 1]
+  import String, only: [to_existing_atom: 1]
 
   @doc false
   def run(args) do
-    # Ensure repo is running
-    Mix.Task.run("app.start", [])
-    opts = parse(args)
-
-    Mix.shell().info("""
-    Migrating #{IO.ANSI.yellow()}#{inspect(opts.schema)}#{IO.ANSI.reset()} using:
-
-      vault: #{IO.ANSI.yellow()}#{inspect(opts.vault)}#{IO.ANSI.reset()}
-      repo:  #{IO.ANSI.yellow()}#{inspect(opts.repo)}#{IO.ANSI.reset()}
-      field: #{IO.ANSI.cyan()}#{inspect(opts.field)}#{IO.ANSI.reset()}
-    """)
-
-    ids = ids_for(opts.vault, opts.repo, opts.schema, opts.field)
-
-    opts.schema
-    |> where([s], s.id in ^ids)
-    |> opts.repo.all()
-    |> Enum.map(&migrate_row(&1, opts.vault, opts.repo, opts.field))
-
-    Mix.shell().info(IO.ANSI.green() <> "Migration complete!" <> IO.ANSI.reset())
+    _ = info("=== Starting Migration ===")
+    {repo, schemas} = parse(args)
+    Mix.Task.run("app.start", args)
+    Enum.each(schemas, &migrate(elem(&1, 0), elem(&1, 1), repo))
+    _ = info("=== Migration Complete ===")
 
     :ok
   end
 
   defp parse(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [v: :vault, s: :schema, f: :field, r: :repo])
-    validate!(opts)
+    {opts, _, _} = OptionParser.parse(args, aliases: [m: :schema, f: :field, r: :repo])
+
+    repo =
+      case opts[:repo] do
+        nil -> Application.get_env(:cloak, :migration)[:repo]
+        repo -> to_module(repo)
+      end
+
+    schemas =
+      case opts[:schema] do
+        nil -> Application.get_env(:cloak, :migration)[:schemas]
+        schema -> [{to_module(schema), String.to_atom(opts[:field])}]
+      end
+
+    validate!(repo, schemas)
+
+    {repo, schemas}
   end
 
-  defp validate!(opts) do
-    if opts[:vault] && opts[:repo] && opts[:schema] && opts[:field] do
-      %{
-        vault: to_module(opts[:vault]),
-        repo: to_module(opts[:repo]),
-        schema: to_module(opts[:schema]),
-        field: String.to_atom(opts[:field])
-      }
-    else
-      Mix.raise("""
-      You must specify which Vault, Repo, and Schema you wish to migrate:
+  defp validate!(repo, [h | _t]) when repo == nil or not is_tuple(h) do
+    raise ArgumentError, """
+    You must specify which schemas you wish to migrate and which repo to use.
 
-          mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.SchemaName -f encryption_version_field
-      """)
+    You can do this in your Mix config, like so:
+
+        config :cloak, :migration,
+          repo: MyApp.Repo,
+          schemas: [{MyApp.Schema1, :encryption_version},
+                   {MyApp.Schema2, :encryption_version}]
+
+    Alternatively, you can pass in the schema, field, and repo as command line
+    arguments to `mix cloak.migrate`:
+
+        mix cloak.migrate -r Repo -m SchemaName -f encryption_version_field
+    """
+  end
+
+  defp validate!(_repo, _schemas), do: :ok
+
+  defp migrate(schema, repo) do
+    types = [
+      Cloak.EncryptedBinaryField,
+      Cloak.EncryptedDateField,
+      Cloak.EncryptedDateTimeField,
+      Cloak.EncryptedField,
+      Cloak.EncryptedFloatField,
+      Cloak.EncryptedIntegerField,
+      Cloak.EncryptedIntegerListField,
+      Cloak.EncryptedMapField,
+      Cloak.EncryptedNaiveDateTimeField,
+      Cloak.EncryptedStringListField,
+      Cloak.EncryptedTimeField,
+      Cloak.SHA256Field
+    ]
+
+    schema
+    |> migrate(
+      schema.__schema__(:fields)
+      |> Enum.filter(&Enum.member?(types, schema.__schema__(:type, &1))),
+      repo
+    )
+  end
+
+  defp migrate(schema, [_ | _] = fields, repo) do
+    _ = info("--- Migrating #{inspect(schema)} Schema ---")
+    ids = ids_needing_migration(schema, fields, repo)
+    _ = info("#{length(ids)} records found needing migration")
+
+    for id <- ids do
+      schema
+      |> repo.get(id)
+      |> migrate_row(repo, fields)
     end
   end
 
-  defp ids_for(vault, repo, schema, field) do
+  defp migrate(schema, field, repo) do
+    migrate(schema, [field], repo)
+  end
+
+  def migrate_row(row, repo, fields) do
+    changeset =
+      row
+      |> Ecto.Changeset.change()
+
+    changeset
+    |> force_reencryption(fields)
+    |> repo.update!
+  end
+
+  def ids_needing_migration(schema, [_ | _] = fields, repo) do
+    # Finds all records that don't have a prefix matching the current Cloak.version() in any of the fields passed in
+    cloak_version = Cloak.version()
+    prefix_length = String.length(Cloak.version()) + 1
+
     query =
       from(
         m in schema,
-        where: field(m, ^field) != ^vault.version(),
-        or_where: is_nil(field(m, ^field)),
         select: m.id
       )
 
-    repo.all(query)
+    fields
+    |> Enum.reduce(query, fn field, query_accumulator ->
+      query_accumulator
+      |> or_where(
+        [m],
+        fragment("substring(?, ?, ?)", field(m, ^field), 0, ^prefix_length) != ^cloak_version
+      )
+    end)
+    |> repo.all()
   end
 
-  defp migrate_row(row, vault, repo, field) do
-    version = Map.get(row, field)
+  def ids_needing_migration(schema, field, repo) do
+    ids_needing_migration(schema, [field], repo)
+  end
 
-    if version != vault.version() do
-      row
-      |> Ecto.Changeset.change(%{field => vault.version()})
-      |> repo.update!()
-    end
+  defp force_reencryption(changeset, fields) do
+    fields
+    |> Enum.reduce(changeset, fn field, acc_changeset ->
+      acc_changeset
+      |> Ecto.Changeset.force_change(
+        field,
+        acc_changeset
+        |> Ecto.Changeset.fetch_field(field)
+        |> elem(1)
+      )
+    end)
   end
 
   defp to_module(name) do
-    String.to_existing_atom("Elixir." <> name)
+    to_existing_atom("Elixir." <> name)
   end
 end
