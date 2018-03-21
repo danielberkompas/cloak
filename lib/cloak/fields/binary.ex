@@ -1,11 +1,11 @@
-defmodule Cloak.EncryptedBinaryField do
+defmodule Cloak.Fields.Binary do
   @moduledoc """
   An `Ecto.Type` to encrypt a binary field.
 
   ## Usage
 
-      defmodule MyApp.EncryptedBinaryField do
-        use Cloak.EncryptedBinaryField, vault: MyApp.Vault
+      defmodule MyApp.Encrypted.Binary do
+        use Cloak.Fields.Binary, vault: MyApp.Vault
       end
   """
 
@@ -14,7 +14,7 @@ defmodule Cloak.EncryptedBinaryField do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
     quote location: :keep do
-      use Cloak.EncryptedField, unquote(opts)
+      use Cloak.Field, unquote(opts)
     end
   end
 end

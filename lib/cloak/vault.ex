@@ -18,7 +18,7 @@ defmodule Cloak.Vault do
       config :my_app, MyApp.Vault,
         json_library: Poison,
         ciphers: [
-          default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
+          default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
         ]
 
   The configuration options are:
@@ -38,8 +38,8 @@ defmodule Cloak.Vault do
   The `opts` are specific to each cipher module. Check their documentation
   for details. The following ciphers ship with Cloak:
 
-  - `Cloak.Cipher.AES.GCM` (recommended) - AES encryption in Galois Counter Mode (GCM).
-  - `Cloak.Cipher.AES.CTR` - AES encryption in CTR stream mode.
+  - `Cloak.Ciphers.AES.GCM` (recommended) - AES encryption in Galois Counter Mode (GCM).
+  - `Cloak.Ciphers.AES.CTR` - AES encryption in CTR stream mode.
 
   **IMPORTANT: THE _FIRST_ CONFIGURED CIPHER IN THE LIST IS THE DEFAULT FOR
   ENCRYPTING ALL NEW DATA.** (Regardless of its label!) The other ciphers
@@ -61,7 +61,7 @@ defmodule Cloak.Vault do
         def init(config) do
           config =
             Keyword.put(config, :ciphers, [
-              default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
+              default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
             ])
 
           {:ok, config}
@@ -73,15 +73,15 @@ defmodule Cloak.Vault do
   Once you have a configured vault, you can define `Ecto.Type` modules which
   use it for encryption/decryption.
 
-      defmodule MyApp.EncryptedBinaryField do
-        use Cloak.EncryptedBinaryField, vault: MyApp.Vault
+      defmodule MyApp.Encrypted.Binary do
+        use Cloak.Fields.Binary, vault: MyApp.Vault
       end
 
   You can also specify that a field uses a particular labeled cipher from
   your configuration:
 
-      defmodule MyApp.EncryptedBinaryField do
-        use Cloak.EncryptedBinaryField,
+      defmodule MyApp.Encrypted.Binary do
+        use Cloak.Fields.Binary,
           vault: MyApp.Vault,
           cipher: :custom # corresponds to the `label` of the cipher
       end
@@ -94,16 +94,16 @@ defmodule Cloak.Vault do
 
   | Type            | Ecto Type             | Field                               |
   | --------------- | --------------------- | ----------------------------------- |
-  | `String`        | `:string` / `:binary` | `Cloak.EncryptedBinaryField`        |
-  | `Date`          | `:date`               | `Cloak.EncryptedDateField`          |
-  | `DateTime`      | `:utc_datetime`       | `Cloak.EncryptedDateTimeField`      |
-  | `Float`         | `:float`              | `Cloak.EncryptedFloatField`         |
-  | `Integer`       | `:integer`            | `Cloak.EncryptedIntegerField`       |
-  | `Map`           | `:map`                | `Cloak.EncryptedMapField`           |
-  | `NaiveDateTime` | `:naive_datetime`     | `Cloak.EncryptedNaiveDateTimeField` |
-  | `Time`          | `:time`               | `Cloak.EncryptedTimeField`          |
-  | `[Integer]`     | `{:array, :integer}`  | `Cloak.EncryptedIntegerListField`   |
-  | `[String]`      | `{:array, :string}`   | `Cloak.EncryptedStringListField`    |
+  | `String`        | `:string` / `:binary` | `Cloak.Fields.Binary`        |
+  | `Date`          | `:date`               | `Cloak.Fields.Date`          |
+  | `DateTime`      | `:utc_datetime`       | `Cloak.Fields.DateTime`      |
+  | `Float`         | `:float`              | `Cloak.Fields.Float`         |
+  | `Integer`       | `:integer`            | `Cloak.Fields.Integer`       |
+  | `Map`           | `:map`                | `Cloak.Fields.Map`           |
+  | `NaiveDateTime` | `:naive_datetime`     | `Cloak.Fields.NaiveDateTime` |
+  | `Time`          | `:time`               | `Cloak.Fields.Time`          |
+  | `[Integer]`     | `{:array, :integer}`  | `Cloak.Fields.IntegerList`   |
+  | `[String]`      | `{:array, :string}`   | `Cloak.Fields.StringList`    |
 
   ## Usage
 
@@ -138,7 +138,7 @@ defmodule Cloak.Vault do
         import Ecto.Changeset
 
         schema "users" do
-          field :email, MyApp.EncryptedBinaryField
+          field :email, MyApp.Encrypted.Binary
           field :encryption_version, :binary
         end
 
@@ -172,15 +172,15 @@ defmodule Cloak.Vault do
 
   Then, in your schema, use one of Cloak's provided hash types, which are:
 
-  | Type      | Ecto Type              | Field               |
-  | --------- | ---------------------- | ------------------- |
-  | `String`  | `:string` / `:binary`  | `Cloak.SHA256Field` |
+  | Type      | Ecto Type              | Field                 |
+  | --------- | ---------------------- | --------------------- |
+  | `String`  | `:string` / `:binary`  | `Cloak.Fields.SHA256` |
 
-  In this example, we'll use `Cloak.SHA256Field`:
+  In this example, we'll use `Cloak.Fields.SHA256`:
 
       schema "users" do
-        field :email, MyApp.EncryptedBinaryField
-        field :email_hash, Cloak.SHA256Field
+        field :email, MyApp.Encrypted.Binary
+        field :email_hash, Cloak.Fields.SHA256
         field :encryption_version, :binary
       end
 
@@ -233,7 +233,7 @@ defmodule Cloak.Vault do
       def init(config) do
         config =
           Keyword.put(config, :ciphers, [
-            default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
+            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
           ])
 
         {:ok, config}

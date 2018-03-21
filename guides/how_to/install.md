@@ -23,7 +23,7 @@ active cipher. Note that the `:key` needs to be a binary, not base64 encoded.
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
       ]
 
 If you want to fetch keys from system vars, you should use the `init/1` callback
@@ -41,7 +41,7 @@ to configure the vault instead:
       def init(config) do
         config =
           Keyword.put(config, :ciphers, [
-            default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: decode_env("CLOAK_KEY")}
+            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env("CLOAK_KEY")}
           ])
 
         {:ok, config}
@@ -58,8 +58,8 @@ to configure the vault instead:
 
 For each type of data you want to encrypt, define a local Ecto type like so.
 
-    defmodule MyApp.EncryptedBinaryField do
-      use Cloak.EncryptedBinaryField, vault: MyApp.Vault
+    defmodule MyApp.Encrypted.Binary do
+      use Cloak.Fields.Binary, vault: MyApp.Vault
     end
 
 You can find a complete list of available types in the "MODULES" documentation.
@@ -89,8 +89,8 @@ The schema module should look like this:
       import Ecto.Changeset
 
       schema "users" do
-        field :email, MyApp.EncryptedBinaryField
-        field :email_hash, Cloak.SHA256Field
+        field :email, MyApp.Encrypted.Binary
+        field :email_hash, Cloak.Fields.SHA256Field
         # ... other fields
         field :encryption_version, :binary
 
@@ -112,12 +112,12 @@ The schema module should look like this:
     end
 
 This example also shows how you would make a given field queryable by
-creating a mirrored `_hash` field. See `Cloak.SHA256Field` for more details.
+creating a mirrored `_hash` field. See `Cloak.Fields.SHA256` for more details.
 
 ## Usage
 
 Your encrypted fields will be transparently encrypted and decrypted as
-data is loaded from the database.
+data are loaded from the database.
 
     Repo.get(Accounts.User, 1)
     # => %Accounts.User{email: "test@example.com", email_hash: <<115, 6, 45, 135, 41, ...>>}

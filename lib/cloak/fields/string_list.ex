@@ -1,44 +1,37 @@
-defmodule Cloak.EncryptedMapField do
+defmodule Cloak.Fields.StringList do
   @moduledoc """
-  An `Ecto.Type` to encrypt maps.
+  An `Ecto.Type` to encrypt a list of strings.
 
   ## Configuration
 
-  You can customize the json library used for for converting the lists.
+  You can customize the json library used for for converting lists.
+  Default: `Poison`
 
       config :my_app, MyApp.Vault,
         json_library: Jason
 
   ## Usage
 
-      defmodule MyApp.EncryptedMapField do
-        use Cloak.EncryptedMapField, vault: MyApp.Vault
+      defmodule MyApp.Encrypted.StringList do
+        use Cloak.Fields.StringList, vault: MyApp.Vault
       end
 
-  You should create the field with type `:binary`. On encryption, the map
+  You should create the field with type `:binary`. On encryption, the list
   will first be converted to JSON using the configured `:json_library`, and
   then encrypted. On decryption, the `:json_library` will be used to convert
-  it back to a map.
-
-  This means that on decryption, atom keys will become string keys.
-
-      %{hello: "world"}
-
-  Will become:
-
-      %{"hello" => "world"}
+  it back to a list of strings.
   """
 
   defmacro __using__(opts) do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
     quote location: :keep do
-      use Cloak.EncryptedField, unquote(opts)
+      use Cloak.Field, unquote(opts)
 
       alias Cloak.Config
 
       def cast(value) do
-        Ecto.Type.cast(:map, value)
+        Ecto.Type.cast({:array, :string}, value)
       end
 
       def before_encrypt(value) do

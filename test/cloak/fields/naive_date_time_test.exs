@@ -1,8 +1,8 @@
-defmodule Cloak.EncryptedNaiveDateTimeFieldTest do
+defmodule Cloak.Fields.NaiveDateTimeTest do
   use ExUnit.Case, async: true
 
   defmodule Field do
-    use Cloak.EncryptedNaiveDateTimeField, vault: Cloak.TestVault
+    use Cloak.Fields.NaiveDateTime, vault: Cloak.TestVault
   end
 
   setup_all do

@@ -37,9 +37,9 @@ your changeset.
 
       schema "users" do
         field :name, :string
-        field :encrypted_name, MyApp.EncryptedBinaryField
+        field :encrypted_name, MyApp.Encrypted.Binary
         field :metadata, :map
-        field :encrypted_metadata, MyApp.EncryptedMapField
+        field :encrypted_metadata, MyApp.Encrypted.Map
         field :encryption_version, :binary
       end
 
@@ -97,8 +97,8 @@ your schema like this:
       import Ecto.Changeset
 
       schema "users" do
-        field :name, MyApp.EncryptedBinaryField
-        field :metadata, MyApp.EncryptedMapField
+        field :name, MyApp.Encrypted.Binary
+        field :metadata, MyApp.Encrypted.Map
         field :encryption_version, :binary
       end
 

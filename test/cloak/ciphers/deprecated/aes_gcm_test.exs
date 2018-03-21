@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.Deprecated.AES.GCMTest do
+defmodule Cloak.Ciphers.Deprecated.AES.GCMTest do
   use ExUnit.Case
 
-  alias Cloak.Cipher.Deprecated.AES.GCM, as: Cipher
+  alias Cloak.Ciphers.Deprecated.AES.GCM, as: Cipher
   alias Cloak.Tags.Encoder
 
   @aad "AES256GCM"

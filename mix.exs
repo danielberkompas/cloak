@@ -50,9 +50,9 @@ defmodule Cloak.Mixfile do
           Cloak.Cipher,
           Cloak.Vault
         ],
-        Ciphers: ~r/Cipher.AES/,
-        "Deprecated Ciphers": ~r/Cipher.Deprecated/,
-        "Ecto Types": ~r/Field/
+        Ciphers: ~r/Ciphers.AES/,
+        "Deprecated Ciphers": ~r/Ciphers.Deprecated/,
+        "Ecto Types": ~r/Fields/
       ]
     ]
   end

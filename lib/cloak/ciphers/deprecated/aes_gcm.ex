@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.Deprecated.AES.GCM do
+defmodule Cloak.Ciphers.Deprecated.AES.GCM do
   @moduledoc """
-  DEPRECATED version of the `Cloak.Cipher.AES.GCM` cipher, for use in
-  migrating existing data to the new format used by `Cloak.Cipher.AES.GCM`.
+  DEPRECATED version of the `Cloak.Ciphers.AES.GCM` cipher, for use in
+  migrating existing data to the new format used by `Cloak.Ciphers.AES.GCM`.
 
   ## Rationale
 
@@ -13,7 +13,7 @@ defmodule Cloak.Cipher.Deprecated.AES.GCM do
       | Module Tag (n bytes) | Key Tag (1 byte) | IV (16 bytes) | Ciphertext (n bytes) |
       +----------------------+------------------+---------------+----------------------+
 
-  The new `Cloak.Cipher.AES.GCM` implementation no longer prepends the "Module Tag"
+  The new `Cloak.Ciphers.AES.GCM` implementation no longer prepends the "Module Tag"
   component, and uses a new format as described in its docs. This cipher can
   assist in upgrading old ciphertext to the new format.
 
@@ -25,7 +25,7 @@ defmodule Cloak.Cipher.Deprecated.AES.GCM do
 
   alias Cloak.Tags.Decoder
 
-  @deprecated "Use Cloak.Cipher.AES.GCM.encrypt/2 instead. This call will raise an error."
+  @deprecated "Use Cloak.Ciphers.AES.GCM.encrypt/2 instead. This call will raise an error."
   @impl Cloak.Cipher
   def encrypt(_plaintext, _opts) do
     raise RuntimeError,

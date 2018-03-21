@@ -18,9 +18,9 @@ defmodule Mix.Tasks.Cloak.Migrate do
       config :my_app, MyApp.Vault,
         ciphers: [
           # This is the new key that you want to use
-          default: {Cloak.Cipher.AES.GCM, tag: "NEW", key: <<...>>},
+          default: {Cloak.Ciphers.AES.GCM, tag: "NEW", key: <<...>>},
           # This is the old key that you want to retire
-          retired: {Cloak.Cipher.AES.CTR, tag: "OLD", key: <<...>>>}
+          retired: {Cloak.Ciphers.AES.CTR, tag: "OLD", key: <<...>>>}
         ]
 
       # If configuring in the `init/1` callback:
@@ -33,9 +33,9 @@ defmodule Mix.Tasks.Cloak.Migrate do
           config =
             Keyword.put(config, :ciphers, [
               # This is the new key that you want to use
-              default: {Cloak.Cipher.AES.GCM, tag: "NEW", key: <<...>>},
+              default: {Cloak.Ciphers.AES.GCM, tag: "NEW", key: <<...>>},
               # This is the old key that you want to retire
-              retired: {Cloak.Cipher.AES.CTR, tag: "OLD", key: <<...>>>}
+              retired: {Cloak.Ciphers.AES.CTR, tag: "OLD", key: <<...>>>}
             ])
 
           {:ok, config}

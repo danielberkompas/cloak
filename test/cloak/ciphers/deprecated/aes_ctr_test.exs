@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.Deprecated.AES.CTRTest do
+defmodule Cloak.Ciphers.Deprecated.AES.CTRTest do
   use ExUnit.Case
 
-  alias Cloak.Cipher.Deprecated.AES.CTR, as: Cipher
+  alias Cloak.Ciphers.Deprecated.AES.CTR, as: Cipher
 
   @opts [module_tag: "AES.CTR", tag: "V1", key: :crypto.strong_rand_bytes(32)]
 

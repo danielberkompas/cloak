@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.AES.CTRTest do
+defmodule Cloak.Ciphers.AES.CTRTest do
   use ExUnit.Case
 
-  alias Cloak.Cipher.AES.CTR, as: Cipher
+  alias Cloak.Ciphers.AES.CTR, as: Cipher
 
   @opts [tag: "AES.CTR.V1", key: :crypto.strong_rand_bytes(32)]
 

@@ -1,8 +1,8 @@
-defmodule Cloak.EncryptedIntegerListFieldTest do
+defmodule Cloak.Fields.IntegerListTest do
   use ExUnit.Case
 
   defmodule Field do
-    use Cloak.EncryptedIntegerListField, vault: Cloak.TestVault
+    use Cloak.Fields.IntegerList, vault: Cloak.TestVault
   end
 
   @list [1, 2, 3, 4, 5]

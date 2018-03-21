@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.AES.GCMTest do
+defmodule Cloak.Ciphers.AES.GCMTest do
   use ExUnit.Case
 
-  alias Cloak.Cipher.AES.GCM, as: Cipher
+  alias Cloak.Ciphers.AES.GCM, as: Cipher
 
   @opts [tag: "AES.GCM.V1", key: :crypto.strong_rand_bytes(32)]
 

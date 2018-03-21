@@ -1,4 +1,4 @@
-defmodule Cloak.EncryptedField do
+defmodule Cloak.Field do
   @moduledoc false
 
   defmacro __using__(opts) do

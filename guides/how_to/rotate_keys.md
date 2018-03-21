@@ -12,7 +12,7 @@ For example, if your config currently looks like this:
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: <<...>>},
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>},
       ]
 
 Then change the `:default` label to the new key, and demote the existing
@@ -20,8 +20,8 @@ key to the `:retired` label.
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V2", key: <<...>>},
-        retired: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V2", key: <<...>>},
+        retired: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
       ]
 
 ## Migrate Data To New Key
@@ -42,7 +42,7 @@ the new key, you may remove the `:retired` key from your configuration.
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Cipher.AES.GCM, tag: "AES.GCM.V2", key: <<...>>},
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V2", key: <<...>>},
       ]
 
 # How It Works
@@ -54,7 +54,7 @@ As a result, Cloak will be able to find and use the correct cipher to decrypt
 any old ciphertext as long as you leave its cipher configured.
 
 When you add a new default key, Cloak will immediately begin encrypting
-new data with the new key. Every time existing data is fetched from the
+new data with the new key. Every time existing data are fetched from the
 database, it will be decrypted with the old key, and if changed, will
 be encrypted with the new key.
 

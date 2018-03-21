@@ -1,11 +1,11 @@
-defmodule Cloak.EncryptedDateField do
+defmodule Cloak.Fields.Date do
   @moduledoc """
   An `Ecto.Type` to encrypt `Date` fields.
 
   ## Usage
 
-      defmodule MyApp.EncryptedDateField do
-        use Cloak.EncryptedDateField, vault: MyApp.Vault
+      defmodule MyApp.Encrypted.Date do
+        use Cloak.Fields.Date, vault: MyApp.Vault
       end
   """
 
@@ -13,7 +13,7 @@ defmodule Cloak.EncryptedDateField do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
     quote do
-      use Cloak.EncryptedField, unquote(opts)
+      use Cloak.Field, unquote(opts)
 
       def cast(value), do: Ecto.Type.cast(:date, value)
 

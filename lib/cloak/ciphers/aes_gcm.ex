@@ -1,4 +1,4 @@
-defmodule Cloak.Cipher.AES.GCM do
+defmodule Cloak.Ciphers.AES.GCM do
   @moduledoc """
   A `Cloak.Cipher` which encrypts values with the AES cipher in GCM (block) mode.
   Internally relies on Erlang's `:crypto.block_encrypt/4`.

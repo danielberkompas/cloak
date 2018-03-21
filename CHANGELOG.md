@@ -125,7 +125,7 @@
 
 **Closed issues:**
 
-- Cloak.EncryptedMapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
+- Cloak.Fields.MapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
 - How to generate keys? [\#5](https://github.com/danielberkompas/cloak/issues/5)
 
 **Merged pull requests:**

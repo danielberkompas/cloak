@@ -1,4 +1,4 @@
-defmodule Cloak.Cipher.AES.CTR do
+defmodule Cloak.Ciphers.AES.CTR do
   @moduledoc """
   A `Cloak.Cipher` which encrypts values with the AES cipher in CTR (stream) mode.
   Internally relies on Erlang's `:crypto.stream_encrypt/2`.

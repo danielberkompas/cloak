@@ -1,7 +1,7 @@
-defmodule Cloak.Cipher.Deprecated.AES.CTR do
+defmodule Cloak.Ciphers.Deprecated.AES.CTR do
   @moduledoc """
-  DEPRECATED version of the `Cloak.Cipher.AES.CTR` cipher, for use in
-  migrating existing data to the new format used by `Cloak.Cipher.AES.CTR`.
+  DEPRECATED version of the `Cloak.Ciphers.AES.CTR` cipher, for use in
+  migrating existing data to the new format used by `Cloak.Ciphers.AES.CTR`.
 
   ## Rationale
 
@@ -13,7 +13,7 @@ defmodule Cloak.Cipher.Deprecated.AES.CTR do
       | Module Tag (n bytes) | Key Tag (1 byte) | IV (16 bytes) | Ciphertext (n bytes) |
       +----------------------+------------------+---------------+----------------------+
 
-  The new `Cloak.Cipher.AES.CTR` implementation no longer prepends the "Module Tag"
+  The new `Cloak.Ciphers.AES.CTR` implementation no longer prepends the "Module Tag"
   component, and uses a new format as described in its docs. This cipher can
   assist in upgrading old ciphertext to the new format.
 
@@ -22,7 +22,7 @@ defmodule Cloak.Cipher.Deprecated.AES.CTR do
 
   @behaviour Cloak.Cipher
 
-  @deprecated "Use Cloak.Cipher.AES.CTR.encrypt/2 instead. This call will raise an error."
+  @deprecated "Use Cloak.Ciphers.AES.CTR.encrypt/2 instead. This call will raise an error."
   @impl Cloak.Cipher
   def encrypt(_plaintext, _opts) do
     raise RuntimeError,

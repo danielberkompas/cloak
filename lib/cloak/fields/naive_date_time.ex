@@ -1,11 +1,11 @@
-defmodule Cloak.EncryptedNaiveDateTimeField do
+defmodule Cloak.Fields.NaiveDateTime do
   @moduledoc """
   An `Ecto.Type` to encrypt `NaiveDateTime` fields.
 
   ## Usage
 
-      defmodule MyApp.EncryptedNaiveDateTimeField do
-        use Cloak.EncryptedNaiveDateTimeField, vault: MyApp.Vault
+      defmodule MyApp.Encrypted.NaiveDateTime do
+        use Cloak.Fields.NaiveDateTime, vault: MyApp.Vault
       end
   """
 
@@ -13,7 +13,7 @@ defmodule Cloak.EncryptedNaiveDateTimeField do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 
     quote location: :keep do
-      use Cloak.EncryptedField, unquote(opts)
+      use Cloak.Field, unquote(opts)
 
       def cast(value), do: Ecto.Type.cast(:naive_datetime, value)
 

@@ -1,8 +1,8 @@
-defmodule Cloak.EncryptedTimeFieldTest do
+defmodule Cloak.Fields.TimeTest do
   use ExUnit.Case, async: true
 
   defmodule Field do
-    use Cloak.EncryptedTimeField, vault: Cloak.TestVault
+    use Cloak.Fields.Time, vault: Cloak.TestVault
   end
 
   setup_all do
