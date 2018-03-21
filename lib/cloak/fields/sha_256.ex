@@ -25,9 +25,9 @@ defmodule Cloak.Fields.SHA256 do
   Ensure that the hash is updated whenever the target field changes with the
   `put_change/3` function:
 
-      def changeset(struct, params \\ %{}) do
+      def changeset(struct, attrs \\\\ %{}) do
         struct
-        |> cast(params, [:field_name, :field_name_hash])
+        |> cast(attrs, [:field_name, :field_name_hash])
         |> put_change(:field_name_hash, get_field(changeset, :field_name))
       end
 
