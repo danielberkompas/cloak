@@ -28,12 +28,18 @@ key to the `:retired` label.
 
 For each schema that uses your vault, run `mix cloak.migrate`:
 
-    mix cloak.migrate -v MyApp.Vault -r MyApp.Repo -s MyApp.Schema -f encryption_version
+    mix cloak.migrate -r MyApp.Repo -s MyApp.Schema
 
-Alternatively, you can create an alias in your `mix.exs` as shown in
-the `Mix.Tasks.Cloak.Migrate` documentation and migrate all schemas at once.
+Alternatively, you can migrate multiple schemas at once by configuring
+the following values in `config/config.exs`:
 
-    mix cloak.migrate_all
+    config :my_app,
+      cloak_repo: MyApp.Repo,
+      cloak_schemas: [...]
+
+With that in place, you can simply run:
+
+    mix cloak.migrate
 
 ## Remove Retired Key
 

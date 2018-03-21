@@ -1,98 +1,53 @@
 defmodule Cloak.MigrateTest do
-  use ExUnit.Case
-
-  defmodule Schema do
-    use Ecto.Schema
-
-    schema "schemas" do
-      field(:encryption_version, :binary)
-    end
-  end
-
-  defmodule Repo do
-    @schema %Schema{
-      id: 1,
-      encryption_version: "AES"
-    }
-
-    def all(query) do
-      query = inspect(query)
-      send(self(), {:query, query})
-
-      if String.length(query) < 70 do
-        [@schema]
-      else
-        [1]
-      end
-    end
-
-    def update!(changeset) do
-      send(self(), {:changeset, changeset})
-    end
-  end
+  use Cloak.DataCase, async: false
 
   import ExUnit.CaptureIO
-  import Ecto.Query
+  import IO.ANSI, only: [yellow: 0, green: 0, reset: 0]
 
   setup do
-    Logger.disable(self())
-    :ok
+    [user: Factory.create_user("test@email.com")]
   end
 
-  test "migrates existing rows to new version" do
+  test "migrates existing rows to new version when command line args given" do
     output =
       capture_io(fn ->
         Mix.Task.rerun("cloak.migrate", [
-          "-v",
-          "Cloak.TestVault",
           "-r",
-          "Cloak.MigrateTest.Repo",
+          "Cloak.TestRepo",
           "-s",
-          "Cloak.MigrateTest.Schema",
-          "-f",
-          "encryption_version"
+          "Cloak.TestUser"
         ])
       end)
 
     assert output == """
-           Migrating #{IO.ANSI.yellow()}Cloak.MigrateTest.Schema#{IO.ANSI.reset()} using:
+           Migrating #{yellow()}Cloak.TestUser#{reset()}...
+           #{green()}Migration complete!#{reset()}
+           """
+  end
 
-             vault: #{IO.ANSI.yellow()}Cloak.TestVault#{IO.ANSI.reset()}
-             repo:  #{IO.ANSI.yellow()}Cloak.MigrateTest.Repo#{IO.ANSI.reset()}
-             field: #{IO.ANSI.cyan()}:encryption_version#{IO.ANSI.reset()}
+  test "reads from configuration" do
+    Application.put_env(:cloak, :cloak_repo, Cloak.TestRepo)
+    Application.put_env(:cloak, :cloak_schemas, [Cloak.TestUser])
 
-           #{IO.ANSI.green()}Migration complete!#{IO.ANSI.reset()}
+    output =
+      capture_io(fn ->
+        Mix.Task.rerun("cloak.migrate", [])
+      end)
+
+    assert output == """
+           Migrating #{yellow()}Cloak.TestUser#{reset()}...
+           #{green()}Migration complete!#{reset()}
            """
 
-    schema = Cloak.MigrateTest.Schema
-    field = :encryption_version
-    vault = Cloak.TestVault
-
-    ids_query =
-      inspect(
-        from(
-          m in schema,
-          where: field(m, ^field) != ^vault.version(),
-          or_where: is_nil(field(m, ^field)),
-          select: m.id
-        )
-      )
-
-    schemas_query = inspect(where(schema, [s], s.id in ^[1]))
-
-    assert_received {:query, ^ids_query}
-    assert_received {:query, ^schemas_query}
-
-    assert_received {:changeset, changeset}
-    assert Ecto.Changeset.get_change(changeset, :encryption_version) == Cloak.TestVault.version()
+    Application.delete_env(:cloak, :cloak_repo)
+    Application.delete_env(:cloak, :cloak_schemas)
   end
 
   test "raises error if called with incorrect arguments" do
     bad_args = [
       [],
-      ["-v", "Cloak.TestVault"],
-      ["-v", "Cloak.TestVault", "-r", "Cloak.MigrateTest.Repo"],
-      ["-v", "Cloak.TestVault", "-r", "Cloak.MigrateTest.Repo", "-s", "Cloak.MigrateTest.Schema"]
+      ["-r", "Cloak.TestRepo"],
+      ["-s", "Cloak.TestSchema"]
     ]
 
     for args <- bad_args do
