@@ -4,7 +4,7 @@ defmodule Cloak.Mixfile do
   def project do
     [
       app: :cloak,
-      version: "0.7.0",
+      version: "0.7.0-alpha.1",
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,

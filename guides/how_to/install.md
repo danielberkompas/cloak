@@ -6,7 +6,7 @@ This guide will walk you through installing Cloak in your project.
 
 First, add `:cloak` to your dependencies in `mix.exs`:
 
-    {:cloak, "~> 1.7.0-alpha.0"}
+    {:cloak, "~> 1.7.0-alpha.1"}
 
 Run `mix deps.get` to fetch the dependency.
 
