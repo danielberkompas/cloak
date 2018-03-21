@@ -79,20 +79,6 @@ defmodule Cloak.VaultTest do
     end
   end
 
-  describe ".version/0" do
-    test "returns :tag of default cipher" do
-      {_module, opts} = Application.get_env(:cloak, Cloak.TestVault)[:ciphers][:default]
-      assert TestVault.version() == opts[:tag]
-    end
-  end
-
-  describe ".version/1" do
-    test "returns :tag of given cipher with label" do
-      {_module, opts} = Application.get_env(:cloak, Cloak.TestVault)[:ciphers][:secondary]
-      assert TestVault.version(:secondary) == opts[:tag]
-    end
-  end
-
   describe ".json_library/1" do
     test "returns Poison by default" do
       assert TestVault.json_library() == Poison

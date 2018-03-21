@@ -55,11 +55,6 @@ defmodule Cloak.Ciphers.Deprecated.AES.GCM do
     end
   end
 
-  @impl Cloak.Cipher
-  def version(opts) do
-    Keyword.fetch!(opts, :tag)
-  end
-
   defp decode(ciphertext, opts) do
     module_tag = Keyword.fetch!(opts, :module_tag)
     tag = Keyword.fetch!(opts, :tag)

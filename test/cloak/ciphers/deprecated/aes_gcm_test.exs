@@ -49,18 +49,6 @@ defmodule Cloak.Ciphers.Deprecated.AES.GCMTest do
     end
   end
 
-  describe ".version/1" do
-    test "returns :tag" do
-      assert Cipher.version(tag: "TAG") == "TAG"
-    end
-
-    test "raises error if :tag not given" do
-      assert_raise KeyError, fn ->
-        Cipher.version([])
-      end
-    end
-  end
-
   defp create_ciphertext(_) do
     iv = :crypto.strong_rand_bytes(16)
 

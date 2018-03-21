@@ -76,7 +76,6 @@ generate the migration with the correct fields, for example:
       add :email, :binary
       add :email_hash, :binary # will be used for searching
       # ...
-      add :encryption_version, :binary
 
       timestamps()
     end
@@ -92,7 +91,6 @@ The schema module should look like this:
         field :email, MyApp.Encrypted.Binary
         field :email_hash, Cloak.Fields.SHA256Field
         # ... other fields
-        field :encryption_version, :binary
 
         timestamps()
       end
@@ -102,7 +100,6 @@ The schema module should look like this:
         struct
         |> cast(attrs, [:email])
         |> put_hashed_fields()
-        |> put_change(:encryption_version, MyApp.Vault.version())
       end
 
       defp put_hashed_fields(changeset) do

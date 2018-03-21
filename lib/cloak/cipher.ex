@@ -25,14 +25,4 @@ defmodule Cloak.Cipher do
   Determines if a given ciphertext can be decrypted by this cipher.
   """
   @callback can_decrypt?(ciphertext, opts) :: boolean
-
-  @doc """
-  Must return a string representing the default settings of your module as it is
-  currently configured.
-
-  This will be used to generate a unique tag, which can
-  then be stored on each database table row to track which encryption
-  configuration it is currently encrypted with.
-  """
-  @callback version(opts) :: String.t()
 end

@@ -23,7 +23,6 @@ perhaps with the `encrypted_` prefix.
     alter table(:users) do
       add :encrypted_name, :binary
       add :encrypted_metadata, :binary
-      add :encryption_version, :binary
     end
 
 Then, add the new fields to your schema. Make sure to keep them up to
@@ -40,7 +39,6 @@ your changeset.
         field :encrypted_name, MyApp.Encrypted.Binary
         field :metadata, :map
         field :encrypted_metadata, MyApp.Encrypted.Map
-        field :encryption_version, :binary
       end
 
       @doc false
@@ -48,7 +46,6 @@ your changeset.
         struct
         |> cast(attrs, [:name, :metadata])
         |> put_encrypted_fields()
-        |> put_change(:encryption_version, MyApp.Vault.version())
       end
 
       # Temporary function during the migration process, to ensure
@@ -99,13 +96,11 @@ your schema like this:
       schema "users" do
         field :name, MyApp.Encrypted.Binary
         field :metadata, MyApp.Encrypted.Map
-        field :encryption_version, :binary
       end
 
       @doc false
       def changeset(struct, attrs \\ %{}) do
         struct
         |> cast(attrs, [:name, :metadata])
-        |> put_change(:encryption_version, MyApp.Vault.version())
       end
     end

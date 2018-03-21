@@ -29,6 +29,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   The `Key Tag` component of the header breaks down into a `Type`, `Length`,
   and `Value` triplet for easy decoding.
   """
+  @impl true
   def encrypt(plaintext, opts) when is_binary(plaintext) do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
@@ -56,6 +57,7 @@ defmodule Cloak.Ciphers.AES.CTR do
       iex> encrypt("Hello") |> decrypt
       "Hello"
   """
+  @impl true
   def decrypt(ciphertext, opts) when is_binary(ciphertext) do
     if can_decrypt?(ciphertext, opts) do
       key = Keyword.fetch!(opts, :key)
@@ -72,6 +74,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   Callback implementation for `Cloak.Cipher.can_decrypt?2`. Determines if
   a ciphertext can be decrypted with this cipher.
   """
+  @impl true
   def can_decrypt?(ciphertext, opts) when is_binary(ciphertext) do
     tag = Keyword.fetch!(opts, :tag)
 
@@ -82,13 +85,5 @@ defmodule Cloak.Ciphers.AES.CTR do
       _other ->
         false
     end
-  end
-
-  @doc """
-  Callback implementation for `Cloak.Cipher.version/0`. Returns the tag of the
-  current default key.
-  """
-  def version(opts) do
-    Keyword.fetch!(opts, :tag)
   end
 end
