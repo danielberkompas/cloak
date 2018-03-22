@@ -15,6 +15,10 @@ defmodule Cloak.Fields.Binary do
 
     quote location: :keep do
       use Cloak.Field, unquote(opts)
+
+      def cast(value) do
+        Ecto.Type.cast(:string, value)
+      end
     end
   end
 end
