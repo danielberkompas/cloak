@@ -14,13 +14,22 @@ defmodule Cloak.Field do
       def type, do: :binary
 
       @doc false
+      def cast(nil) do
+        {:ok, nil}
+      end
+
       def cast(value) do
         {:ok, value}
       end
 
       @doc false
+      def dump(nil) do
+        {:ok, nil}
+      end
+
       def dump(value) do
-        with value <- before_encrypt(value),
+        with {:ok, value} <- cast(value),
+             value <- before_encrypt(value),
              {:ok, value} <- encrypt(value) do
           {:ok, value}
         else
@@ -30,6 +39,10 @@ defmodule Cloak.Field do
       end
 
       @doc false
+      def load(nil) do
+        {:ok, nil}
+      end
+
       def load(value) do
         with {:ok, value} <- decrypt(value) do
           value = after_decrypt(value)
