@@ -9,10 +9,24 @@ defmodule Cloak.Fields.IntegerList do
       config :my_app, MyApp.Vault,
         json_library: Jason
 
+  ## Migration
+
+  The database field must be of type `:binary`.
+
+      add :encrypted_field, :binary
+
   ## Usage
+
+  Define an `Encrypted.IntegerList` module in your project:
 
       defmodule MyApp.Encrypted.IntegerList do
         use Cloak.Fields.IntegerList, vault: MyApp.Vault
+      end
+
+  Then, define the type of your desired fields:
+
+      schema "table_name" do
+        field :encrypted_field, MyApp.Encrypted.IntegerList
       end
   """
 

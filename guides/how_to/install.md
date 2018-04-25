@@ -6,9 +6,21 @@ This guide will walk you through installing Cloak in your project.
 
 First, add `:cloak` to your dependencies in `mix.exs`:
 
-    {:cloak, "~> 0.7.0-alpha.1"}
+    {:cloak, "~> 0.7.0-alpha.2"}
 
 Run `mix deps.get` to fetch the dependency.
+
+### Generate a Key
+
+You'll need a secret key for encryption. This is easy to generate in the
+IEx console.
+
+    $ iex
+    iex> 32 |> :crypto.strong_rand_bytes() |> Base.encode64()
+    "aJ7HcM24BcyiwsAvRsa3EG3jcvaFWooyQJ+91OO7bRU="
+
+This will generate a relatively strong encryption 256-bit encryption
+key encoded with Base64.
 
 ### Create a Vault
 
@@ -19,11 +31,12 @@ Next, create a `Cloak.Vault` for your project.
     end
 
 Configure it as shown in the `Cloak.Vault` documentation, with at least one
-active cipher. Note that the `:key` needs to be a binary, not base64 encoded.
+active cipher. Note that the `:key` needs to be decoded from Base64 encoding into
+its raw binary form.
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("your-key-here")}
       ]
 
 If you want to fetch keys from system vars, you should use the `init/1` callback

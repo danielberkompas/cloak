@@ -43,10 +43,11 @@ defmodule Cloak.Mixfile do
 
   defp docs do
     [
-      readme: "README.md",
-      main: Cloak,
+      main: "README",
       extras: [
+        "README.md",
         "guides/how_to/install.md": [title: "Install Cloak"],
+        "guides/how_to/generate_keys.md": [title: "Generate Encryption Keys"],
         "guides/how_to/encrypt_existing_data.md": [title: "Encrypt Existing Data"],
         "guides/how_to/rotate_keys.md": [title: "Rotate Keys"],
         "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]

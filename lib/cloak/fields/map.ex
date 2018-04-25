@@ -4,28 +4,43 @@ defmodule Cloak.Fields.Map do
 
   ## Configuration
 
-  You can customize the json library used for for converting the lists.
+  You can customize the json library used for for converting the maps to
+  and from JSON during encryption and decryption.
 
       config :my_app, MyApp.Vault,
         json_library: Jason
 
+  ## Migration
+
+  The database field must be of type `:binary`.
+
+      add :encrypted_field, :binary
+
   ## Usage
+
+  Define an `Encrypted.Map` module in your project:
 
       defmodule MyApp.Encrypted.Map do
         use Cloak.Fields.Map, vault: MyApp.Vault
       end
 
-  You should create the field with type `:binary`. On encryption, the map
-  will first be converted to JSON using the configured `:json_library`, and
-  then encrypted. On decryption, the `:json_library` will be used to convert
-  it back to a map.
+  Then, define the type of your desired fields:
+
+      schema "table_name" do
+        field :encrypted_field, MyApp.Encrypted.Map
+      end
+
+  On encryption, the map will first be converted to JSON using the configured
+  `:json_library`, and then encrypted. On decryption, the `:json_library`
+  will be used to convert it back to a map.
 
   This means that on decryption, atom keys will become string keys.
 
+      # ON WRITE
       %{hello: "world"}
 
-  Will become:
-
+      # ON READ
+      # Keys converted to strings
       %{"hello" => "world"}
   """
 

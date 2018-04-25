@@ -2,13 +2,28 @@ defmodule Cloak.Fields.Time do
   @moduledoc """
   An `Ecto.Type` to encrypt `Time` fields.
 
+  ## Migration
+
+  The database field must be of type `:binary`.
+
+      add :encrypted_field, :binary
+
   ## Usage
+
+  Define an `Encrypted.Time` module in your project:
 
       defmodule MyApp.Encrypted.Time do
         use Cloak.Fields.Time, vault: MyApp.Vault
       end
+
+  Then, define the type of your desired fields:
+
+      schema "table_name" do
+        field :encrypted_field, MyApp.Encrypted.Time
+      end
   """
 
+  @doc false
   defmacro __using__(opts) do
     opts = Keyword.merge(opts, vault: Keyword.fetch!(opts, :vault))
 

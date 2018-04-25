@@ -92,8 +92,8 @@ defmodule Cloak.Vault do
 
   The following Cloak field types are available:
 
-  | Type            | Ecto Type             | Field                               |
-  | --------------- | --------------------- | ----------------------------------- |
+  | Elixir Type     | Ecto Type             | Cloak Type                   |
+  | --------------- | --------------------- | ---------------------------- |
   | `String`        | `:string` / `:binary` | `Cloak.Fields.Binary`        |
   | `Date`          | `:date`               | `Cloak.Fields.Date`          |
   | `DateTime`      | `:utc_datetime`       | `Cloak.Fields.DateTime`      |
