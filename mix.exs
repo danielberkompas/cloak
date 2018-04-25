@@ -44,7 +44,7 @@ defmodule Cloak.Mixfile do
 
   defp docs do
     [
-      main: "README",
+      main: "readme",
       extras: [
         "README.md",
         "guides/how_to/install.md": [title: "Install Cloak"],
