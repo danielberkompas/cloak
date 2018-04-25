@@ -1,5 +1,18 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.1...HEAD)
+
+**Closed issues:**
+
+- \(Postgrex.Error\) ERROR 22021 \(character\_not\_in\_repertoire\) [\#65](https://github.com/danielberkompas/cloak/issues/65)
+
+**Merged pull requests:**
+
+- Update install.md [\#64](https://github.com/danielberkompas/cloak/pull/64) ([mhussa](https://github.com/mhussa))
+- Improve nil support in Ecto types [\#63](https://github.com/danielberkompas/cloak/pull/63) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v0.7.0-alpha.1](https://github.com/danielberkompas/cloak/tree/v0.7.0-alpha.1) (2018-03-21)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.2...v0.7.0-alpha.1)
 
