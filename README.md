@@ -6,7 +6,7 @@ Cloak
 [![Inline docs](http://inch-ci.org/github/danielberkompas/cloak.svg?branch=master)](http://inch-ci.org/github/danielberkompas/cloak)
 [![Coverage Status](https://coveralls.io/repos/github/danielberkompas/cloak/badge.svg?branch=migrate)](https://coveralls.io/github/danielberkompas/cloak?branch=migrate)
 
-Cloak makes it easy to encrypt fields in your [Ecto](https://github.com/elixir-ecto/ecto) schemas
+Cloak makes it easy to encrypt fields in your [Ecto](https://github.com/elixir-ecto/ecto) schemas.
 
 ## Example
 
