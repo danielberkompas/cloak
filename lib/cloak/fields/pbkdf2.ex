@@ -118,7 +118,6 @@ if Code.ensure_loaded?(:pbkdf2) do
           sha384
           sha512
         ]a
-        @sizes [16, 32, 64, 128]
 
         @impl Cloak.Fields.PBKDF2
         def init(config) do
@@ -180,11 +179,11 @@ if Code.ensure_loaded?(:pbkdf2) do
                   "#{iterations} must be a positive integer for #{inspect(__MODULE__)}"
           end
 
-          unless config[:size] in @sizes do
+          unless is_integer(config[:size]) && config[:size] > 0 do
             size = inspect(config[:size])
 
             raise Cloak.InvalidConfig,
-              "#{size} should be one of 16, 32, 64, or 128 for #{inspect(__MODULE__)}"
+                  "#{size} should be a positive integer for #{inspect(__MODULE__)}"
           end
 
           config
