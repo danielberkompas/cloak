@@ -4,7 +4,7 @@ defmodule Cloak.Mixfile do
   def project do
     [
       app: :cloak,
-      version: "0.7.0-alpha.2",
+      version: "0.7.0",
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -32,7 +32,7 @@ defmodule Cloak.Mixfile do
   defp deps do
     [
       {:ecto, ">= 1.0.0"},
-      {:flow, "~> 0.13.0"},
+      {:flow, "~> 0.13"},
       {:pbkdf2, "~> 2.0", optional: true},
       {:poison, ">= 1.5.0", optional: true},
       {:excoveralls, "~> 0.8", only: :test},

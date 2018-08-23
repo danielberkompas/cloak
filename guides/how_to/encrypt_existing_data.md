@@ -66,7 +66,7 @@ In a one-off mix task, run the following:
     |> Enum.map(fn user ->
       user
       |> Ecto.Changeset.change(%{
-           name_encrypted: user.name,
+           encrypted_name: user.name,
            encrypted_metadata: user.metadata
          })
       |> MyApp.Repo.update!()

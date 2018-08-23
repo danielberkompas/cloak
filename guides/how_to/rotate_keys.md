@@ -61,11 +61,11 @@ any old ciphertext as long as you leave its cipher configured.
 
 When you add a new default key, Cloak will immediately begin encrypting
 new data with the new key. Every time existing data are fetched from the
-database, it will be decrypted with the old key, and if changed, will
+database, they will be decrypted with the old key, and if changed, will
 be encrypted with the new key.
 
 Even if you don't run `mix cloak.migrate`, data will gradually be converted
-over to the new key as the data are used. The migration task simply speeds up
+over to the new key as they are used. The migration task simply speeds up
 the process.
 
 This allows you to perform key migrations with zero dowtime, with both
