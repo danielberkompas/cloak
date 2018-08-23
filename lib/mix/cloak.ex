@@ -4,7 +4,11 @@ defmodule Mix.Cloak do
 
   # %{ app => %{repo: repo, schemas: schemas}}
   def parse_config(args) do
-    {opts, _, _} = OptionParser.parse(args, aliases: [s: :schema, r: :repo])
+    {opts, _, _} =
+      OptionParser.parse(args,
+        aliases: [s: :schema, r: :repo],
+        strict: [schema: :string, repo: :string]
+      )
 
     opts
     |> Enum.into(%{})
