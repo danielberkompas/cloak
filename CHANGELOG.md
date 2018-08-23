@@ -1,5 +1,14 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.2...HEAD)
+
+**Merged pull requests:**
+
+- Prepare for 0.7 release [\#68](https://github.com/danielberkompas/cloak/pull/68) ([danielberkompas](https://github.com/danielberkompas))
+- Add support for PBKDF2 for blind indexing [\#67](https://github.com/danielberkompas/cloak/pull/67) ([michaelherold](https://github.com/michaelherold))
+
 ## [v0.7.0-alpha.2](https://github.com/danielberkompas/cloak/tree/v0.7.0-alpha.2) (2018-04-25)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.1...v0.7.0-alpha.2)
 
