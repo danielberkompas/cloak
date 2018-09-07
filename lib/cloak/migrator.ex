@@ -12,10 +12,12 @@ defmodule Cloak.Migrator do
     max_id = repo.aggregate(schema, :max, :id)
     fields = cloak_fields(schema)
 
-    min_id..max_id
-    |> Flow.from_enumerable(stages: System.schedulers_online())
-    |> Flow.map(&migrate_row(&1, repo, schema, fields))
-    |> Flow.run()
+    unless is_nil(min_id) and is_nil(max_id) do
+      min_id..max_id
+      |> Flow.from_enumerable(stages: System.schedulers_online())
+      |> Flow.map(&migrate_row(&1, repo, schema, fields))
+      |> Flow.run()
+    end
   end
 
   defp migrate_row(id, repo, schema, fields) do
