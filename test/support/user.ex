@@ -5,5 +5,6 @@ defmodule Cloak.TestUser do
     field(:name, :string)
     field(:email, Cloak.Test.Encrypted.Binary)
     field(:email_hash, Cloak.Test.Hashed.HMAC)
+    timestamps(type: :utc_datetime)
   end
 end

@@ -8,16 +8,27 @@ defmodule Cloak.MigratorTest do
   @email "test@email.com"
 
   defp create_user(_) do
+    for _ <- 1..200 do
+      Factory.create_user("#{32 |> :crypto.strong_rand_bytes() |> Base.encode16()}@email.com")
+    end
+
     [user: Factory.create_user(@email)]
   end
 
-  defp migrate(_) do
+  defp migrate(context) do
     Migrator.migrate(Repo, User)
-    updated = Repo.one(from(u in "users", select: [:id, :name, :email, :email_hash]))
+
+    updated =
+      from(u in "users",
+        where: u.id == ^context[:user].id,
+        select: [:id, :name, :email, :email_hash]
+      )
+      |> Repo.one()
+
     [updated: updated]
   end
 
-  describe ".migrate/2" do
+  describe ".migrate/2 with integer IDs" do
     setup [:create_user, :migrate]
 
     test "migrates cloak fields to default cipher", %{user: user, updated: updated} do
@@ -53,6 +64,32 @@ defmodule Cloak.MigratorTest do
           Migrator.migrate(Repo, invalid)
         end
       end
+    end
+  end
+
+  @post_title "Test Title"
+
+  describe ".migrate/2 with binary ids" do
+    setup do
+      now = DateTime.utc_now()
+      encrypted_title = Cloak.TestVault.encrypt!(@post_title, :secondary)
+      posts = for _ <- 1..500, do: %{title: encrypted_title, inserted_at: now, updated_at: now}
+      Repo.insert_all("posts", posts)
+
+      :ok
+    end
+
+    test "migrates all the rows to the new cipher" do
+      Migrator.migrate(Repo, Cloak.TestPost)
+
+      titles =
+        "posts"
+        |> select([:title])
+        |> Repo.all()
+        |> Enum.map(&decrypt(&1.title, :default))
+        |> Enum.uniq()
+
+      assert titles == [{:ok, @post_title}], "Not all titles were migrated!"
     end
   end
 
