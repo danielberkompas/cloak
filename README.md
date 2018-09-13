@@ -72,3 +72,6 @@ Cloak's ciphers to implement these in your application logic.
 ## Documentation
 
 Detailed documentation and guides are available [on Hex](https://hexdocs.pm/cloak).
+
+## Migrating from 0.6.x to 0.7.x
+Updating to Cloak versions `0.7.0` and higher will require changes to your configuration and Ecto models.  Please see the [0.6.x to 0.7.x Migration Guide](https://hexdocs.pm/cloak/0.6.x_to_0.7.x.html) for a full summary of changes and upgrade instructions.
