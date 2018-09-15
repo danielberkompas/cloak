@@ -8,6 +8,14 @@ defmodule Cloak.Migrator do
   def migrate(repo, schema) when is_atom(repo) and is_atom(schema) do
     validate(repo, schema)
 
+    pk_types =
+      schema.__schema__(:primary_key)
+      |> Enum.map(fn k -> schema.__schema__(:type, k) end)
+
+    migrate_schema(repo, schema, pk_types)
+  end
+
+  defp migrate_schema(repo, schema, [:id]) do
     min_id = repo.aggregate(schema, :min, :id)
     max_id = repo.aggregate(schema, :max, :id)
     fields = cloak_fields(schema)
@@ -18,6 +26,19 @@ defmodule Cloak.Migrator do
       |> Flow.map(&migrate_row(&1, repo, schema, fields))
       |> Flow.run()
     end
+  end
+
+  defp migrate_schema(repo, schema, [:binary_id]) do
+    fields = cloak_fields(schema)
+
+    repo.all(from(s in schema, select: s.id))
+    |> Flow.from_enumerable(stages: System.schedulers_online())
+    |> Flow.map(&migrate_row(&1, repo, schema, fields))
+    |> Flow.run()
+  end
+
+  defp migrate_schema(_repo, schema, _pk_types) do
+    raise ArgumentError, "#{inspect(schema)} has a composite primary key"
   end
 
   defp migrate_row(id, repo, schema, fields) do
