@@ -3,8 +3,8 @@ defmodule Cloak.Migrator.CursorStream do
   # Returns a stream of primary key values from a database table associated
   # with an Ecto.Schema.
   #
-  # Uses a multi-field cursor to page through the table, so as not to rely on
-  # sequential integer IDs to find all rows.
+  # By default, uses the primary key as the cursor. Users can specify a
+  # custom list of cursor fields using the Cloak.CustomCursor behaviour.
 
   import Ecto.Query
 
