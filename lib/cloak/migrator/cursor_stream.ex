@@ -1,5 +1,10 @@
 defmodule Cloak.Migrator.CursorStream do
   @moduledoc false
+  # Returns a stream of primary key values from a database table associated
+  # with an Ecto.Schema.
+  #
+  # Uses a multi-field cursor to page through the table, so as not to rely on
+  # sequential integer IDs to find all rows.
 
   import Ecto.Query
 
@@ -71,9 +76,10 @@ defmodule Cloak.Migrator.CursorStream do
   end
 
   defp fields_for_cursor(schema, primary_key) do
-    case schema.__schema__(:type, primary_key) do
-      :integer -> [primary_key]
-      _other -> [primary_key, :inserted_at]
+    if function_exported?(schema, :__cloak_cursor_fields__, 0) do
+      schema.__cloak_cursor_fields__
+    else
+      [primary_key]
     end
   end
 

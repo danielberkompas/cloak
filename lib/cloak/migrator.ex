@@ -19,10 +19,12 @@ defmodule Cloak.Migrator do
   end
 
   defp migrate_row(id, repo, schema, fields) do
+    [primary_key | _] = schema.__schema__(:primary_key)
+
     repo.transaction(fn ->
       query =
         schema
-        |> where(id: ^id)
+        |> where([s], field(s, ^primary_key) == ^id)
         |> lock("FOR UPDATE")
 
       case repo.one(query) do

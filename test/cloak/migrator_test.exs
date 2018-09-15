@@ -1,6 +1,8 @@
 defmodule Cloak.MigratorTest do
   use Cloak.DataCase
 
+  import ExUnit.CaptureIO
+
   alias Cloak.Migrator
   alias Cloak.TestUser, as: User
   alias Cloak.TestVault, as: Vault
@@ -80,7 +82,10 @@ defmodule Cloak.MigratorTest do
     end
 
     test "migrates all the rows to the new cipher" do
-      Migrator.migrate(Repo, Cloak.TestPost)
+      io =
+        capture_io(fn ->
+          Migrator.migrate(Repo, Cloak.TestPost)
+        end)
 
       titles =
         "posts"
@@ -89,6 +94,7 @@ defmodule Cloak.MigratorTest do
         |> Enum.map(&decrypt(&1.title, :default))
         |> Enum.uniq()
 
+      assert io =~ "__cloak_cursor_fields__", "Did not call __cloak_cursor_fields__ on schema!"
       assert titles == [{:ok, @post_title}], "Not all titles were migrated!"
     end
   end

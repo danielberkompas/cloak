@@ -15,12 +15,12 @@ defmodule Cloak.Ciphers.AES.CTR do
   Generates a random IV for every encryption, and prepends the key tag and IV to
   the beginning of the ciphertext. The format can be diagrammed like this:
 
-      +----------------------------------+----------------------+
-      |              HEADER              |         BODY         |
-      +------------------+---------------+----------------------+
-      | Key Tag (1 byte) | IV (16 bytes) | Ciphertext (n bytes) |
-      +------------------+---------------+----------------------+
-      |                  |__________________________________
+      +-----------------------------------+----------------------+
+      |               HEADER              |         BODY         |
+      +-------------------+---------------+----------------------+
+      | Key Tag (n bytes) | IV (16 bytes) | Ciphertext (n bytes) |
+      +-------------------+---------------+----------------------+
+      |                   |__________________________________
       |                                                     |
       +---------------+-----------------+-------------------+
       | Type (1 byte) | Length (1 byte) | Key Tag (n bytes) |
