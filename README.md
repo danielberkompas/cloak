@@ -8,6 +8,9 @@ Cloak
 
 Cloak makes it easy to encrypt fields in your [Ecto](https://github.com/elixir-ecto/ecto) schemas.
 
+- [Hex Documentation](https://hexdocs.pm/cloak)
+- [How to upgrade from Cloak 0.6.x to 0.7.x](https://hexdocs.pm/cloak/0.7.0/0.6.x_to_0.7.x.html)
+
 ## Example
 
 Fields are encrypted with custom `Ecto.Type` modules which Cloak helps you
@@ -68,10 +71,6 @@ at runtime is not encrypted.**
 Cloak's `Ecto.Type` modules do not support user-specific encryption keys,
 due to limitations on the `Ecto.Type` behaviour. However, you can still use
 Cloak's ciphers to implement these in your application logic.
-
-## Documentation
-
-Detailed documentation and guides are available [on Hex](https://hexdocs.pm/cloak).
 
 ## Migrating from 0.6.x to 0.7.x
 Updating to Cloak versions `0.7.0` and higher will require changes to your configuration and Ecto models.  Please see the [0.6.x to 0.7.x Migration Guide](https://hexdocs.pm/cloak/0.6.x_to_0.7.x.html) for a full summary of changes and upgrade instructions.
