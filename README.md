@@ -54,23 +54,24 @@ iex> Repo.get(MyApp.EctoSchema, 1)
 
 ## Security Notes
 
-Provided encryption algorithms are based on Erlang's `:crypto` module. The 
-following algorithms come with Cloak:
+-  **Supported Algorithms**: Cloak's built-in encryption modules rely on Erlang's 
+   `:crypto` module. Cloak supports the following algorithms out of the box:
+   
+    - AES.GCM
+    - AES.CTR
 
-  - AES.GCM
-  - AES.CTR
+- **Encrypted Data Not Searchable**: Cloak uses random IVs for each ciphertext. This 
+  means that the same value will not encrypt to the same value twice. As a result,
+  encrypted columns are not queryable. However, Cloak does provide easy ways to
+  create hashed, searchable columns.
 
-Provided encryption algorithms use random IVs for each encryption. This means
-that the same value will not encrypt to the same value twice. As a result,
-encrypted columns are not queryable. (However, Cloak has your back and provides
-easy ways to create hashed, queryable columns)
+- **Runtime Data is not Encrypted**: Cloak encrypts data _at rest_ in the database. 
+  The data in your Ecto structs at runtime is not encrypted.
 
-Cloak encrypts data _at rest_ in the database. **The data in your Ecto structs
-at runtime is not encrypted.**
-
-Cloak's `Ecto.Type` modules do not support user-specific encryption keys,
-due to limitations on the `Ecto.Type` behaviour. However, you can still use
-Cloak's ciphers to implement these in your application logic.
+- **No Support for User-specific Encryption Keys**: Cloak's `Ecto.Type` modules do not
+  support user-specific encryption keys, due to limitations on the `Ecto.Type` 
+  behaviour. However, you can still use Cloak's ciphers to implement these in your 
+  application logic.
 
 ## Migrating from 0.6.x to 0.7.x
 Updating to Cloak versions `0.7.0` and higher will require changes to your configuration and Ecto models.  Please see the [0.6.x to 0.7.x Migration Guide](https://hexdocs.pm/cloak/0.6.x_to_0.7.x.html) for a full summary of changes and upgrade instructions.
