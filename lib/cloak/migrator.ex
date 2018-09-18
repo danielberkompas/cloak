@@ -4,27 +4,27 @@ defmodule Cloak.Migrator do
   import Ecto.Query
 
   alias Ecto.Changeset
+  alias Cloak.Migrator.CursorStream
 
   def migrate(repo, schema) when is_atom(repo) and is_atom(schema) do
     validate(repo, schema)
 
-    min_id = repo.aggregate(schema, :min, :id)
-    max_id = repo.aggregate(schema, :max, :id)
     fields = cloak_fields(schema)
 
-    unless is_nil(min_id) and is_nil(max_id) do
-      min_id..max_id
-      |> Flow.from_enumerable(stages: System.schedulers_online())
-      |> Flow.map(&migrate_row(&1, repo, schema, fields))
-      |> Flow.run()
-    end
+    repo
+    |> CursorStream.new(schema, 100)
+    |> Flow.from_enumerable(stages: System.schedulers_online())
+    |> Flow.map(&migrate_row(&1, repo, schema, fields))
+    |> Flow.run()
   end
 
   defp migrate_row(id, repo, schema, fields) do
+    [primary_key | _] = schema.__schema__(:primary_key)
+
     repo.transaction(fn ->
       query =
         schema
-        |> where(id: ^id)
+        |> where([s], field(s, ^primary_key) == ^id)
         |> lock("FOR UPDATE")
 
       case repo.one(query) do

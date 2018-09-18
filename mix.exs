@@ -61,7 +61,8 @@ defmodule Cloak.Mixfile do
       groups_for_modules: [
         Behaviours: [
           Cloak.Cipher,
-          Cloak.Vault
+          Cloak.Vault,
+          Cloak.CustomCursor
         ],
         Ciphers: ~r/Ciphers.AES/,
         "Deprecated Ciphers": ~r/Ciphers.Deprecated/,
