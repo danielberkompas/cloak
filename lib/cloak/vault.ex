@@ -169,6 +169,8 @@ defmodule Cloak.Vault do
   | Type      | Ecto Type              | Field                 |
   | --------- | ---------------------- | --------------------- |
   | `String`  | `:string` / `:binary`  | `Cloak.Fields.SHA256` |
+  | `String`  | `:string` / `:binary`  | `Cloak.Fields.HMAC`   |
+  | `String`  | `:string` / `:binary`  | `Cloak.Fields.PBKDF2` |
 
   In this example, we'll use `Cloak.Fields.SHA256`:
 
