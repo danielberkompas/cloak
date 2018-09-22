@@ -1,5 +1,21 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0...HEAD)
+
+**Closed issues:**
+
+- convert Cloak errors into Ecto errors [\#74](https://github.com/danielberkompas/cloak/issues/74)
+- Support migrations with non-integer `:id` field [\#70](https://github.com/danielberkompas/cloak/issues/70)
+- Roadmap [\#66](https://github.com/danielberkompas/cloak/issues/66)
+
+**Merged pull requests:**
+
+- Support :binary\_ids via cursor paging [\#73](https://github.com/danielberkompas/cloak/pull/73) ([danielberkompas](https://github.com/danielberkompas))
+- Add a link to the 0.6.x to 0.7.x migration guide to readme [\#72](https://github.com/danielberkompas/cloak/pull/72) ([4141done](https://github.com/4141done))
+- Do not fail migration task when running on schema linked to empty table [\#69](https://github.com/danielberkompas/cloak/pull/69) ([tizpuppi](https://github.com/tizpuppi))
+
 ## [v0.7.0](https://github.com/danielberkompas/cloak/tree/v0.7.0) (2018-08-23)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.2...v0.7.0)
 
