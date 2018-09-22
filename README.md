@@ -73,5 +73,5 @@ iex> Repo.get(MyApp.EctoSchema, 1)
   behaviour. However, you can still use Cloak's ciphers to implement these in your 
   application logic.
 
-## Migrating from 0.6.x to 0.7.x
+## Migrating from 0.6.x
 Updating to Cloak versions `0.7.0` and higher will require changes to your configuration and Ecto models.  Please see the [0.6.x to 0.7.x Migration Guide](https://hexdocs.pm/cloak/0.6.x_to_0.7.x.html) for a full summary of changes and upgrade instructions.
