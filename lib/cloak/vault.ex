@@ -393,7 +393,7 @@ defmodule Cloak.Vault do
 
   @doc false
   def save_config(table_name, config) do
-    if :ets.whereis(table_name) == :undefined do
+    if :ets.info(table_name) == :undefined do
       :ets.new(table_name, [:named_table, :protected])
     end
 
