@@ -39,16 +39,9 @@ defmodule Cloak.Ciphers.AES.GCM do
   def encrypt(plaintext, opts) do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
-    iv = generate_iv()
+    iv = :crypto.strong_rand_bytes(16)
 
-    {ciphertext, ciphertag} =
-      :crypto.block_encrypt(
-        :aes_gcm,
-        key,
-        iv,
-        {@aad, plaintext}
-      )
-
+    {ciphertext, ciphertag} = :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
     {:ok, Encoder.encode(tag) <> iv <> ciphertag <> ciphertext}
   end
 
@@ -86,6 +79,4 @@ defmodule Cloak.Ciphers.AES.GCM do
         false
     end
   end
-
-  defp generate_iv, do: :crypto.strong_rand_bytes(16)
 end

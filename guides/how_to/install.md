@@ -6,7 +6,7 @@ This guide will walk you through installing Cloak in your project.
 
 First, add `:cloak` to your dependencies in `mix.exs`:
 
-    {:cloak, "~> 0.7.0"}
+    {:cloak, "~> 0.9.0"}
 
 Run `mix deps.get` to fetch the dependency.
 
@@ -54,18 +54,24 @@ to configure the vault instead:
       def init(config) do
         config =
           Keyword.put(config, :ciphers, [
-            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env("CLOAK_KEY")}
+            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("CLOAK_KEY")}
           ])
 
         {:ok, config}
       end
 
-      defp decode_env(var) do
+      defp decode_env!(var) do
         var
         |> System.get_env()
         |> Base.decode64!()
       end
     end
+
+Finally, add your vault to your supervision tree.
+
+    children = [
+      MyApp.Vault
+    ]
 
 ### Create Local Ecto Types
 

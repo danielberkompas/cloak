@@ -4,7 +4,7 @@ defmodule Cloak.Mixfile do
   def project do
     [
       app: :cloak,
-      version: "0.8.0",
+      version: "0.9.0",
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -51,6 +51,7 @@ defmodule Cloak.Mixfile do
         "guides/how_to/generate_keys.md": [title: "Generate Encryption Keys"],
         "guides/how_to/encrypt_existing_data.md": [title: "Encrypt Existing Data"],
         "guides/how_to/rotate_keys.md": [title: "Rotate Keys"],
+        "guides/upgrading/0.8.x_to_0.9.x.md": [title: "0.8.x to 0.9.x"],
         "guides/upgrading/0.7.x_to_0.8.x.md": [title: "0.7.x to 0.8.x"],
         "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]
       ],
