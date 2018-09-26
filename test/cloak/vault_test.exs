@@ -3,6 +3,54 @@ defmodule Cloak.VaultTest do
 
   alias Cloak.TestVault
 
+  defmodule RuntimeVault do
+    use Cloak.Vault, otp_app: :cloak
+  end
+
+  defmodule SupervisedVault do
+    use Cloak.Vault, otp_app: :cloak
+  end
+
+  describe ".start_link/1" do
+    test "allows configuration" do
+      key = :crypto.strong_rand_bytes(32)
+
+      {:ok, pid} =
+        RuntimeVault.start_link(
+          ciphers: [
+            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: key}
+          ],
+          json_library: Jason
+        )
+
+      assert RuntimeVault.json_library() == Jason
+
+      assert "plaintext" ==
+               "plaintext"
+               |> RuntimeVault.encrypt!()
+               |> RuntimeVault.decrypt!()
+
+      GenServer.stop(pid)
+    end
+
+    test "can be supervised" do
+      assert {:ok, pid} = Supervisor.start_link([SupervisedVault], strategy: :one_for_one)
+      assert SupervisedVault.json_library() == Poison
+      GenServer.stop(pid)
+
+      assert {:ok, pid} =
+               Supervisor.start_link(
+                 [
+                   {SupervisedVault, json_library: Jason}
+                 ],
+                 strategy: :one_for_one
+               )
+
+      assert SupervisedVault.json_library() == Jason
+      GenServer.stop(pid)
+    end
+  end
+
   describe ".init/1" do
     test "returns the given config" do
       assert {:ok, []} == TestVault.init([])
@@ -82,15 +130,6 @@ defmodule Cloak.VaultTest do
   describe ".json_library/1" do
     test "returns Poison by default" do
       assert TestVault.json_library() == Poison
-    end
-
-    test "can be configured" do
-      existing = Application.get_env(:cloak, Cloak.TestVault)
-      Application.put_env(:cloak, Cloak.TestVault, Keyword.merge(existing, json_library: Jason))
-
-      assert TestVault.json_library() == Jason
-
-      Application.put_env(:cloak, Cloak.TestVault, existing)
     end
   end
 end

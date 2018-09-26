@@ -4,7 +4,7 @@ defmodule Cloak.Vault do
 
   ## Configuration
 
-  When used, the vault expects the `:otp_app` option. The `:otp_app` option
+  Vaults require the `:otp_app` option. The `:otp_app` option
   should point to an OTP application that has the vault configuration.
 
   For example, the vault:
@@ -23,33 +23,28 @@ defmodule Cloak.Vault do
 
   The configuration options are:
 
-  ### `:json_library`
+  - `:json_library`: Used to convert data types like lists and maps into
+    binary so that they can be encrypted. (Default: `Poison`)
 
-  Used to convert data types like lists and maps into binary so that they can
-  be encrypted. (Default: `Poison`)
+  - :ciphers: a list of `Cloak.Cipher` modules the following format:
 
-  ### `:ciphers`
+          {:label, {CipherModule, opts}}
 
-  A `Keyword` list of `Cloak.Cipher` modules to use for encryption or
-  decryption, in the following format:
+    **The first configured cipher in the list is the default for encrypting
+    all new data, regardless of its label.** This behaviour can be overridden
+    on a field-by-field basis.
 
-      {label, {cipher_module, opts}}
+    The `opts` are specific to each cipher module. Check their
+    codumentation for what each cipher requires.
 
-  The `opts` are specific to each cipher module. Check their documentation
-  for details. The following ciphers ship with Cloak:
-
-  - `Cloak.Ciphers.AES.GCM` (recommended) - AES encryption in Galois Counter Mode (GCM).
-  - `Cloak.Ciphers.AES.CTR` - AES encryption in CTR stream mode.
-
-  **IMPORTANT: THE _FIRST_ CONFIGURED CIPHER IN THE LIST IS THE DEFAULT FOR
-  ENCRYPTING ALL NEW DATA.** (Regardless of its label!) The other ciphers
-  are, by default, used only for decryption. (This behavior can be overriden
-  on a field-by-field basis, see below)
+      - `Cloak.Ciphers.AES.GCM`
+      - `Cloak.Ciphers.AES.CTR`
 
   ### Runtime Configuration
 
-  Vaults can be configured at runtime using the `init/1` callback. This allows
-  you to easily fetch values like environment variables in a reliable way.
+  Because Vaults are GenServers, they can be configured at runtime using the
+  `init/1` callback. This allows you to easily fetch values like environment
+  variables in a reliable way.
 
   The configuration from the `:otp_app` is passed as the first argument to the
   callback, allowing you to append to or change it at will.
@@ -57,16 +52,28 @@ defmodule Cloak.Vault do
       defmodule MyApp.Vault do
         use Cloak.Vault, otp_app: :my_app
 
-        @impl Cloak.Vault
+        @impl GenServer
         def init(config) do
           config =
             Keyword.put(config, :ciphers, [
-              default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
+              default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("CLOAK_KEY")}
             ])
 
           {:ok, config}
         end
+
+        defp decode_env!(var) do
+          var
+          |> System.get_env()
+          |> Base.decode64!()
+        end
       end
+
+  You can also pass configuration to vaults via `start_link/1`:
+
+      MyApp.Vault.start_link(ciphers: [
+        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: key}
+      ])
 
   ### Configuring Ecto Types
 
@@ -104,6 +111,21 @@ defmodule Cloak.Vault do
   | `Time`          | `:time`               | `Cloak.Fields.Time`          |
   | `[Integer]`     | `{:array, :integer}`  | `Cloak.Fields.IntegerList`   |
   | `[String]`      | `{:array, :string}`   | `Cloak.Fields.StringList`    |
+
+  ## Supervision
+
+  Because Vaults are `GenServer`s, you'll need to add your vault to your
+  supervision tree in `application.ex` or whichever supervisor you prefer.
+
+      children = [
+        MyApp.Vault
+      ]
+
+  If you want to pass in configuration values at runtime, you can do so:
+
+      children = [
+        {MyApp.Vault, ciphers: [...]}
+      ]
 
   ## Usage
 
@@ -208,31 +230,17 @@ defmodule Cloak.Vault do
   ### Rotating Keys
 
   See `Mix.Tasks.Cloak.Migrate` for instructions on how to rotate keys.
-  """
 
-  alias Cloak.MissingCipher
+  ### Performance Notes
+
+  Vaults are not bottlenecks. They simply store configuration in ETS
+  tables. All encryption and decryption is performed in your local
+  process, reading configuration from the vault's ETS table.
+  """
 
   @type plaintext :: binary
   @type ciphertext :: binary
   @type label :: atom
-
-  @doc """
-  Accepts configuration from the vault's `:otp_app`, and returns updated
-  configuration. Useful for changing configuration based on the runtime
-  environment.
-
-  ## Example
-
-      def init(config) do
-        config =
-          Keyword.put(config, :ciphers, [
-            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: System.get_env("CLOAK_KEY")}
-          ])
-
-        {:ok, config}
-      end
-  """
-  @callback init(config :: Keyword.t()) :: {:ok, Keyword.t()} | :error
 
   @doc """
   Encrypts a binary using the first configured cipher in the vault's
@@ -260,7 +268,7 @@ defmodule Cloak.Vault do
   Decrypts a binary with the configured cipher that generated the binary.
   Automatically detects which cipher to use, based on the ciphertext.
   """
-  @callback decrypt(ciphertext) :: {:ok, String.t()} | {:error, Exception.t()}
+  @callback decrypt(ciphertext) :: {:ok, plaintext} | {:error, Exception.t()}
 
   @doc """
   Like `decrypt/1`, but raises any errors.
@@ -273,65 +281,144 @@ defmodule Cloak.Vault do
   """
   @callback json_library :: module
 
-  @doc false
   defmacro __using__(opts) do
     otp_app = Keyword.fetch!(opts, :otp_app)
 
     quote location: :keep do
-      @behaviour Cloak.Vault
+      use GenServer
 
-      @impl Cloak.Vault
+      @behaviour Cloak.Vault
+      @otp_app unquote(otp_app)
+      @table_name :"#{__MODULE__}.Config"
+
+      ###
+      # GenServer
+      ###
+
+      def start_link(config \\ []) do
+        # Merge passed in configuration with otp_app configuration
+        app_config = Application.get_env(@otp_app, __MODULE__, [])
+        config = Keyword.merge(app_config, config)
+
+        # Start the server
+        {:ok, pid} = GenServer.start_link(__MODULE__, config, name: __MODULE__)
+
+        # Ensure that the configuration is saved
+        GenServer.call(pid, :save_config, 10_000)
+
+        # Return the pid
+        {:ok, pid}
+      end
+
+      # Users can override init/1 to customize the configuration
+      # of the vault during startup
+      @impl GenServer
       def init(config) do
         {:ok, config}
       end
 
+      # Cache the results of the `init` configuration callback in
+      # the application configuration for this Vault.
+      @impl GenServer
+      def handle_call(:save_config, _from, config) do
+        Cloak.Vault.save_config(@table_name, config)
+        {:reply, :ok, config}
+      end
+
+      # If a hot upgrade occurs, rerun the `init` callback to
+      # refresh the configuration in case it changed
+      @impl GenServer
+      def code_change(_vsn, config, _extra) do
+        config = init(config)
+        Cloak.Vault.save_config(@table_name, config)
+        {:ok, config}
+      end
+
+      ###
+      # Encrypt/Decrypt functions
+      ###
+
       @impl Cloak.Vault
       def encrypt(plaintext) do
-        Cloak.Vault.encrypt(build_config(), plaintext)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.encrypt(plaintext)
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext) do
-        Cloak.Vault.encrypt!(build_config(), plaintext)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.encrypt!(plaintext)
       end
 
       @impl Cloak.Vault
       def encrypt(plaintext, label) do
-        Cloak.Vault.encrypt(build_config(), plaintext, label)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.encrypt(plaintext, label)
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext, label) do
-        Cloak.Vault.encrypt!(build_config(), plaintext, label)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.encrypt!(plaintext, label)
       end
 
       @impl Cloak.Vault
       def decrypt(ciphertext) do
-        Cloak.Vault.decrypt(build_config(), ciphertext)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.decrypt(ciphertext)
       end
 
       @impl Cloak.Vault
       def decrypt!(ciphertext) do
-        Cloak.Vault.decrypt!(build_config(), ciphertext)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Cloak.Vault.decrypt!(ciphertext)
       end
 
       @impl Cloak.Vault
       def json_library do
-        Keyword.get(build_config(), :json_library, Poison)
+        @table_name
+        |> Cloak.Vault.read_config()
+        |> Keyword.get(:json_library, Poison)
       end
 
-      defp build_config do
-        Cloak.Vault.build_config(__MODULE__, unquote(otp_app))
-      end
+      defoverridable(Module.definitions_in(__MODULE__))
+    end
+  end
 
-      defoverridable init: 1, encrypt: 1, decrypt: 1
+  @doc false
+  def save_config(table_name, config) do
+    if :ets.info(table_name) == :undefined do
+      :ets.new(table_name, [:named_table, :protected])
+    end
+
+    :ets.insert(table_name, {:config, config})
+  end
+
+  @doc false
+  def read_config(table_name) do
+    case :ets.lookup(table_name, :config) do
+      [{:config, config} | _] ->
+        config
+
+      _ ->
+        :error
     end
   end
 
   @doc false
   def encrypt(config, plaintext) do
-    [{_label, {module, opts}} | _ciphers] = config[:ciphers]
-    module.encrypt(plaintext, opts)
+    with [{_label, {module, opts}} | _ciphers] <- config[:ciphers] do
+      module.encrypt(plaintext, opts)
+    else
+      _ ->
+        {:error, Cloak.InvalidConfig.exception("could not encrypt due to missing configuration")}
+    end
   end
 
   @doc false
@@ -349,7 +436,7 @@ defmodule Cloak.Vault do
   def encrypt(config, plaintext, label) do
     case config[:ciphers][label] do
       nil ->
-        {:error, MissingCipher.exception(vault: config[:vault], label: label)}
+        {:error, Cloak.MissingCipher.exception(vault: config[:vault], label: label)}
 
       {module, opts} ->
         module.encrypt(plaintext, opts)
@@ -371,7 +458,7 @@ defmodule Cloak.Vault do
   def decrypt(config, ciphertext) do
     case find_module_to_decrypt(config, ciphertext) do
       nil ->
-        {:error, MissingCipher.exception(vault: config[:vault], ciphertext: ciphertext)}
+        {:error, Cloak.MissingCipher.exception(vault: config[:vault], ciphertext: ciphertext)}
 
       {_label, {module, opts}} ->
         module.decrypt(ciphertext, opts)
@@ -393,16 +480,5 @@ defmodule Cloak.Vault do
     Enum.find(config[:ciphers], fn {_label, {module, opts}} ->
       module.can_decrypt?(ciphertext, opts)
     end)
-  end
-
-  @doc false
-  def build_config(vault, otp_app) do
-    {:ok, config} =
-      otp_app
-      |> Application.get_env(vault, [])
-      |> Keyword.put(:vault, vault)
-      |> vault.init()
-
-    config
   end
 end
