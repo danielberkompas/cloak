@@ -1,5 +1,17 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.8.0...HEAD)
+
+**Closed issues:**
+
+- Make Cloak.Vault a GenServer [\#75](https://github.com/danielberkompas/cloak/issues/75)
+
+**Merged pull requests:**
+
+- \[\#75\] Make Cloak.Vault a GenServer [\#78](https://github.com/danielberkompas/cloak/pull/78) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v0.8.0](https://github.com/danielberkompas/cloak/tree/v0.8.0) (2018-09-22)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0...v0.8.0)
 
