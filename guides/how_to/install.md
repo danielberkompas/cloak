@@ -50,7 +50,7 @@ to configure the vault instead:
     defmodule MyApp.Vault do
       use Cloak.Vault, otp_app: :my_app
 
-      @impl Cloak.Vault
+      @impl GenServer
       def init(config) do
         config =
           Keyword.put(config, :ciphers, [
