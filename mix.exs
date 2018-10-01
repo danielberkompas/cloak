@@ -32,7 +32,7 @@ defmodule Cloak.Mixfile do
   defp deps do
     [
       {:ecto, ">= 1.0.0"},
-      {:flow, "~> 0.13"},
+      {:flow, "~> 0.14"},
       {:pbkdf2, "~> 2.0", optional: true},
       {:poison, ">= 1.5.0", optional: true},
       {:excoveralls, "~> 0.8", only: :test},
