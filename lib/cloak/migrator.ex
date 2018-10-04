@@ -51,12 +51,18 @@ defmodule Cloak.Migrator do
     |> Enum.map(fn field ->
       {field, schema.__schema__(:type, field)}
     end)
-    |> Enum.filter(fn {_field, type} ->
-      Code.ensure_loaded?(type) && function_exported?(type, :__cloak__, 0)
-    end)
+    |> Enum.filter(&cloak_field?/1)
     |> Enum.map(fn {field, _type} ->
       field
     end)
+  end
+
+  defp cloak_field?({_field, {:embed, %Ecto.Embedded{}}}) do
+    false
+  end
+
+  defp cloak_field?({_field, type}) do
+    Code.ensure_loaded?(type) && function_exported?(type, :__cloak__, 0)
   end
 
   defp validate(repo, schema) do

@@ -7,6 +7,7 @@ defmodule Cloak.TestPost do
 
   schema "posts" do
     field(:title, Cloak.Test.Encrypted.Binary)
+    embeds_many(:comments, Cloak.TestComment)
     timestamps(type: :utc_datetime)
   end
 

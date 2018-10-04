@@ -12,3 +12,5 @@ script:
 after_script:
   - MIX_ENV=docs mix deps.get
   - MIX_ENV=docs mix inch.report
+addons:
+  postgresql: "9.4"

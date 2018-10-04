@@ -75,7 +75,17 @@ defmodule Cloak.MigratorTest do
     setup do
       now = DateTime.utc_now()
       encrypted_title = Cloak.TestVault.encrypt!(@post_title, :secondary)
-      posts = for _ <- 1..500, do: %{title: encrypted_title, inserted_at: now, updated_at: now}
+
+      posts =
+        for _ <- 1..500 do
+          %{
+            title: encrypted_title,
+            comments: [%{author: "Daniel", body: "Comment"}],
+            inserted_at: now,
+            updated_at: now
+          }
+        end
+
       Repo.insert_all("posts", posts)
 
       :ok
