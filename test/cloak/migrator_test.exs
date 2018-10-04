@@ -21,7 +21,8 @@ defmodule Cloak.MigratorTest do
     Migrator.migrate(Repo, User)
 
     updated =
-      from(u in "users",
+      from(
+        u in "users",
         where: u.id == ^context[:user].id,
         select: [:id, :name, :email, :email_hash]
       )
@@ -96,6 +97,12 @@ defmodule Cloak.MigratorTest do
 
       assert io =~ "__cloak_cursor_fields__", "Did not call __cloak_cursor_fields__ on schema!"
       assert titles == [{:ok, @post_title}], "Not all titles were migrated!"
+    end
+  end
+
+  describe ".migrate/2 on a schema with no rows" do
+    test "alerts no data available to migrate" do
+      assert match?({:ok, "Empty schema. No data migrated."}, Migrator.migrate(Repo, User))
     end
   end
 
