@@ -9,7 +9,9 @@ defmodule Cloak.Migrator do
   def migrate(repo, schema) when is_atom(repo) and is_atom(schema) do
     validate(repo, schema)
 
-    case repo.aggregate(schema, :count, :id) do
+    [primary_key | _] = schema.__schema__(:primary_key)
+
+    case repo.aggregate(schema, :count, primary_key) do
       0 -> {:ok, "Empty schema. No data migrated."}
       _ -> migrate_schema_with_data(repo, schema)
     end
