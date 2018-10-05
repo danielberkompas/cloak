@@ -21,7 +21,8 @@ defmodule Cloak.MigratorTest do
     Migrator.migrate(Repo, User)
 
     updated =
-      from(u in "users",
+      from(
+        u in "users",
         where: u.id == ^context[:user].id,
         select: [:id, :name, :email, :email_hash]
       )
