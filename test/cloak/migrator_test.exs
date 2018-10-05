@@ -100,12 +100,6 @@ defmodule Cloak.MigratorTest do
     end
   end
 
-  describe ".migrate/2 on a schema with no rows" do
-    test "alerts no data available to migrate" do
-      assert match?({:ok, "Empty schema. No data migrated."}, Migrator.migrate(Repo, User))
-    end
-  end
-
   defp decrypt(ciphertext, label) do
     {cipher, opts} = Application.get_env(:cloak, Vault)[:ciphers][label]
     cipher.decrypt(ciphertext, opts)

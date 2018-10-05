@@ -12,7 +12,7 @@ defmodule Cloak.Migrator do
     [primary_key | _] = schema.__schema__(:primary_key)
 
     case repo.aggregate(schema, :count, primary_key) do
-      0 -> {:ok, "Empty schema. No data migrated."}
+      0 -> :ok
       _ -> migrate_schema_with_data(repo, schema)
     end
   end
