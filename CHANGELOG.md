@@ -1,5 +1,21 @@
 # Change Log
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.0...HEAD)
+
+**Closed issues:**
+
+- Testing with hashed fields fails to equal fixture [\#85](https://github.com/danielberkompas/cloak/issues/85)
+- Migrator Embedded Schema Error [\#81](https://github.com/danielberkompas/cloak/issues/81)
+
+**Merged pull requests:**
+
+- \[\#81\] Fix migrator with embedded schemas [\#83](https://github.com/danielberkompas/cloak/pull/83) ([danielberkompas](https://github.com/danielberkompas))
+- Migration task succeeds on empty table [\#82](https://github.com/danielberkompas/cloak/pull/82) ([kevin-j-m](https://github.com/kevin-j-m))
+- Update docs [\#80](https://github.com/danielberkompas/cloak/pull/80) ([hl](https://github.com/hl))
+- Upgrade Flow to 0.14 [\#79](https://github.com/danielberkompas/cloak/pull/79) ([mikeastock](https://github.com/mikeastock))
+
 ## [v0.9.0](https://github.com/danielberkompas/cloak/tree/v0.9.0) (2018-09-29)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.8.0...v0.9.0)
 
