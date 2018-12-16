@@ -1,8 +1,7 @@
 use Mix.Config
 
-config :cloak, json_library: Poison
-
 config :cloak, Cloak.TestVault,
+  json_library: Poison,
   ciphers: [
     default:
       {Cloak.Ciphers.AES.GCM,
@@ -13,14 +12,3 @@ config :cloak, Cloak.TestVault,
   ]
 
 config :logger, level: :warn
-
-config :cloak, ecto_repos: [Cloak.TestRepo]
-
-config :cloak, Cloak.TestRepo,
-  adapter: Ecto.Adapters.Postgres,
-  username: "postgres",
-  password: "postgres",
-  database: "cloak_test",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox,
-  priv: "test/support/"
