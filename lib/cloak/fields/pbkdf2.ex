@@ -167,31 +167,33 @@ if Code.ensure_loaded?(:pbkdf2) do
         end
 
         defp validate_config(config) do
+          m = inspect(__MODULE__)
+
           unless is_binary(config[:secret]) do
             secret = inspect(config[:secret])
 
-            raise Cloak.InvalidConfig, "#{secret} is an invalid secret for #{inspect(__MODULE__)}"
+            raise Cloak.InvalidConfig, "#{secret} is an invalid secret for #{m}"
           end
 
           unless config[:algorithm] in @algorithms do
             algo = inspect(config[:algorithm])
 
             raise Cloak.InvalidConfig,
-                  "#{algo} is an invalid hash algorithm for #{inspect(__MODULE__)}"
+                  "#{algo} is an invalid hash algorithm for #{m}"
           end
 
           unless is_integer(config[:iterations]) && config[:iterations] > 0 do
             iterations = inspect(config[:iterations])
 
             raise Cloak.InvalidConfig,
-                  "#{iterations} must be a positive integer for #{inspect(__MODULE__)}"
+                  "Interations must be a positive integer for #{m}, got: #{iterations}"
           end
 
           unless is_integer(config[:size]) && config[:size] > 0 do
             size = inspect(config[:size])
 
             raise Cloak.InvalidConfig,
-                  "#{size} should be a positive integer for #{inspect(__MODULE__)}"
+                  "Size should be a positive integer for #{m}, got: #{size}"
           end
 
           config
