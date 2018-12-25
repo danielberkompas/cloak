@@ -39,7 +39,8 @@ if Code.ensure_loaded?(:pbkdf2) do
         config :my_app, MyApp.Hashed.PBKDF2,
           algorithm: :sha256,
           iterations: 10_000,
-          secret: "secret"
+          secret: "secret",
+          size: 64
 
     Or using the `init/1` callback to fetch configuration at runtime:
 
