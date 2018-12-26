@@ -179,7 +179,9 @@ if Code.ensure_loaded?(:pbkdf2) do
             algo = inspect(config[:algorithm])
 
             raise Cloak.InvalidConfig,
-                  "#{algo} is an invalid hash algorithm for #{m}"
+                  "#{algo} is an invalid hash algorithm for #{m}, must be in #{
+                    inspect(@algorithms)
+                  }"
           end
 
           unless is_integer(config[:iterations]) && config[:iterations] > 0 do
