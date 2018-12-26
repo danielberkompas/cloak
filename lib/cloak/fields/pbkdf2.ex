@@ -186,7 +186,7 @@ if Code.ensure_loaded?(:pbkdf2) do
             iterations = inspect(config[:iterations])
 
             raise Cloak.InvalidConfig,
-                  "Interations must be a positive integer for #{m}, got: #{iterations}"
+                  "Iterations must be a positive integer for #{m}, got: #{iterations}"
           end
 
           unless is_integer(config[:size]) && config[:size] > 0 do
