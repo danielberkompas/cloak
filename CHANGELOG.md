@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.9.2](https://github.com/danielberkompas/cloak/tree/v0.9.2) (2018-12-26)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.1...v0.9.2)
+
+**Merged pull requests:**
+
+- Fix typo & add better error msg for PBKDF2 algorithm [\#88](https://github.com/danielberkompas/cloak/pull/88) ([jc00ke](https://github.com/jc00ke))
+- Improve PBKDF2 config error messages [\#87](https://github.com/danielberkompas/cloak/pull/87) ([jc00ke](https://github.com/jc00ke))
+
 ## [v0.9.1](https://github.com/danielberkompas/cloak/tree/v0.9.1) (2018-10-07)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.0...v0.9.1)
 
