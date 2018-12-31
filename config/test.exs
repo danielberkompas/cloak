@@ -1,7 +1,7 @@
 use Mix.Config
 
 config :cloak, Cloak.TestVault,
-  json_library: Poison,
+  json_library: Jason,
   ciphers: [
     default:
       {Cloak.Ciphers.AES.GCM,

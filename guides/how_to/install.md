@@ -6,7 +6,7 @@ This guide will walk you through installing Cloak in your project.
 
 First, add `:cloak` to your dependencies in `mix.exs`:
 
-    {:cloak, "~> 0.9.2"}
+    {:cloak, "1.0.0-alpha.0"}
 
 Run `mix deps.get` to fetch the dependency.
 
@@ -73,75 +73,28 @@ Finally, add your vault to your supervision tree.
       MyApp.Vault
     ]
 
-### Create Local Ecto Types
-
-For each type of data you want to encrypt, define a local Ecto type like so.
-
-    defmodule MyApp.Encrypted.Binary do
-      use Cloak.Fields.Binary, vault: MyApp.Vault
-    end
-
-You can find a complete list of available types in the "MODULES" documentation.
-
-### Create Your Schema
-
-If you want to encrypt an existing schema, see the guide on [Encrypting
-Existing Data](encrypt_existing_data.html).
-
-If you're starting from scratch with a new `Ecto.Schema`, it's enough to
-generate the migration with the correct fields, for example:
-
-    create table(:users) do
-      add :email, :binary
-      add :email_hash, :binary # will be used for searching
-      # ...
-
-      timestamps()
-    end
-
-The schema module should look like this:
-
-    defmodule MyApp.Accounts.User do
-      use Ecto.Schema
-
-      import Ecto.Changeset
-
-      schema "users" do
-        field :email, MyApp.Encrypted.Binary
-        field :email_hash, Cloak.Fields.SHA256
-        # ... other fields
-
-        timestamps()
-      end
-
-      @doc false
-      def changeset(struct, attrs \\ %{}) do
-        struct
-        |> cast(attrs, [:email])
-        |> put_hashed_fields()
-      end
-
-      defp put_hashed_fields(changeset) do
-        changeset
-        |> put_change(:email_hash, get_field(changeset, :email))
-      end
-    end
-
-This example also shows how you would make a given field queryable by
-creating a mirrored `_hash` field. See `Cloak.Fields.SHA256` or
-`Cloak.Fields.HMAC` for more details.
-
 ## Usage
 
-Your encrypted fields will be transparently encrypted and decrypted as
-data are loaded from the database.
+You can now encrypt and decrypt values using your Vault.
 
-    Repo.get(Accounts.User, 1)
-    # => %Accounts.User{email: "test@example.com", email_hash: <<115, 6, 45, 135, 41, ...>>}
+    {:ok, ciphertext} = MyApp.Vault.encrypt("plaintext") 
+    # => {:ok, <<1, 10, 65, 69, 83, 46, 71, 67, 77, 46, 86, 49, 93, 140, 255, 234,
+    1, 195, 125, 112, 121, 186, 169, 185, 129, 122, 237, 161, 160, 24, 166,
+    48, 224, 230, 53, 194, 251, 175, 215, 10, 186, 130, 61, 230, 176, 102,
+    213, 209, ...>>}
 
-You can query by the mirrored `_hash` fields:
+    MyApp.Vault.decrypt(ciphertext)
+    {:ok, "plaintext"}
 
-    Repo.get_by(Accounts.User, email_hash: "test@example.com")
-    # => %Accounts.User{email: "test@example.com", ...}
+By default, the first configured key will be used. You can use a specific key
+to use by referencing its label:
 
-And you're done! Cloak is successfully installed.
+    MyApp.Vault.encrypt("plaintext", :default)
+
+Decryption will use the metadata embedded in the ciphertext to decide which
+configured key to use.
+
+## Usage with Ecto
+
+If you want to use Cloak to automatically encrypt and decrypt fields in your
+`Ecto` schemas, see [`cloak_ecto`](https://hex.pm/packages/cloak_ecto).

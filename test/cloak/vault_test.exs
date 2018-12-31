@@ -35,7 +35,7 @@ defmodule Cloak.VaultTest do
 
     test "can be supervised" do
       assert {:ok, pid} = Supervisor.start_link([SupervisedVault], strategy: :one_for_one)
-      assert SupervisedVault.json_library() == Poison
+      assert SupervisedVault.json_library() == Jason
       GenServer.stop(pid)
 
       assert {:ok, pid} =
@@ -128,8 +128,8 @@ defmodule Cloak.VaultTest do
   end
 
   describe ".json_library/1" do
-    test "returns Poison by default" do
-      assert TestVault.json_library() == Poison
+    test "returns Jason by default" do
+      assert TestVault.json_library() == Jason
     end
   end
 end

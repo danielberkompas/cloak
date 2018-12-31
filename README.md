@@ -6,72 +6,87 @@ Cloak
 [![Inline docs](http://inch-ci.org/github/danielberkompas/cloak.svg?branch=master)](http://inch-ci.org/github/danielberkompas/cloak)
 [![Coverage Status](https://coveralls.io/repos/github/danielberkompas/cloak/badge.svg?branch=migrate)](https://coveralls.io/github/danielberkompas/cloak?branch=migrate)
 
-Cloak makes it easy to encrypt fields in your [Ecto](https://github.com/elixir-ecto/ecto) schemas.
+Cloak is an Elixir encryption library that implements several best practices
+and conveniences for Elixir developers:
 
-- [Hex Documentation](https://hexdocs.pm/cloak)
-- [How to upgrade from Cloak 0.6.x to 0.7.x](https://hexdocs.pm/cloak/0.7.0/0.6.x_to_0.7.x.html)
+- Random IVs
+- Tagged ciphertexts
+- Elixir-native configuration
 
-## Example
+## Documentation
 
-Fields are encrypted with custom `Ecto.Type` modules which Cloak helps you
-create.
+- [Hex Documentation](https://hexdocs.pm/cloak) (Includes installation guide)
+- [How to upgrade from Cloak 0.9.x to 1.0.x](https://hexdocs.pm/cloak/0.9.x_to_1.0.x.html)
 
-```elixir
-defmodule MyApp.EctoSchema do
-  use Ecto.Schema
+## Examples
 
-  schema "table_name" do
-    field :encrypted_field, MyApp.Encrypted.Binary
-
-    # ...
-  end
-end
-```
-
-When Ecto writes these fields to the database, it encrypts the values into
-a binary blob, using a configured encryption algorithm chosen by you.
-
-```console
-iex> Repo.insert!(%MyApp.EctoSchema{encrypted_field: "plaintext"})
-08:46:08.862 [debug] QUERY OK db=3.4ms
-INSERT INTO "table_name" ("encrypted_field") VALUES ($1) RETURNING "id", "encrypted_field" [<<1,10, 65, 69, 83, 46, 67, 84, 82, 46, 86, 49, 69, 92, 173, 219, 203, 238, 26, 58, 236, 5, 104, 23, 12, 10, 182, 31, 221, 89, 22, 58, 34, 79, 109, 30, 70, 254, 56, 93, 102, 84>>]
-```
-
-Likewise, when Ecto reads the field out of the database, it will automatically
-decrypt the value.
+### Encrypt / Decrypt
 
 ```elixir
-iex> Repo.get(MyApp.EctoSchema, 1)
-%MyApp.EctoSchema{encrypted_field: "plaintext"}
+{:ok, ciphertext} = MyApp.Vault.encrypt("plaintext")
+# => {:ok, <<1, 10, 65, 69, 83, 46, 71, 67, 77, 46, 86, 49, 45, 1, 250, 221,
+# =>  189, 64, 26, 214, 26, 147, 171, 101, 181, 158, 224, 117, 10, 254, 140, 207, 
+# =>  215, 98, 208, 208, 174, 162, 33, 197, 179, 56, 236, 71, 81, 67, 85, 229, 
+# =>  ...>>}
+
+MyApp.Vault.decrypt(ciphertext)
+# => {:ok, "plaintext"}
 ```
 
-## Notable Features
+### Reencrypt With New Algorithm/Key
 
-- Transparent, easy to use encryption for database fields
-- Fully compatible with umbrella projects (as of 0.7.0)
-- Bring your own encryption algorithm, if you want
-- Mix task for key rotation: `mix cloak.migrate`
+```elixir
+"plaintext"
+|> MyApp.Vault.encrypt!(:aes_gcm)
+|> MyApp.Vault.decrypt!()
+|> MyApp.Vault.encrypt!(:aes_ctr)
+|> MyApp.Vault.decrypt!()
+# => "plaintext"
+```
+
+### Configuration
+
+```elixir
+config :my_app, MyApp.Vault,
+  ciphers: [
+    aes_gcm: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>},
+    aes_ctr: {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: <<...>>}
+  ]
+```
+
+## Features
+
+### Random Initialization Vectors (IV)
+
+Every strong encryption algorithm recommends unique initialization vectors.
+Cloak automatically generates unique vectors using
+`:crypto.strong_rand_bytes`, and includes the IV in the ciphertext.
+This greatly simplifies storage and is not a security risk.
+
+### Tagged Ciphertext
+
+Each ciphertext contains metadata about the algorithm and key which was used
+to encrypt it. This allows Cloak to automatically select the correct key and
+algorithm to use for decryption for any given ciphertext.
+
+This makes key rotation much easier, because you can easily tell whether any
+given ciphertext is using the old key or the new key.
+
+### Elixir-Native Configuration
+
+Cloak works through `Vault` modules which you define in your app, and add
+to your supervision tree.
+
+You can have as many vaults as you wish running simultaneously in your
+project. (This works well with umbrella apps, or any runtime environment
+where you have multiple OTP apps using Cloak)
+
+### Ecto Support
+
+You can use Cloak to transparently encrypt Ecto fields, using
+[`cloak_ecto`](https://hex.pm/packages/cloak_ecto).
 
 ## Security Notes
 
--  **Supported Algorithms**: Cloak's built-in encryption modules rely on Erlang's 
-   `:crypto` module. Cloak supports the following algorithms out of the box:
-   
-    - AES.GCM
-    - AES.CTR
-
-- **Encrypted Data Not Searchable**: Cloak uses random IVs for each ciphertext. This 
-  means that the same value will not encrypt to the same value twice. As a result,
-  encrypted columns are not queryable. However, Cloak does provide easy ways to
-  create hashed, searchable columns.
-
-- **Runtime Data is not Encrypted**: Cloak encrypts data _at rest_ in the database. 
-  The data in your Ecto structs at runtime is not encrypted.
-
-- **No Support for User-specific Encryption Keys**: Cloak's `Ecto.Type` modules do not
-  support user-specific encryption keys, due to limitations on the `Ecto.Type` 
-  behaviour. However, you can still use Cloak's ciphers to implement these in your 
-  application logic.
-
-## Migrating from 0.6.x
-Updating to Cloak versions `0.7.0` and higher will require changes to your configuration and Ecto models.  Please see the [0.6.x to 0.7.x Migration Guide](https://hexdocs.pm/cloak/0.6.x_to_0.7.x.html) for a full summary of changes and upgrade instructions.
+- Cloak is built on Erlang's `crypto` library, and therefore inherits its security.
+- You can implement your own cipher modules to use with Cloak, which may use any other encryption algorithms of your choice.
