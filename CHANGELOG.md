@@ -1,5 +1,16 @@
 # Change Log
 
+## [v1.0.0-alpha.0](https://github.com/danielberkompas/cloak/tree/v1.0.0-alpha.0) (2018-12-31)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.2...v1.0.0-alpha.0)
+
+**Closed issues:**
+
+- Extract Ecto components to cloak\_ecto hex package [\#77](https://github.com/danielberkompas/cloak/issues/77)
+
+**Merged pull requests:**
+
+- Extract Ecto components to cloak\_ecto [\#89](https://github.com/danielberkompas/cloak/pull/89) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v0.9.2](https://github.com/danielberkompas/cloak/tree/v0.9.2) (2018-12-26)
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.1...v0.9.2)
 
