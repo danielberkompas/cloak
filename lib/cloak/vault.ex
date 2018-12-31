@@ -2,10 +2,18 @@ defmodule Cloak.Vault do
   @moduledoc """
   Encrypts and decrypts data, using a configured cipher.
 
+  ## Create Your Vault
+
+  Define a module in your application that uses `Cloak.Vault`.
+
+      defmodule MyApp.Vault do
+        use Cloak.Vault, otp_app: :my_app
+      end
+
   ## Configuration
 
-  Vaults require the `:otp_app` option. The `:otp_app` option
-  should point to an OTP application that has the vault configuration.
+  The `:otp_app` option should point to an OTP application that has the vault
+  configuration.
 
   For example, the vault:
 
@@ -13,10 +21,10 @@ defmodule Cloak.Vault do
         use Cloak.Vault, otp_app: :my_app
       end
 
-  Could be configured with:
+  Could be configured with Mix configuration like so:
 
       config :my_app, MyApp.Vault,
-        json_library: Poison,
+        json_library: Jason,
         ciphers: [
           default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>}
         ]
@@ -24,7 +32,7 @@ defmodule Cloak.Vault do
   The configuration options are:
 
   - `:json_library`: Used to convert data types like lists and maps into
-    binary so that they can be encrypted. (Default: `Poison`)
+    binary so that they can be encrypted. (Default: `Jason`)
 
   - :ciphers: a list of `Cloak.Cipher` modules the following format:
 
@@ -75,43 +83,6 @@ defmodule Cloak.Vault do
         default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: key}
       ])
 
-  ### Configuring Ecto Types
-
-  Once you have a configured vault, you can define `Ecto.Type` modules which
-  use it for encryption/decryption.
-
-      defmodule MyApp.Encrypted.Binary do
-        use Cloak.Fields.Binary, vault: MyApp.Vault
-      end
-
-  You can also specify that a field uses a particular labeled cipher from
-  your configuration:
-
-      defmodule MyApp.Encrypted.Binary do
-        use Cloak.Fields.Binary,
-          vault: MyApp.Vault,
-          cipher: :custom # corresponds to the `label` of the cipher
-      end
-
-  **The field will only use the specified cipher for encryption, not
-  decryption.** It will decrypt stored data with whichever cipher originally
-  generated it.
-
-  The following Cloak field types are available:
-
-  | Elixir Type     | Ecto Type             | Cloak Type                   |
-  | --------------- | --------------------- | ---------------------------- |
-  | `String`        | `:string` / `:binary` | `Cloak.Fields.Binary`        |
-  | `Date`          | `:date`               | `Cloak.Fields.Date`          |
-  | `DateTime`      | `:utc_datetime`       | `Cloak.Fields.DateTime`      |
-  | `Float`         | `:float`              | `Cloak.Fields.Float`         |
-  | `Integer`       | `:integer`            | `Cloak.Fields.Integer`       |
-  | `Map`           | `:map`                | `Cloak.Fields.Map`           |
-  | `NaiveDateTime` | `:naive_datetime`     | `Cloak.Fields.NaiveDateTime` |
-  | `Time`          | `:time`               | `Cloak.Fields.Time`          |
-  | `[Integer]`     | `{:array, :integer}`  | `Cloak.Fields.IntegerList`   |
-  | `[String]`      | `{:array, :string}`   | `Cloak.Fields.StringList`    |
-
   ## Supervision
 
   Because Vaults are `GenServer`s, you'll need to add your vault to your
@@ -129,8 +100,6 @@ defmodule Cloak.Vault do
 
   ## Usage
 
-  ### Direct Usage
-
   You can use the vault directly by calling its functions.
 
       MyApp.Vault.encrypt("plaintext")
@@ -141,101 +110,12 @@ defmodule Cloak.Vault do
 
   See the documented callbacks below for the functions you can call.
 
-  ### With Schemas
-
-  Once you have configured your types, you can use them in your `Ecto.Schema`s.
-  Be sure to first create the fields with the `:binary` type in your migration:
-
-      # in your migration
-      create table(:users) do
-        add :email, :binary
-      end
-
-  Then, use the custom `Ecto.Type` you defined, as in this example:
-
-      defmodule MyApp.Accounts.User do
-        use Ecto.Schema
-
-        import Ecto.Changeset
-
-        schema "users" do
-          field :email, MyApp.Encrypted.Binary
-        end
-
-        def changeset(struct, attrs \\\\ %{}) do
-          struct
-          |> cast(attrs, [:email])
-        end
-      end
-
-  In this case, the `:email` field will now be transparently encrypted when
-  written to the database and decrypted when loaded out of the database.
-
-  ### Querying Encrypted Data
-
-  By design, Cloak ciphers produce unique ciphertext each time, even if the
-  value remains the same. As a result, you cannot query on an encrypted
-  schema field directly.
-
-  However, you can create a mirror of a encrypted field which contains a
-  predictable hashed value. This allows you to query for exact matches.
-
-  In your migration, create a `[field_name]_hash` field:
-
-      alter table(:users) do
-        add :email_hash, :binary
-      end
-
-  Then, in your schema, use one of Cloak's provided hash types, which are:
-
-  | Type      | Ecto Type              | Field                 |
-  | --------- | ---------------------- | --------------------- |
-  | `String`  | `:string` / `:binary`  | `Cloak.Fields.SHA256` |
-  | `String`  | `:string` / `:binary`  | `Cloak.Fields.HMAC`   |
-  | `String`  | `:string` / `:binary`  | `Cloak.Fields.PBKDF2` |
-
-  In this example, we'll use `Cloak.Fields.SHA256`:
-
-      schema "users" do
-        field :email, MyApp.Encrypted.Binary
-        field :email_hash, Cloak.Fields.SHA256
-      end
-
-  Finally, in your `changeset/2` function, ensure that the `_hash` field
-  is updated every time the main field is changed:
-
-      def changeset(struct, attrs \\\\ %{}) do
-        struct
-        |> cast(attrs, [:email])
-        |> put_hashed_fields()
-      end
-
-      defp put_hashed_fields(changeset) do
-        changeset
-        |> put_change(:email_hash, get_field(changeset, :email))
-      end
-
-  Now, you can query by the `_hash` field anywhere you might have previously
-  queried by the main field.
-
-      Repo.get_by(MyApp.Accounts.User, email_hash: "test@example.com")
-      # => %MyApp.Accounts.User{
-      #      email: "test@example.com",
-      #      email_hash:
-      #        <<151, 61, 254, 70, 62, 200, 87, 133, 245, 249, 90, 245, 186, 57,
-      #        6, 238, 219, 45, 147, 28, 36, 230, 152, 36, 168, 158, 166, 93,
-      #        186, 78, 129, 59>>
-      #    }
-
-  ### Rotating Keys
-
-  See `Mix.Tasks.Cloak.Migrate` for instructions on how to rotate keys.
-
   ### Performance Notes
 
-  Vaults are not bottlenecks. They simply store configuration in ETS
-  tables. All encryption and decryption is performed in your local
-  process, reading configuration from the vault's ETS table.
+  Vaults are not bottlenecks. They simply store configuration in an ETS table
+  named after the Vault, e.g. `MyApp.Vault.Config`. All encryption and
+  decryption is performed in your local process, reading configuration from
+  the vault's ETS table.
   """
 
   @type plaintext :: binary
@@ -384,7 +264,7 @@ defmodule Cloak.Vault do
       def json_library do
         @table_name
         |> Cloak.Vault.read_config()
-        |> Keyword.get(:json_library, Poison)
+        |> Keyword.get(:json_library, Jason)
       end
 
       defoverridable(Module.definitions_in(__MODULE__))
