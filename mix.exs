@@ -32,9 +32,9 @@ defmodule Cloak.Mixfile do
     [
       {:pbkdf2, "~> 2.0", optional: true},
       {:jason, "~> 1.0", optional: true},
-      {:excoveralls, "~> 0.8", only: :test},
-      {:ex_doc, ">= 0.0.0", only: [:dev, :docs]},
-      {:inch_ex, ">= 0.0.0", only: :docs}
+      {:excoveralls, "~> 0.12", only: :test},
+      {:ex_doc, "~> 0.21", only: [:dev, :docs]},
+      {:inch_ex, "~> 2.0", only: :docs}
     ]
   end
 
