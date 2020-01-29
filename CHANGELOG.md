@@ -1,9 +1,34 @@
-# Change Log
+# Changelog
 
-## [v1.0.0-alpha.0](https://github.com/danielberkompas/cloak/tree/v1.0.0-alpha.0) (2018-12-31)
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.2...v1.0.0-alpha.0)
+## [1.0.1](https://github.com/danielberkompas/cloak/tree/1.0.1) (2020-01-29)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.0...1.0.1)
 
 **Closed issues:**
+
+- MyApp.Vault.encrypt\("plaintext"\) failing [\#92](https://github.com/danielberkompas/cloak/issues/92)
+
+**Merged pull requests:**
+
+- Clean up and update dev deps [\#94](https://github.com/danielberkompas/cloak/pull/94) ([chulkilee](https://github.com/chulkilee))
+
+## [v1.0.0](https://github.com/danielberkompas/cloak/tree/v1.0.0) (2019-07-31)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.0-alpha.0...v1.0.0)
+
+**Closed issues:**
+
+- Outstanding work for 1.0? [\#91](https://github.com/danielberkompas/cloak/issues/91)
+
+**Merged pull requests:**
+
+- Correct code example on upgrading guide [\#90](https://github.com/danielberkompas/cloak/pull/90) ([ruan-brandao](https://github.com/ruan-brandao))
+
+## [v1.0.0-alpha.0](https://github.com/danielberkompas/cloak/tree/v1.0.0-alpha.0) (2018-12-31)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.2...v1.0.0-alpha.0)
+
+**Breaking changes:**
 
 - Extract Ecto components to cloak\_ecto hex package [\#77](https://github.com/danielberkompas/cloak/issues/77)
 
@@ -12,14 +37,15 @@
 - Extract Ecto components to cloak\_ecto [\#89](https://github.com/danielberkompas/cloak/pull/89) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.9.2](https://github.com/danielberkompas/cloak/tree/v0.9.2) (2018-12-26)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.1...v0.9.2)
 
 **Merged pull requests:**
 
 - Fix typo & add better error msg for PBKDF2 algorithm [\#88](https://github.com/danielberkompas/cloak/pull/88) ([jc00ke](https://github.com/jc00ke))
-- Improve PBKDF2 config error messages [\#87](https://github.com/danielberkompas/cloak/pull/87) ([jc00ke](https://github.com/jc00ke))
 
 ## [v0.9.1](https://github.com/danielberkompas/cloak/tree/v0.9.1) (2018-10-07)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.9.0...v0.9.1)
 
 **Closed issues:**
@@ -29,15 +55,17 @@
 
 **Merged pull requests:**
 
+- Improve PBKDF2 config error messages [\#87](https://github.com/danielberkompas/cloak/pull/87) ([jc00ke](https://github.com/jc00ke))
 - \[\#81\] Fix migrator with embedded schemas [\#83](https://github.com/danielberkompas/cloak/pull/83) ([danielberkompas](https://github.com/danielberkompas))
 - Migration task succeeds on empty table [\#82](https://github.com/danielberkompas/cloak/pull/82) ([kevin-j-m](https://github.com/kevin-j-m))
 - Update docs [\#80](https://github.com/danielberkompas/cloak/pull/80) ([hl](https://github.com/hl))
 - Upgrade Flow to 0.14 [\#79](https://github.com/danielberkompas/cloak/pull/79) ([mikeastock](https://github.com/mikeastock))
 
 ## [v0.9.0](https://github.com/danielberkompas/cloak/tree/v0.9.0) (2018-09-29)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.8.0...v0.9.0)
 
-**Closed issues:**
+**Breaking changes:**
 
 - Make Cloak.Vault a GenServer [\#75](https://github.com/danielberkompas/cloak/issues/75)
 
@@ -46,6 +74,7 @@
 - \[\#75\] Make Cloak.Vault a GenServer [\#78](https://github.com/danielberkompas/cloak/pull/78) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.8.0](https://github.com/danielberkompas/cloak/tree/v0.8.0) (2018-09-22)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0...v0.8.0)
 
 **Closed issues:**
@@ -61,6 +90,7 @@
 - Do not fail migration task when running on schema linked to empty table [\#69](https://github.com/danielberkompas/cloak/pull/69) ([tizpuppi](https://github.com/tizpuppi))
 
 ## [v0.7.0](https://github.com/danielberkompas/cloak/tree/v0.7.0) (2018-08-23)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.2...v0.7.0)
 
 **Merged pull requests:**
@@ -69,6 +99,7 @@
 - Add support for PBKDF2 for blind indexing [\#67](https://github.com/danielberkompas/cloak/pull/67) ([michaelherold](https://github.com/michaelherold))
 
 ## [v0.7.0-alpha.2](https://github.com/danielberkompas/cloak/tree/v0.7.0-alpha.2) (2018-04-25)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.7.0-alpha.1...v0.7.0-alpha.2)
 
 **Closed issues:**
@@ -81,6 +112,7 @@
 - Improve nil support in Ecto types [\#63](https://github.com/danielberkompas/cloak/pull/63) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.7.0-alpha.1](https://github.com/danielberkompas/cloak/tree/v0.7.0-alpha.1) (2018-03-21)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.2...v0.7.0-alpha.1)
 
 **Closed issues:**
@@ -94,6 +126,7 @@
 - Vaults [\#60](https://github.com/danielberkompas/cloak/pull/60) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.6.2](https://github.com/danielberkompas/cloak/tree/v0.6.2) (2018-03-19)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.1...v0.6.2)
 
 **Closed issues:**
@@ -108,6 +141,7 @@
 - \[Documentation\] Fix small typo: SHA265 -\> SHA256 [\#56](https://github.com/danielberkompas/cloak/pull/56) ([connorlay](https://github.com/connorlay))
 
 ## [v0.6.1](https://github.com/danielberkompas/cloak/tree/v0.6.1) (2018-02-25)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.6.0...v0.6.1)
 
 **Merged pull requests:**
@@ -115,6 +149,7 @@
 - bugfix\(cipher?\): Rescue from UndefinedFunctionError instead of using … [\#54](https://github.com/danielberkompas/cloak/pull/54) ([tomciopp](https://github.com/tomciopp))
 
 ## [v0.6.0](https://github.com/danielberkompas/cloak/tree/v0.6.0) (2018-02-24)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.5.0...v0.6.0)
 
 **Merged pull requests:**
@@ -123,6 +158,7 @@
 - perf\(Cloak.Config.all/0\): remove calls to ensure\_loaded when checking… [\#51](https://github.com/danielberkompas/cloak/pull/51) ([tomciopp](https://github.com/tomciopp))
 
 ## [v0.5.0](https://github.com/danielberkompas/cloak/tree/v0.5.0) (2018-01-06)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.4.0...v0.5.0)
 
 **Closed issues:**
@@ -139,6 +175,7 @@
 - feat\(Date Types\): add EncryptedDateField, and EncryptedNaiveDatetimeF… [\#46](https://github.com/danielberkompas/cloak/pull/46) ([tomciopp](https://github.com/tomciopp))
 
 ## [v0.4.0](https://github.com/danielberkompas/cloak/tree/v0.4.0) (2018-01-02)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.3...v0.4.0)
 
 **Fixed bugs:**
@@ -160,6 +197,7 @@
 - Allow multiple concurrent ciphers to encrypt [\#37](https://github.com/danielberkompas/cloak/pull/37) ([asummers](https://github.com/asummers))
 
 ## [v0.3.3](https://github.com/danielberkompas/cloak/tree/v0.3.3) (2017-09-08)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.2...v0.3.3)
 
 **Closed issues:**
@@ -167,6 +205,7 @@
 - EncryptedIntegerField and EncryptedFloat field do not cast properly [\#35](https://github.com/danielberkompas/cloak/issues/35)
 
 ## [v0.3.2](https://github.com/danielberkompas/cloak/tree/v0.3.2) (2017-08-05)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.3.0...v0.3.2)
 
 **Closed issues:**
@@ -186,6 +225,7 @@
 - clean up compile warnings under Elixir 1.4 [\#25](https://github.com/danielberkompas/cloak/pull/25) ([boydm](https://github.com/boydm))
 
 ## [v0.3.0](https://github.com/danielberkompas/cloak/tree/v0.3.0) (2016-09-16)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.3...v0.3.0)
 
 **Merged pull requests:**
@@ -193,6 +233,7 @@
 - Rely on configuration at runtime [\#20](https://github.com/danielberkompas/cloak/pull/20) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.2.3](https://github.com/danielberkompas/cloak/tree/v0.2.3) (2016-09-16)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.2...v0.2.3)
 
 **Fixed bugs:**
@@ -214,6 +255,7 @@
 - Add deps badge to README [\#13](https://github.com/danielberkompas/cloak/pull/13) ([rrrene](https://github.com/rrrene))
 
 ## [v0.2.2](https://github.com/danielberkompas/cloak/tree/v0.2.2) (2016-05-20)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.1...v0.2.2)
 
 **Closed issues:**
@@ -224,9 +266,9 @@
 **Merged pull requests:**
 
 - Decode AES environment variable keys from base64 [\#11](https://github.com/danielberkompas/cloak/pull/11) ([philss](https://github.com/philss))
-- Update dependencies [\#7](https://github.com/danielberkompas/cloak/pull/7) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.2.1](https://github.com/danielberkompas/cloak/tree/v0.2.1) (2016-04-06)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.2.0...v0.2.1)
 
 **Merged pull requests:**
@@ -234,6 +276,7 @@
 - Update examples to reflect the remotion of Cloak.Model [\#4](https://github.com/danielberkompas/cloak/pull/4) ([philss](https://github.com/philss))
 
 ## [v0.2.0](https://github.com/danielberkompas/cloak/tree/v0.2.0) (2015-12-16)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.1.0...v0.2.0)
 
 **Merged pull requests:**
@@ -243,9 +286,13 @@
 - Inform that key must be 16, 24 or 32 bytes long [\#1](https://github.com/danielberkompas/cloak/pull/1) ([mspanc](https://github.com/mspanc))
 
 ## [v0.1.0](https://github.com/danielberkompas/cloak/tree/v0.1.0) (2015-09-22)
+
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v0.1.0-pre...v0.1.0)
 
 ## [v0.1.0-pre](https://github.com/danielberkompas/cloak/tree/v0.1.0-pre) (2015-09-16)
 
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/2bd17019e285b55c5c218cc842537bf9280f24c3...v0.1.0-pre)
 
-\* *This Change Log was automatically generated by [github_changelog_generator](https://github.com/skywinder/Github-Changelog-Generator)*
+
+
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
