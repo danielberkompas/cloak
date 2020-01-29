@@ -4,7 +4,7 @@ defmodule Cloak.Mixfile do
   def project do
     [
       app: :cloak,
-      version: "1.0.0",
+      version: "1.0.1",
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -33,7 +33,7 @@ defmodule Cloak.Mixfile do
       {:pbkdf2, "~> 2.0", optional: true},
       {:jason, "~> 1.0", optional: true},
       {:excoveralls, "~> 0.12", only: :test},
-      {:ex_doc, "~> 0.21", only: [:dev, :docs]},
+      {:ex_doc, ">= 0.0.0", only: [:dev, :docs]},
       {:inch_ex, "~> 2.0", only: :docs}
     ]
   end
