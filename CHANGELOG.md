@@ -1,8 +1,20 @@
 # Changelog
 
-## [1.0.1](https://github.com/danielberkompas/cloak/tree/1.0.1) (2020-01-29)
+## [1.0.2](https://github.com/danielberkompas/cloak/tree/1.0.2) (2020-02-01)
 
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.0...1.0.1)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.1...1.0.2)
+
+**Closed issues:**
+
+- AES GCM should use a 12 byte nonce instead of 16 [\#93](https://github.com/danielberkompas/cloak/issues/93)
+
+**Merged pull requests:**
+
+- \[\#93\] Add option to specify iv length for AES.GCM [\#95](https://github.com/danielberkompas/cloak/pull/95) ([danielberkompas](https://github.com/danielberkompas))
+
+## [v1.0.1](https://github.com/danielberkompas/cloak/tree/v1.0.1) (2020-01-29)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.0...v1.0.1)
 
 **Closed issues:**
 
@@ -43,6 +55,7 @@
 **Merged pull requests:**
 
 - Fix typo & add better error msg for PBKDF2 algorithm [\#88](https://github.com/danielberkompas/cloak/pull/88) ([jc00ke](https://github.com/jc00ke))
+- Improve PBKDF2 config error messages [\#87](https://github.com/danielberkompas/cloak/pull/87) ([jc00ke](https://github.com/jc00ke))
 
 ## [v0.9.1](https://github.com/danielberkompas/cloak/tree/v0.9.1) (2018-10-07)
 
@@ -55,7 +68,6 @@
 
 **Merged pull requests:**
 
-- Improve PBKDF2 config error messages [\#87](https://github.com/danielberkompas/cloak/pull/87) ([jc00ke](https://github.com/jc00ke))
 - \[\#81\] Fix migrator with embedded schemas [\#83](https://github.com/danielberkompas/cloak/pull/83) ([danielberkompas](https://github.com/danielberkompas))
 - Migration task succeeds on empty table [\#82](https://github.com/danielberkompas/cloak/pull/82) ([kevin-j-m](https://github.com/kevin-j-m))
 - Update docs [\#80](https://github.com/danielberkompas/cloak/pull/80) ([hl](https://github.com/hl))
@@ -156,6 +168,7 @@
 
 - Add support for encrypted Ecto String and Integer Array types [\#53](https://github.com/danielberkompas/cloak/pull/53) ([boydm](https://github.com/boydm))
 - perf\(Cloak.Config.all/0\): remove calls to ensure\_loaded when checking… [\#51](https://github.com/danielberkompas/cloak/pull/51) ([tomciopp](https://github.com/tomciopp))
+- Add DateTime field, better docs [\#48](https://github.com/danielberkompas/cloak/pull/48) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.5.0](https://github.com/danielberkompas/cloak/tree/v0.5.0) (2018-01-06)
 
@@ -170,7 +183,6 @@
 
 - Add EncryptedTimeField [\#50](https://github.com/danielberkompas/cloak/pull/50) ([danielberkompas](https://github.com/danielberkompas))
 - Update the documentation sidebar [\#49](https://github.com/danielberkompas/cloak/pull/49) ([danielberkompas](https://github.com/danielberkompas))
-- Add DateTime field, better docs [\#48](https://github.com/danielberkompas/cloak/pull/48) ([danielberkompas](https://github.com/danielberkompas))
 - refactor\(Cloak.Config.all/0\): Find ciphers by checking if the module … [\#47](https://github.com/danielberkompas/cloak/pull/47) ([tomciopp](https://github.com/tomciopp))
 - feat\(Date Types\): add EncryptedDateField, and EncryptedNaiveDatetimeF… [\#46](https://github.com/danielberkompas/cloak/pull/46) ([tomciopp](https://github.com/tomciopp))
 
