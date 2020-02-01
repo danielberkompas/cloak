@@ -6,7 +6,7 @@ This guide will walk you through installing Cloak in your project.
 
 First, add `:cloak` to your dependencies in `mix.exs`:
 
-    {:cloak, "1.0.0"}
+    {:cloak, "1.0.2"}
 
 Run `mix deps.get` to fetch the dependency.
 
@@ -36,7 +36,18 @@ its raw binary form.
 
     config :my_app, MyApp.Vault,
       ciphers: [
-        default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: Base.decode64!("your-key-here")}
+        default: {
+          Cloak.Ciphers.AES.GCM, 
+          tag: "AES.GCM.V1", 
+          key: Base.decode64!("your-key-here"),
+          # In AES.GCM, it is important to specify 12-byte IV length for
+          # interoperability with other encryption software. See this GitHub
+          # issue for more details:
+          # https://github.com/danielberkompas/cloak/issues/93
+          # 
+          # In Cloak 2.0, this will be the default iv length for AES.GCM.
+          iv_length: 12
+        }
       ]
 
 If you want to fetch keys from system vars, you should use the `init/1` callback
@@ -54,7 +65,12 @@ to configure the vault instead:
       def init(config) do
         config =
           Keyword.put(config, :ciphers, [
-            default: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: decode_env!("CLOAK_KEY")}
+            default: {
+              Cloak.Ciphers.AES.GCM, 
+              tag: "AES.GCM.V1", 
+              key: decode_env!("CLOAK_KEY"),
+              iv_length: 12
+            }
           ])
 
         {:ok, config}

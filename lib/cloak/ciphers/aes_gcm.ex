@@ -6,12 +6,13 @@ defmodule Cloak.Ciphers.AES.GCM do
 
   @behaviour Cloak.Cipher
   @aad "AES256GCM"
+  @default_iv_length 16
 
   alias Cloak.Tags.Encoder
   alias Cloak.Tags.Decoder
 
   @doc """
-  Callback implementation for `Cloak.Cipher.encrypt/2`. Encrypts a value using
+  Callback implementation for `Cloak.Cipher`. Encrypts a value using
   AES in GCM mode.
 
   Generates a random IV for every encryption, and prepends the key tag, IV,
@@ -21,7 +22,7 @@ defmodule Cloak.Ciphers.AES.GCM do
       +----------------------------------------------------------+----------------------+
       |                          HEADER                          |         BODY         |
       +-------------------+---------------+----------------------+----------------------+
-      | Key Tag (n bytes) | IV (16 bytes) | Ciphertag (16 bytes) | Ciphertext (n bytes) |
+      | Key Tag (n bytes) | IV (n bytes)  | Ciphertag (16 bytes) | Ciphertext (n bytes) |
       +-------------------+---------------+----------------------+----------------------+
       |                   |_________________________________
       |                                                     |
@@ -39,22 +40,24 @@ defmodule Cloak.Ciphers.AES.GCM do
   def encrypt(plaintext, opts) do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
-    iv = :crypto.strong_rand_bytes(16)
+    iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
+    iv = :crypto.strong_rand_bytes(iv_length)
 
     {ciphertext, ciphertag} = :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
     {:ok, Encoder.encode(tag) <> iv <> ciphertag <> ciphertext}
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.decrypt/2`. Decrypts a value
+  Callback implementation for `Cloak.Cipher`. Decrypts a value
   encrypted with AES in GCM mode.
   """
   @impl true
   def decrypt(ciphertext, opts) do
     if can_decrypt?(ciphertext, opts) do
       key = Keyword.fetch!(opts, :key)
+      iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
 
-      %{remainder: <<iv::binary-16, ciphertag::binary-16, ciphertext::binary>>} =
+      %{remainder: <<iv::binary-size(iv_length), ciphertag::binary-16, ciphertext::binary>>} =
         Decoder.decode(ciphertext)
 
       {:ok, :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})}
@@ -64,15 +67,19 @@ defmodule Cloak.Ciphers.AES.GCM do
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.can_decrypt?/2`. Determines whether
-  this module can decrypt the given ciphertext.
+  Callback implementation for `Cloak.Cipher`. Determines whether this module
+  can decrypt the given ciphertext.
   """
   @impl true
   def can_decrypt?(ciphertext, opts) do
     tag = Keyword.fetch!(opts, :tag)
+    iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
 
     case Decoder.decode(ciphertext) do
-      %{tag: ^tag, remainder: <<_iv::binary-16, _ciphertag::binary-16, _ciphertext::binary>>} ->
+      %{
+        tag: ^tag,
+        remainder: <<_iv::binary-size(iv_length), _ciphertag::binary-16, _ciphertext::binary>>
+      } ->
         true
 
       _other ->
