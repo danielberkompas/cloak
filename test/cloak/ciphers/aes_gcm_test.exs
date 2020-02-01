@@ -3,7 +3,7 @@ defmodule Cloak.Ciphers.AES.GCMTest do
 
   alias Cloak.Ciphers.AES.GCM, as: Cipher
 
-  @opts [tag: "AES.GCM.V1", key: :crypto.strong_rand_bytes(32)]
+  @opts [tag: "AES.GCM.V1", key: :crypto.strong_rand_bytes(32), iv_length: 12]
 
   describe ".encrypt/2" do
     test "encrypts binaries" do
@@ -12,11 +12,13 @@ defmodule Cloak.Ciphers.AES.GCMTest do
     end
 
     test "returns ciphertext in the format key_tag <> iv <> ciphertag <> ciphertext" do
+      iv_length = @opts[:iv_length]
+
       assert {:ok,
-              <<_type::binary-1, _length::binary-1, "AES.GCM.V1", iv::binary-16,
+              <<_type::binary-1, _length::binary-1, "AES.GCM.V1", iv::binary-size(iv_length),
                 ciphertag::binary-16, ciphertext::binary>>} = Cipher.encrypt("plaintext", @opts)
 
-      assert byte_size(iv) == 16
+      assert byte_size(iv) == iv_length
       assert byte_size(ciphertag) == 16
       assert String.length(ciphertext) > 0
     end
