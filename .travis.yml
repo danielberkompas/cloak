@@ -1,8 +1,8 @@
 language: elixir
 elixir:
-  - 1.9.1
+  - 1.10.0
 otp_release:
-  - 22.0
+  - 22.1
 before_script:
   - mix local.hex --force
   - mix deps.get --only test
@@ -12,5 +12,3 @@ script:
 after_script:
   - MIX_ENV=docs mix deps.get
   - MIX_ENV=docs mix inch.report
-addons:
-  postgresql: "9.4"
