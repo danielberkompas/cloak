@@ -112,10 +112,10 @@ defmodule Cloak.Vault do
 
   ### Performance Notes
 
-  Vaults are not bottlenecks. They simply store configuration in an ETS table
-  named after the Vault, e.g. `MyApp.Vault.Config`. All encryption and
-  decryption is performed in your local process, reading configuration from
-  the vault's ETS table.
+  Vaults are not bottlenecks. They simply store configuration in a
+  `:persistent_term` named after the Vault, e.g. `MyApp.Vault.Config`.
+  All encryption and decryption is performed in your local process,
+  reading configuration from the vault's `:persistent_term`.
   """
 
   @type plaintext :: binary
@@ -169,7 +169,7 @@ defmodule Cloak.Vault do
 
       @behaviour Cloak.Vault
       @otp_app unquote(otp_app)
-      @table_name :"#{__MODULE__}.Config"
+      @config_key :"#{__MODULE__}.Config"
 
       ###
       # GenServer
@@ -201,7 +201,7 @@ defmodule Cloak.Vault do
       # the application configuration for this Vault.
       @impl GenServer
       def handle_call(:save_config, _from, config) do
-        Cloak.Vault.save_config(@table_name, config)
+        Cloak.Vault.save_config(@config_key, config)
         {:reply, :ok, config}
       end
 
@@ -210,7 +210,7 @@ defmodule Cloak.Vault do
       @impl GenServer
       def code_change(_vsn, config, _extra) do
         config = init(config)
-        Cloak.Vault.save_config(@table_name, config)
+        Cloak.Vault.save_config(@config_key, config)
         {:ok, config}
       end
 
@@ -220,49 +220,49 @@ defmodule Cloak.Vault do
 
       @impl Cloak.Vault
       def encrypt(plaintext) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.encrypt(plaintext)
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.encrypt!(plaintext)
       end
 
       @impl Cloak.Vault
       def encrypt(plaintext, label) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.encrypt(plaintext, label)
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext, label) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.encrypt!(plaintext, label)
       end
 
       @impl Cloak.Vault
       def decrypt(ciphertext) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.decrypt(ciphertext)
       end
 
       @impl Cloak.Vault
       def decrypt!(ciphertext) do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Cloak.Vault.decrypt!(ciphertext)
       end
 
       @impl Cloak.Vault
       def json_library do
-        @table_name
+        @config_key
         |> Cloak.Vault.read_config()
         |> Keyword.get(:json_library, Jason)
       end
@@ -271,31 +271,33 @@ defmodule Cloak.Vault do
     end
   end
 
-  @doc false
-  def save_config(table_name, config) do
-    if :ets.info(table_name) == :undefined do
-      :ets.new(table_name, [:named_table, :protected])
+  defmacrop unsafe(input) do
+    quote do
+      case unquote(input) do
+        {:ok, some_result} -> some_result
+        {:error, error} -> raise error
+      end
     end
-
-    :ets.insert(table_name, {:config, config})
   end
 
   @doc false
-  def read_config(table_name) do
-    case :ets.lookup(table_name, :config) do
-      [{:config, config} | _] ->
-        config
+  def save_config(key, config) do
+    :persistent_term.put(key, config)
+  end
 
-      _ ->
-        :error
-    end
+  @doc false
+  def read_config(key) do
+    :persistent_term.get(key)
+  rescue
+    _ in ArgumentError -> :error
   end
 
   @doc false
   def encrypt(config, plaintext) do
-    with [{_label, {module, opts}} | _ciphers] <- config[:ciphers] do
-      module.encrypt(plaintext, opts)
-    else
+    case config[:ciphers] do
+      [{_label, {module, opts}} | _ciphers] ->
+        module.encrypt(plaintext, opts)
+
       _ ->
         {:error, Cloak.InvalidConfig.exception("could not encrypt due to missing configuration")}
     end
@@ -303,13 +305,7 @@ defmodule Cloak.Vault do
 
   @doc false
   def encrypt!(config, plaintext) do
-    case encrypt(config, plaintext) do
-      {:ok, ciphertext} ->
-        ciphertext
-
-      {:error, error} ->
-        raise error
-    end
+    unsafe encrypt(config, plaintext)
   end
 
   @doc false
@@ -325,13 +321,7 @@ defmodule Cloak.Vault do
 
   @doc false
   def encrypt!(config, plaintext, label) do
-    case encrypt(config, plaintext, label) do
-      {:ok, ciphertext} ->
-        ciphertext
-
-      {:error, error} ->
-        raise error
-    end
+    unsafe encrypt(config, plaintext, label)
   end
 
   @doc false
@@ -347,13 +337,7 @@ defmodule Cloak.Vault do
 
   @doc false
   def decrypt!(config, ciphertext) do
-    case decrypt(config, ciphertext) do
-      {:ok, plaintext} ->
-        plaintext
-
-      {:error, error} ->
-        raise error
-    end
+    unsafe decrypt(config, ciphertext)
   end
 
   defp find_module_to_decrypt(config, ciphertext) do
