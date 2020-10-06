@@ -75,6 +75,19 @@ defmodule Cloak.VaultTest do
   describe ".encrypt/2" do
     test "encrypts ciphertext with the cipher associated with label" do
       assert {:ok, ciphertext} = TestVault.encrypt("plaintext", :secondary)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "encrypts ciphertext with default padding" do
+      assert {:ok, ciphertext} = TestVault.encrypt("plaintext", padding: true)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "encrypts ciphertext with custom padding" do
+      assert {:ok, ciphertext} = TestVault.encrypt("plaintext", padding: 24)
+      assert is_binary(ciphertext)
       assert ciphertext != "plaintext"
     end
 
@@ -90,9 +103,60 @@ defmodule Cloak.VaultTest do
       assert ciphertext != "plaintext"
     end
 
+    test "encrypts ciphertext with default padding" do
+      assert ciphertext = TestVault.encrypt!("plaintext", padding: true)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "encrypts ciphertext with custom padding" do
+      assert ciphertext = TestVault.encrypt!("plaintext", padding: 24)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
     test "raises error if no cipher associated with label" do
       assert_raise Cloak.MissingCipher, fn ->
         TestVault.encrypt!("plaintext", :nonexistent)
+      end
+    end
+  end
+
+  describe ".encrypt/3" do
+    test "encrypts ciphertext with the cipher associated with label and default padding" do
+      assert {:ok, ciphertext} = TestVault.encrypt("plaintext", :secondary, padding: true)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "encrypts ciphertext with the cipher associated with label and custom padding" do
+      assert {:ok, ciphertext} = TestVault.encrypt("plaintext", :secondary, padding: 24)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "returns error if no cipher associated with label" do
+      assert {:error, %Cloak.MissingCipher{}} =
+               TestVault.encrypt("plaintext", :nonexistent, padding: true)
+    end
+  end
+
+  describe ".encrypt!/3" do
+    test "encrypts ciphertext with the cipher associated with label and default padding" do
+      ciphertext = TestVault.encrypt!("plaintext", :secondary, padding: true)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "encrypts ciphertext with the cipher associated with label and custom padding" do
+      assert ciphertext = TestVault.encrypt!("plaintext", :secondary, padding: 32)
+      assert is_binary(ciphertext)
+      assert ciphertext != "plaintext"
+    end
+
+    test "raises error if no cipher associated with label" do
+      assert_raise Cloak.MissingCipher, fn ->
+        TestVault.encrypt!("plaintext", :nonexistent, padding: true)
       end
     end
   end
@@ -111,13 +175,81 @@ defmodule Cloak.VaultTest do
     end
   end
 
-  describe ".decrypt!" do
+  describe ".decrypt!/1" do
     test "decrypts ciphertext" do
       ciphertext1 = TestVault.encrypt!("plaintext")
       ciphertext2 = TestVault.encrypt!("plaintext", :secondary)
 
       assert "plaintext" == TestVault.decrypt!(ciphertext1)
       assert "plaintext" == TestVault.decrypt!(ciphertext2)
+    end
+
+    test "raises error if no module found to decrypt" do
+      assert_raise Cloak.MissingCipher, fn ->
+        TestVault.decrypt!(<<123, 123>>)
+      end
+    end
+  end
+
+  describe ".decrypt/2" do
+    test "decrypts ciphertext with default padding" do
+      {:ok, ciphertext1} = TestVault.encrypt("plaintext", padding: true)
+      {:ok, ciphertext2} = TestVault.encrypt("plaintext", :secondary, padding: true)
+
+      assert {:ok, "plaintext"} = TestVault.decrypt(ciphertext1, padding: true)
+      assert {:ok, "plaintext"} = TestVault.decrypt(ciphertext2, padding: true)
+    end
+
+    test "decrypts ciphertext with custom padding" do
+      {:ok, ciphertext1} = TestVault.encrypt("plaintext", padding: 24)
+      {:ok, ciphertext2} = TestVault.encrypt("plaintext", :secondary, padding: 24)
+
+      assert {:ok, "plaintext"} = TestVault.decrypt(ciphertext1, padding: 24)
+      assert {:ok, "plaintext"} = TestVault.decrypt(ciphertext2, padding: 24)
+    end
+
+    test "decrypts ciphertext but skips unpadding" do
+      {:ok, ciphertext1} = TestVault.encrypt("plaintext", padding: true)
+      {:ok, ciphertext2} = TestVault.encrypt("plaintext", :secondary, padding: true)
+
+      assert {:ok, "plaintext\x80\x00\x00\x00\x00\x00"} =
+               TestVault.decrypt(ciphertext1, padding: false)
+
+      assert {:ok, "plaintext\x80\x00\x00\x00\x00\x00"} =
+               TestVault.decrypt(ciphertext2, padding: false)
+    end
+
+    test "returns error if no module found to decrypt" do
+      assert {:error, %Cloak.MissingCipher{}} = TestVault.decrypt(<<123, 123>>)
+    end
+  end
+
+  describe ".decrypt!/2" do
+    test "decrypts ciphertext with default padding" do
+      ciphertext1 = TestVault.encrypt!("plaintext", padding: true)
+      ciphertext2 = TestVault.encrypt!("plaintext", :secondary, padding: true)
+
+      assert "plaintext" == TestVault.decrypt!(ciphertext1, padding: true)
+      assert "plaintext" == TestVault.decrypt!(ciphertext2, padding: true)
+    end
+
+    test "decrypts ciphertext with custom padding" do
+      ciphertext1 = TestVault.encrypt!("plaintext", padding: 24)
+      ciphertext2 = TestVault.encrypt!("plaintext", :secondary, padding: 24)
+
+      assert "plaintext" == TestVault.decrypt!(ciphertext1, padding: 24)
+      assert "plaintext" == TestVault.decrypt!(ciphertext2, padding: 24)
+    end
+
+    test "decrypts ciphertext but skips unpadding" do
+      ciphertext1 = TestVault.encrypt!("plaintext", padding: true)
+      ciphertext2 = TestVault.encrypt!("plaintext", :secondary, padding: true)
+
+      assert "plaintext\x80\x00\x00\x00\x00\x00" ==
+               TestVault.decrypt!(ciphertext1, padding: false)
+
+      assert "plaintext\x80\x00\x00\x00\x00\x00" ==
+               TestVault.decrypt!(ciphertext2, padding: false)
     end
 
     test "raises error if no module found to decrypt" do
