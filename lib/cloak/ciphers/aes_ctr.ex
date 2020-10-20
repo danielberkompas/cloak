@@ -9,7 +9,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   alias Cloak.Tags.{Encoder, Decoder}
 
   @doc """
-  Callback implementation for `Cloak.Cipher.encrypt`. Encrypts a value using
+  Callback implementation for `Cloak.Cipher`. Encrypts a value using
   AES in CTR mode.
 
   Generates a random IV for every encryption, and prepends the key tag and IV to
@@ -42,7 +42,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.decrypt/2`. Decrypts a value
+  Callback implementation for `Cloak.Cipher`. Decrypts a value
   encrypted with AES in CTR mode.
 
   Uses the key tag to find the correct key for decryption, and the IV included
@@ -71,7 +71,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   end
 
   @doc """
-  Callback implementation for `Cloak.Cipher.can_decrypt?2`. Determines if
+  Callback implementation for `Cloak.Cipher`. Determines if
   a ciphertext can be decrypted with this cipher.
   """
   @impl true
