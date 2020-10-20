@@ -1,8 +1,8 @@
 # Changelog
 
-## [1.0.2](https://github.com/danielberkompas/cloak/tree/1.0.2) (2020-02-01)
+## [v1.0.2](https://github.com/danielberkompas/cloak/tree/v1.0.2) (2020-02-01)
 
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.1...1.0.2)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.1...v1.0.2)
 
 **Closed issues:**
 
@@ -168,7 +168,6 @@
 
 - Add support for encrypted Ecto String and Integer Array types [\#53](https://github.com/danielberkompas/cloak/pull/53) ([boydm](https://github.com/boydm))
 - perf\(Cloak.Config.all/0\): remove calls to ensure\_loaded when checking… [\#51](https://github.com/danielberkompas/cloak/pull/51) ([tomciopp](https://github.com/tomciopp))
-- Add DateTime field, better docs [\#48](https://github.com/danielberkompas/cloak/pull/48) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v0.5.0](https://github.com/danielberkompas/cloak/tree/v0.5.0) (2018-01-06)
 
@@ -183,6 +182,7 @@
 
 - Add EncryptedTimeField [\#50](https://github.com/danielberkompas/cloak/pull/50) ([danielberkompas](https://github.com/danielberkompas))
 - Update the documentation sidebar [\#49](https://github.com/danielberkompas/cloak/pull/49) ([danielberkompas](https://github.com/danielberkompas))
+- Add DateTime field, better docs [\#48](https://github.com/danielberkompas/cloak/pull/48) ([danielberkompas](https://github.com/danielberkompas))
 - refactor\(Cloak.Config.all/0\): Find ciphers by checking if the module … [\#47](https://github.com/danielberkompas/cloak/pull/47) ([tomciopp](https://github.com/tomciopp))
 - feat\(Date Types\): add EncryptedDateField, and EncryptedNaiveDatetimeF… [\#46](https://github.com/danielberkompas/cloak/pull/46) ([tomciopp](https://github.com/tomciopp))
 
@@ -263,7 +263,7 @@
 
 - \[\#16\] Update encryption version in cloak.migrate [\#19](https://github.com/danielberkompas/cloak/pull/19) ([danielberkompas](https://github.com/danielberkompas))
 - Fix validation bug in cloak.migrate [\#15](https://github.com/danielberkompas/cloak/pull/15) ([bgeihsgt](https://github.com/bgeihsgt))
-- Add key generation example to README. [\#14](https://github.com/danielberkompas/cloak/pull/14) ([rpelyush](https://github.com/rpelyush))
+- Add key generation example to README. [\#14](https://github.com/danielberkompas/cloak/pull/14) ([ghost](https://github.com/ghost))
 - Add deps badge to README [\#13](https://github.com/danielberkompas/cloak/pull/13) ([rrrene](https://github.com/rrrene))
 
 ## [v0.2.2](https://github.com/danielberkompas/cloak/tree/v0.2.2) (2016-05-20)
@@ -274,10 +274,6 @@
 
 - Cloak.EncryptedMapField strange Poison errors [\#6](https://github.com/danielberkompas/cloak/issues/6)
 - How to generate keys? [\#5](https://github.com/danielberkompas/cloak/issues/5)
-
-**Merged pull requests:**
-
-- Decode AES environment variable keys from base64 [\#11](https://github.com/danielberkompas/cloak/pull/11) ([philss](https://github.com/philss))
 
 ## [v0.2.1](https://github.com/danielberkompas/cloak/tree/v0.2.1) (2016-04-06)
 

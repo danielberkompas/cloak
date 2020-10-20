@@ -1,8 +1,8 @@
 language: elixir
 elixir:
-  - 1.10.0
+  - 1.11.1
 otp_release:
-  - 22.1
+  - 23.0.4
 before_script:
   - mix local.hex --force
   - mix deps.get --only test
