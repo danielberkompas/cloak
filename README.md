@@ -16,7 +16,7 @@ and conveniences for Elixir developers:
 ## Documentation
 
 - [Hex Documentation](https://hexdocs.pm/cloak) (Includes installation guide)
-- [How to upgrade from Cloak 0.9.x to 1.0.x](https://hexdocs.pm/cloak/0.9.x_to_1.0.x.html)
+- [How to upgrade from Cloak 0.9.x to 1.0.x](https://hexdocs.pm/cloak/0-9-x_to_1-0-x.html)
 
 ## Examples
 
