@@ -2,7 +2,7 @@ Cloak
 ======
 
 [![Hex Version](http://img.shields.io/hexpm/v/cloak.svg)](https://hex.pm/packages/cloak)
-[![Build Status](https://travis-ci.org/danielberkompas/cloak.svg?branch=master)](https://travis-ci.org/danielberkompas/cloak)
+[![Build Status](https://danielberkompas.semaphoreci.com/badges/cloak/branches/master.svg?style=shields)](https://danielberkompas.semaphoreci.com/projects/cloak)
 [![Inline docs](http://inch-ci.org/github/danielberkompas/cloak.svg?branch=master)](http://inch-ci.org/github/danielberkompas/cloak)
 [![Coverage Status](https://coveralls.io/repos/github/danielberkompas/cloak/badge.svg?branch=migrate)](https://coveralls.io/github/danielberkompas/cloak?branch=migrate)
 
