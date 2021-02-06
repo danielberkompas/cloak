@@ -1,0 +1,39 @@
+version: "v1.0"
+name: "CI Build"
+
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+auto_cancel:
+  running:
+    when: "true"
+
+fail_fast:
+  stop:
+    when: "true"
+
+blocks:
+  - name: "Build"
+    dependencies: []
+    task:
+      env_vars:
+        - name: MIX_ENV
+          value: test
+      secrets:
+        - name: cloak-coveralls
+      jobs:
+        - name: "Build"
+          matrix:
+            - env_var: ELIXIR_VERSION
+              values: ["1.11.3"]
+          commands:
+            - sem-version elixir $ELIXIR_VERSION
+            - checkout
+            - cache restore
+            - mix local.hex --force
+            - mix local.rebar --force
+            - mix deps.get
+            - bin/test
+            - cache store
