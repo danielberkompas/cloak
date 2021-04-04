@@ -35,9 +35,9 @@ defmodule Cloak.Ciphers.AES.CTR do
     tag = Keyword.fetch!(opts, :tag)
 
     iv = :crypto.strong_rand_bytes(16)
-    state = :crypto.stream_init(:aes_ctr, key, iv)
+    state = do_init(key, iv, true)
 
-    {_state, ciphertext} = :crypto.stream_encrypt(state, to_string(plaintext))
+    ciphertext = do_encrypt(state, to_string(plaintext))
     {:ok, Encoder.encode(tag) <> iv <> ciphertext}
   end
 
@@ -62,8 +62,8 @@ defmodule Cloak.Ciphers.AES.CTR do
     if can_decrypt?(ciphertext, opts) do
       key = Keyword.fetch!(opts, :key)
       %{remainder: <<iv::binary-16, ciphertext::binary>>} = Decoder.decode(ciphertext)
-      state = :crypto.stream_init(:aes_ctr, key, iv)
-      {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
+      state = do_init(key, iv, false)
+      plaintext = do_decrypt(state, ciphertext)
       {:ok, plaintext}
     else
       :error
@@ -84,6 +84,33 @@ defmodule Cloak.Ciphers.AES.CTR do
 
       _other ->
         false
+    end
+  end
+
+  # TODO: remove this once support for Erlang/OTP 21 is dropped
+  defp do_init(key, iv, encoder?) do
+    if System.otp_release() >= "22" do
+      :crypto.crypto_init(:aes_256_ctr, key, iv, encoder?)
+    else
+      :crypto.stream_init(:aes_ctr, key, iv)
+    end
+  end
+
+  defp do_encrypt(state, plaintext) do
+    if System.otp_release() >= "22" do
+      :crypto.crypto_update(state, plaintext)
+    else
+      {_state, cyphertext} = :crypto.stream_encrypt(state, plaintext)
+      cyphertext
+    end
+  end
+
+  defp do_decrypt(state, ciphertext) do
+    if System.otp_release() >= "22" do
+      :crypto.crypto_update(state, ciphertext)
+    else
+      {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
+      plaintext
     end
   end
 end
