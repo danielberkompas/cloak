@@ -90,7 +90,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   # TODO: remove this once support for Erlang/OTP 21 is dropped
   defp do_init(key, iv, encoder?) do
     if System.otp_release() >= "22" do
-      :crypto.crypto_init(:aes_ctr, key, iv, encoder?)
+      :crypto.crypto_init(:aes_256_ctr, key, iv, encoder?)
     else
       :crypto.stream_init(:aes_ctr, key, iv)
     end
