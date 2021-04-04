@@ -50,7 +50,7 @@ defmodule Cloak.Ciphers.AES.GCM do
   # TODO: remove this once support for Erlang/OTP 21 is dropped
   defp do_encrypt(key, iv, plaintext) do
     if System.otp_release() >= "22" do
-      :crypto.crypto_one_time_aead(:aes_gcm, key, iv, plaintext, @aad, true)
+      :crypto.crypto_one_time_aead(:aes_256_gcm, key, iv, plaintext, @aad, true)
     else
       :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
     end
@@ -76,10 +76,12 @@ defmodule Cloak.Ciphers.AES.GCM do
   end
 
   # TODO: remove this once support for Erlang/OTP 21 is dropped
-  defp do_decrypt(key, iv, ciphertext, ciphertag) do
-    if System.otp_release() >= "22" do
-      :crypto.crypto_one_time_aead(:aes_gcm, key, iv, ciphertext, @aad, ciphertag, false)
-    else
+  if System.otp_release() >= "22" do
+    defp do_decrypt(key, iv, ciphertext, ciphertag) do
+      :crypto.crypto_one_time_aead(:aes_256_gcm, key, iv, ciphertext, @aad, ciphertag, false)
+    end
+  else
+    defp do_decrypt(key, iv, ciphertext, ciphertag) do
       :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})
     end
   end
