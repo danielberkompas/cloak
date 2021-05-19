@@ -51,8 +51,7 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTRTest do
   # and key tag were prepended to the iv and ciphertext.
   defp create_ciphertext(_) do
     iv = :crypto.strong_rand_bytes(16)
-    state = :crypto.stream_init(:aes_ctr, @opts[:key], iv)
-    {_state, ciphertext} = :crypto.stream_encrypt(state, "plaintext")
+    ciphertext = Cloak.Crypto.encrypt_one_time(:aes_ctr, @opts[:key], iv, "plaintext")
     [ciphertext: @opts[:module_tag] <> @opts[:tag] <> iv <> ciphertext]
   end
 end
