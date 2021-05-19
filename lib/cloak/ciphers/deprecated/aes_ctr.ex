@@ -22,6 +22,10 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTR do
 
   @behaviour Cloak.Cipher
 
+  alias Cloak.Crypto
+
+  @cipher Crypto.map_cipher(:aes_256_ctr)
+
   @deprecated "Use Cloak.Ciphers.AES.CTR.encrypt/2 instead. This call will raise an error."
   @impl Cloak.Cipher
   def encrypt(_plaintext, _opts) do
@@ -36,8 +40,7 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTR do
     with true <- can_decrypt?(ciphertext, opts),
          <<iv::binary-16, ciphertext::binary>> <-
            String.replace_leading(ciphertext, tag(opts), <<>>) do
-      state = :crypto.stream_init(:aes_ctr, key, iv)
-      {_state, plaintext} = :crypto.stream_decrypt(state, ciphertext)
+      plaintext = Crypto.decrypt_one_time(@cipher, key, iv, ciphertext)
       {:ok, plaintext}
     else
       _other ->
