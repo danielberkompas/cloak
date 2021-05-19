@@ -23,12 +23,12 @@ defmodule Cloak.Crypto do
 
     @impl Cloak.Crypto.Interface
     def encrypt_one_time_aead(cipher, key, iv, aad, plaintext) do
-      :crypto.crypto_one_time_aead(cipher, key, iv, aad, plaintext, true)
+      :crypto.crypto_one_time_aead(cipher, key, iv, plaintext, aad, true)
     end
 
     @impl Cloak.Crypto.Interface
     def decrypt_one_time_aead(cipher, key, iv, aad, ciphertext, ciphertag) do
-      :crypto.crypto_one_time_aead(cipher, key, iv, aad, ciphertext, ciphertag, false)
+      :crypto.crypto_one_time_aead(cipher, key, iv, ciphertext, aad, ciphertag, false)
     end
 
     @impl Cloak.Crypto.Interface
