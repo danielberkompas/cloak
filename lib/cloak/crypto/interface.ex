@@ -9,4 +9,5 @@ defmodule Cloak.Crypto.Interface do
               {binary(), binary()}
   @callback decrypt_one_time_aead(atom(), iodata(), iodata(), iodata(), iodata(), iodata()) ::
               binary()
+  @callback map_cipher(atom()) :: atom()
 end

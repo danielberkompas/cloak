@@ -9,6 +9,8 @@ defmodule Cloak.Ciphers.AES.CTR do
   alias Cloak.Tags.{Encoder, Decoder}
   alias Cloak.Crypto
 
+  @cipher Crypto.map_cipher(:aes_256_ctr)
+
   @doc """
   Callback implementation for `Cloak.Cipher`. Encrypts a value using
   AES in CTR mode.
@@ -34,9 +36,8 @@ defmodule Cloak.Ciphers.AES.CTR do
   def encrypt(plaintext, opts) when is_binary(plaintext) do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
-
     iv = Crypto.strong_rand_bytes(16)
-    ciphertext = Crypto.encrypt_one_time(:aes_ctr, key, iv, to_string(plaintext))
+    ciphertext = Crypto.encrypt_one_time(@cipher, key, iv, to_string(plaintext))
     {:ok, Encoder.encode(tag) <> iv <> ciphertext}
   end
 
@@ -61,7 +62,7 @@ defmodule Cloak.Ciphers.AES.CTR do
     if can_decrypt?(ciphertext, opts) do
       key = Keyword.fetch!(opts, :key)
       %{remainder: <<iv::binary-16, ciphertext::binary>>} = Decoder.decode(ciphertext)
-      plaintext = Crypto.decrypt_one_time(:aes_ctr, key, iv, ciphertext)
+      plaintext = Crypto.decrypt_one_time(@cipher, key, iv, ciphertext)
       {:ok, plaintext}
     else
       :error

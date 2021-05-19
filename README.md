@@ -37,9 +37,9 @@ MyApp.Vault.decrypt(ciphertext)
 
 ```elixir
 "plaintext"
-|> MyApp.Vault.encrypt!(:aes_gcm)
+|> MyApp.Vault.encrypt!(:aes_256_gcm)
 |> MyApp.Vault.decrypt!()
-|> MyApp.Vault.encrypt!(:aes_ctr)
+|> MyApp.Vault.encrypt!(:aes_256_ctr)
 |> MyApp.Vault.decrypt!()
 # => "plaintext"
 ```
