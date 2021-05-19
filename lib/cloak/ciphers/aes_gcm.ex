@@ -61,6 +61,7 @@ defmodule Cloak.Ciphers.AES.GCM do
 
       %{remainder: <<iv::binary-size(iv_length), ciphertag::binary-16, ciphertext::binary>>} =
         Decoder.decode(ciphertext)
+
       plaintext = Crypto.decrypt_one_time_aead(@cipher, key, iv, @aad, ciphertext, ciphertag)
       {:ok, plaintext}
     else
