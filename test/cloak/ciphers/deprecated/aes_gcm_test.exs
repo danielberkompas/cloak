@@ -70,7 +70,7 @@ defmodule Cloak.Ciphers.Deprecated.AES.GCMTest do
     iv = :crypto.strong_rand_bytes(16)
 
     {ciphertext, ciphertag} =
-      :crypto.block_encrypt(:aes_gcm, @opts[:key], iv, {@aad, "plaintext"})
+      Cloak.Crypto.encrypt_one_time_aead(:aes_gcm, @opts[:key], iv, @aad, "plaintext")
 
     [
       ciphertext:

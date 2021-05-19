@@ -8,8 +8,8 @@ defmodule Cloak.Ciphers.AES.GCM do
   @aad "AES256GCM"
   @default_iv_length 16
 
-  alias Cloak.Tags.Encoder
-  alias Cloak.Tags.Decoder
+  alias Cloak.Tags.{Encoder, Decoder}
+  alias Cloak.Crypto
 
   @doc """
   Callback implementation for `Cloak.Cipher`. Encrypts a value using
@@ -41,9 +41,10 @@ defmodule Cloak.Ciphers.AES.GCM do
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
     iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
-    iv = :crypto.strong_rand_bytes(iv_length)
+    iv = Crypto.strong_rand_bytes(iv_length)
 
-    {ciphertext, ciphertag} = :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
+    {ciphertext, ciphertag} = Crypto.encrypt_one_time_aead(:aes_gcm, key, iv, @aad, plaintext)
+
     {:ok, Encoder.encode(tag) <> iv <> ciphertag <> ciphertext}
   end
 
@@ -60,7 +61,8 @@ defmodule Cloak.Ciphers.AES.GCM do
       %{remainder: <<iv::binary-size(iv_length), ciphertag::binary-16, ciphertext::binary>>} =
         Decoder.decode(ciphertext)
 
-      {:ok, :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})}
+      plaintext = Crypto.decrypt_one_time_aead(:aes_gcm, key, iv, @aad, ciphertext, ciphertag)
+      {:ok, plaintext}
     else
       :error
     end
