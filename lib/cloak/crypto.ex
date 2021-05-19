@@ -34,7 +34,6 @@ defmodule Cloak.Crypto do
     @impl Cloak.Crypto.Interface
     def map_cipher(cipher), do: cipher
   else
-
     @impl Cloak.Crypto.Interface
     def encrypt_one_time(cipher, key, iv, plaintext) do
       state = :crypto.stream_init(cipher, key, iv)
