@@ -43,7 +43,7 @@ defmodule Cloak.Ciphers.AES.GCM do
     iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
     iv = :crypto.strong_rand_bytes(iv_length)
 
-    {ciphertext, ciphertag} = :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
+    {ciphertext, ciphertag} = do_encrypt(key, iv, plaintext)
     {:ok, Encoder.encode(tag) <> iv <> ciphertag <> ciphertext}
   end
 
@@ -60,7 +60,7 @@ defmodule Cloak.Ciphers.AES.GCM do
       %{remainder: <<iv::binary-size(iv_length), ciphertag::binary-16, ciphertext::binary>>} =
         Decoder.decode(ciphertext)
 
-      {:ok, :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})}
+      {:ok, do_decrypt(key, iv, ciphertext, ciphertag)}
     else
       :error
     end
@@ -84,6 +84,25 @@ defmodule Cloak.Ciphers.AES.GCM do
 
       _other ->
         false
+    end
+  end
+
+  # TODO: remove this once support for Erlang/OTP 21 is dropped
+  if System.otp_release() >= "22" do
+    defp do_decrypt(key, iv, ciphertext, ciphertag) do
+      :crypto.crypto_one_time_aead(:aes_256_gcm, key, iv, ciphertext, @aad, ciphertag, false)
+    end
+
+    defp do_encrypt(key, iv, plaintext) do
+      :crypto.crypto_one_time_aead(:aes_256_gcm, key, iv, plaintext, @aad, true)
+    end
+  else
+    defp do_decrypt(key, iv, ciphertext, ciphertag) do
+      :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})
+    end
+
+    defp do_encrypt(key, iv, plaintext) do
+      :crypto.block_encrypt(:aes_gcm, key, iv, {@aad, plaintext})
     end
   end
 end
