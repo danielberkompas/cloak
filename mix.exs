@@ -30,7 +30,6 @@ defmodule Cloak.Mixfile do
 
   defp deps do
     [
-      {:pbkdf2, "~> 2.0", optional: true},
       {:jason, "~> 1.0", optional: true},
       {:excoveralls, "~> 0.12", only: :test},
       {:ex_doc, ">= 0.0.0", only: [:dev, :docs]},
