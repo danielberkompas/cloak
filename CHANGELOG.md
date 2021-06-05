@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.1](https://github.com/danielberkompas/cloak/tree/v1.1.1) (2021-06-05)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.0...v1.1.1)
+
+**Merged pull requests:**
+
+- Remove unused pbkdf2 dependency [\#107](https://github.com/danielberkompas/cloak/pull/107) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v1.1.0](https://github.com/danielberkompas/cloak/tree/v1.1.0) (2021-06-05)
 
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.0.3...v1.1.0)
