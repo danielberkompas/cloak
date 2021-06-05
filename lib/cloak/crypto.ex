@@ -1,7 +1,7 @@
 defmodule Cloak.Crypto do
-  @moduledoc ~S"""
-  Interface for mapping encrypt/decrypt actions to different versions of Erlang's `:crypto` API
-  """
+  @moduledoc false
+  # Interface for mapping encrypt/decrypt actions to different versions of Erlang's `:crypto` API.
+  # See `Cloak.Crypto.Interface` for details on the included functions.
 
   @behaviour Cloak.Crypto.Interface
 
