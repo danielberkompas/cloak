@@ -19,11 +19,13 @@ defmodule Cloak.Ciphers.Deprecated.AES.GCM do
 
   See the [Upgrading from 0.6.x](0.6.x_to_0.7.x.html) guide for usage.
   """
-
   @behaviour Cloak.Cipher
-  @aad "AES256GCM"
 
   alias Cloak.Tags.Decoder
+  alias Cloak.Crypto
+
+  @cipher Crypto.map_cipher(:aes_256_gcm)
+  @aad "AES256GCM"
 
   @deprecated "Use Cloak.Ciphers.AES.GCM.encrypt/2 instead. This call will raise an error."
   @impl Cloak.Cipher
@@ -37,7 +39,8 @@ defmodule Cloak.Ciphers.Deprecated.AES.GCM do
     key = Keyword.fetch!(opts, :key)
 
     with <<iv::binary-16, ciphertag::binary-16, ciphertext::binary>> <- decode(ciphertext, opts) do
-      {:ok, :crypto.block_decrypt(:aes_gcm, key, iv, {@aad, ciphertext, ciphertag})}
+      plaintext = Crypto.decrypt_one_time_aead(@cipher, key, iv, @aad, ciphertext, ciphertag)
+      {:ok, plaintext}
     else
       _other ->
         :error
