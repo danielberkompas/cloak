@@ -49,11 +49,16 @@ defmodule Cloak.VaultTest do
       assert SupervisedVault.json_library() == Jason
       GenServer.stop(pid)
     end
+
+    test "can be re-started" do
+      {:ok, _} = RuntimeVault.start_link()
+      {:error, {:already_started, _}} = RuntimeVault.start_link()
+    end
   end
 
   describe ".init/1" do
     test "returns the given config" do
-      assert {:ok, []} == TestVault.init([])
+      assert {:ok, [], {:continue, :save_config}} == TestVault.init([])
     end
   end
 
