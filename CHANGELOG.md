@@ -1,14 +1,18 @@
 # Changelog
 
-## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+## [v1.1.2](https://github.com/danielberkompas/cloak/tree/v1.1.2) (2022-06-17)
 
-[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.1...HEAD)
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.1...v1.1.2)
 
 **Closed issues:**
 
 - Accepting function as `key` configuration [\#112](https://github.com/danielberkompas/cloak/issues/112)
 - ETS problem with Clock as application in umbrella project [\#111](https://github.com/danielberkompas/cloak/issues/111)
 - Cloak relies in deprecated :crypto API that will be removed in OTP 24 [\#102](https://github.com/danielberkompas/cloak/issues/102)
+
+**Merged pull requests:**
+
+- Run tests against Elixir 1.13 [\#116](https://github.com/danielberkompas/cloak/pull/116) ([danielberkompas](https://github.com/danielberkompas))
 
 ## [v1.1.1](https://github.com/danielberkompas/cloak/tree/v1.1.1) (2021-06-05)
 
@@ -28,7 +32,6 @@
 - Add regression tests to prepare for OTP 24 [\#105](https://github.com/danielberkompas/cloak/pull/105) ([danielberkompas](https://github.com/danielberkompas))
 - Erlang 24 Support [\#104](https://github.com/danielberkompas/cloak/pull/104) ([mjquinlan2000](https://github.com/mjquinlan2000))
 - Update Upgrade Documentation Link [\#101](https://github.com/danielberkompas/cloak/pull/101) ([kevin-j-m](https://github.com/kevin-j-m))
-- Correct code example on upgrading guide [\#90](https://github.com/danielberkompas/cloak/pull/90) ([ruan-brandao](https://github.com/ruan-brandao))
 
 ## [v1.0.3](https://github.com/danielberkompas/cloak/tree/v1.0.3) (2020-10-20)
 
@@ -65,6 +68,10 @@
 **Closed issues:**
 
 - Outstanding work for 1.0? [\#91](https://github.com/danielberkompas/cloak/issues/91)
+
+**Merged pull requests:**
+
+- Correct code example on upgrading guide [\#90](https://github.com/danielberkompas/cloak/pull/90) ([ruan-brandao](https://github.com/ruan-brandao))
 
 ## [v1.0.0-alpha.0](https://github.com/danielberkompas/cloak/tree/v1.0.0-alpha.0) (2018-12-31)
 
@@ -263,7 +270,7 @@
 **Merged pull requests:**
 
 - Add ability to pull cipher key from OTP app env [\#32](https://github.com/danielberkompas/cloak/pull/32) ([tielur](https://github.com/tielur))
-- Add `prepare\_changes` example to module doc for use with ecto 2.0 [\#27](https://github.com/danielberkompas/cloak/pull/27) ([kgautreaux](https://github.com/kgautreaux))
+- Add `prepare_changes` example to module doc for use with ecto 2.0 [\#27](https://github.com/danielberkompas/cloak/pull/27) ([kgautreaux](https://github.com/kgautreaux))
 - clean up compile warnings under Elixir 1.4 [\#25](https://github.com/danielberkompas/cloak/pull/25) ([boydm](https://github.com/boydm))
 
 ## [v0.3.0](https://github.com/danielberkompas/cloak/tree/v0.3.0) (2016-09-16)
