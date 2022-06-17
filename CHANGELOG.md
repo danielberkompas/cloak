@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased](https://github.com/danielberkompas/cloak/tree/HEAD)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.1...HEAD)
+
+**Closed issues:**
+
+- Accepting function as `key` configuration [\#112](https://github.com/danielberkompas/cloak/issues/112)
+- ETS problem with Clock as application in umbrella project [\#111](https://github.com/danielberkompas/cloak/issues/111)
+- Cloak relies in deprecated :crypto API that will be removed in OTP 24 [\#102](https://github.com/danielberkompas/cloak/issues/102)
+
 ## [v1.1.1](https://github.com/danielberkompas/cloak/tree/v1.1.1) (2021-06-05)
 
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.0...v1.1.1)
@@ -18,6 +28,7 @@
 - Add regression tests to prepare for OTP 24 [\#105](https://github.com/danielberkompas/cloak/pull/105) ([danielberkompas](https://github.com/danielberkompas))
 - Erlang 24 Support [\#104](https://github.com/danielberkompas/cloak/pull/104) ([mjquinlan2000](https://github.com/mjquinlan2000))
 - Update Upgrade Documentation Link [\#101](https://github.com/danielberkompas/cloak/pull/101) ([kevin-j-m](https://github.com/kevin-j-m))
+- Correct code example on upgrading guide [\#90](https://github.com/danielberkompas/cloak/pull/90) ([ruan-brandao](https://github.com/ruan-brandao))
 
 ## [v1.0.3](https://github.com/danielberkompas/cloak/tree/v1.0.3) (2020-10-20)
 
@@ -54,10 +65,6 @@
 **Closed issues:**
 
 - Outstanding work for 1.0? [\#91](https://github.com/danielberkompas/cloak/issues/91)
-
-**Merged pull requests:**
-
-- Correct code example on upgrading guide [\#90](https://github.com/danielberkompas/cloak/pull/90) ([ruan-brandao](https://github.com/ruan-brandao))
 
 ## [v1.0.0-alpha.0](https://github.com/danielberkompas/cloak/tree/v1.0.0-alpha.0) (2018-12-31)
 

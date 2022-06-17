@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :cloak, Cloak.TestVault,
   json_library: Jason,
