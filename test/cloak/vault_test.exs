@@ -62,6 +62,14 @@ defmodule Cloak.VaultTest do
       assert {:ok, ciphertext} = TestVault.encrypt("plaintext")
       assert ciphertext != "plaintext"
     end
+
+    test "returns error if vault is not configured correctly" do
+      {:ok, pid} = RuntimeVault.start_link()
+
+      assert {:error, %Cloak.InvalidConfig{}} = RuntimeVault.encrypt("plaintext")
+
+      GenServer.stop(pid)
+    end
   end
 
   describe ".encrypt!/1" do
@@ -69,6 +77,16 @@ defmodule Cloak.VaultTest do
       ciphertext = TestVault.encrypt!("plaintext")
       assert is_binary(ciphertext)
       assert ciphertext != "plaintext"
+    end
+
+    test "raises error if vault is not configured correctly" do
+      {:ok, pid} = RuntimeVault.start_link()
+
+      assert_raise Cloak.InvalidConfig, fn ->
+        RuntimeVault.encrypt!("plaintext")
+      end
+
+      GenServer.stop(pid)
     end
   end
 
