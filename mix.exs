@@ -47,10 +47,12 @@ defmodule Cloak.Mixfile do
         "guides/upgrading/0.9.x_to_1.0.x.md": [title: "0.9.x to 1.0.x"],
         "guides/upgrading/0.8.x_to_0.9.x.md": [title: "0.8.x to 0.9.x"],
         "guides/upgrading/0.7.x_to_0.8.x.md": [title: "0.7.x to 0.8.x"],
-        "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"]
+        "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"],
+        "guides/cheatsheets/cheatsheet.cheatmd": [title: "Cheatsheet"]
       ],
       extra_section: "GUIDES",
       groups_for_extras: [
+        Cheatsheets: ~r/cheatsheets/,
         "How To": ~r/how_to/,
         Upgrading: ~r/upgrading/
       ],

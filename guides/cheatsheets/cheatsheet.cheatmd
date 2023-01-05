@@ -1,0 +1,145 @@
+## Setup
+{: .col-2}
+
+### Define a vault module
+
+This is the module you will use to encrypt/decrypt your ciphertext. You can have more than one!
+
+```elixir
+defmodule MyApp.MyVault do
+  use Cloak.Vault, otp_app: :my_app
+end
+```
+
+### Generate an encryption key
+
+This will generate a 256-bit key in Base64 encoding that you can store in an environment variable.
+
+```elixir
+32
+|> :crypto.strong_rand_bytes()
+|> Base.encode64
+```
+
+### Custom Cipher Module
+If you don't want to use any of the included cipher modules, you can define your own. See `Cloak.Cipher`.
+
+```elixir
+defmodule MyApp.MyCipher do
+  @behaviour Cloak.Cipher
+
+  @impl true
+  def encrypt(plaintext, opts) do
+    # your logic here
+  end
+
+  @impl true
+  def decrypt(ciphertext, opts) do
+    # your logic here
+  end
+
+  @impl true
+  def can_decrypt?(ciphertext, opts) do
+    # return a boolean
+  end
+end
+```
+
+
+## Configure
+{: .col-2}
+
+### Using `Config`
+
+This is the easiest option, and the vault will automatically read this configuration.
+
+```elixir
+# config/runtime.exs
+config :my_app, MyApp.MyVault,
+    ciphers: [
+      default: Cloak.Ciphers.AES.GCM, 
+      tag: "AES.GCM.V1", 
+      key: Base.decode64!("your-key-here"),
+      iv_length: 12
+    ]
+```
+
+### Inside the Vault module
+
+This is best if you need to fetch the key from some custom store before you use it. Add these lines to your vault module.
+
+```elixir
+defmodule MyApp.Vault do
+  use Cloak.Vault, otp_app: :my_app
+
+  @impl GenServer
+  def init(config) do
+    config =
+      Keyword.put(config, :ciphers, [
+        default: {
+          Cloak.Ciphers.AES.GCM, 
+          tag: "AES.GCM.V1", 
+          key: decode_env!("CLOAK_KEY"),
+          iv_length: 12
+        }
+      ])
+
+    {:ok, config}
+  end
+
+  defp decode_env!(var) do
+    var
+    |> System.get_env()
+    |> Base.decode64!()
+  end
+end
+```
+
+## Usage
+{: .col-2}
+
+### Encrypt
+
+#### Safe: return any errors
+
+```elixir
+MyApp.MyVault.encrypt("plaintext")
+# => {:ok, "ciphertext"}
+```
+
+#### Unsafe: raise any errors
+
+```elixir
+MyApp.MyVault.encrypt!("plaintext")
+# => "ciphertext"
+```
+
+
+### Decrypt
+
+#### Safe: return any errors
+
+```elixir
+MyApp.MyVault.decrypt("ciphertext")
+# => {:ok, "plaintext"}
+```
+
+#### Unsafe: raise any errors
+
+```elixir
+MyApp.MyVault.decrypt!("ciphertext")
+# => "plaintext"
+```
+
+## Usage with Ecto
+See the [`cloak_ecto`](https://hexdocs.pm/cloak_ecto) library! Here's a preview:
+
+```elixir
+defmodule MyApp.MySchema do
+  use Ecto.Schema
+
+  schema "table" do
+    field :encrypted_field, MyApp.Encrypted.Binary
+  end
+end
+```
