@@ -19,7 +19,8 @@ defmodule Cloak.Tags.Decoder do
   def decode(<<_type::size(8), len::size(8), rest::binary>> = message) do
     tag_length =
       if len >= @half_byte do
-        <<value::binary-size(len - @half_byte), _::binary>> = rest
+        size = len - @half_byte
+        <<value::binary-size(size), _::binary>> = rest
         @offset + len - @half_byte + value_bytes(:binary.bin_to_list(value))
       else
         @offset + len
