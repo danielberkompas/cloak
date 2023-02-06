@@ -181,28 +181,29 @@ defmodule Cloak.Vault do
         config = Keyword.merge(app_config, config)
 
         # Start the server
-        {:ok, pid} = GenServer.start_link(__MODULE__, config, name: __MODULE__)
-
-        # Ensure that the configuration is saved
-        GenServer.call(pid, :save_config, 10_000)
-
-        # Return the pid
-        {:ok, pid}
+        GenServer.start_link(__MODULE__, config, name: __MODULE__)
       end
 
       # Users can override init/1 to customize the configuration
       # of the vault during startup
       @impl GenServer
       def init(config) do
-        {:ok, config}
+        # Ensure that the configuration is saved
+        {:ok, config, {:continue, :save_config}}
       end
 
       # Cache the results of the `init` configuration callback in
       # the application configuration for this Vault.
       @impl GenServer
       def handle_call(:save_config, _from, config) do
+        {:reply, :ok, config, {:continue, :save_config}}
+      end
+
+      @impl GenServer
+      def handle_continue(:save_config, config) do
         Cloak.Vault.save_config(@table_name, config)
-        {:reply, :ok, config}
+
+        {:noreply, config}
       end
 
       # If a hot upgrade occurs, rerun the `init` callback to
