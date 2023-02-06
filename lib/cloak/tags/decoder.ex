@@ -16,29 +16,23 @@ defmodule Cloak.Tags.Decoder do
   @byte_length 256
   @half_byte 128
 
-  def decode(message) do
-    length = tag_length(message)
+  def decode(<<_type::size(8), len::size(8), rest::binary>> = message) do
+    tag_length =
+      if len >= @half_byte do
+        <<value::binary-size(len - @half_byte), _::binary>> = rest
+        @offset + len - @half_byte + value_bytes(:binary.bin_to_list(value))
+      else
+        @offset + len
+      end
 
     case message do
-      <<tlv::binary-size(length), remainder::binary>> ->
+      <<tlv::binary-size(tag_length), remainder::binary>> ->
         %{tag: tag(tlv), remainder: remainder}
 
       _other ->
         :error
     end
   end
-
-  defp tag_length(message) do
-    <<_type::size(8), len::size(8), rest::binary>> = message
-
-    tag_length(len, :binary.bin_to_list(rest))
-  end
-
-  defp tag_length(num, list) when num >= @half_byte do
-    @offset + num - @half_byte + value_bytes(list, num - @half_byte)
-  end
-
-  defp tag_length(num, _list), do: @offset + num
 
   defp tag(<<_type::size(8), len::size(8), rest::binary>>) when len >= @half_byte do
     size = len - @half_byte
@@ -51,9 +45,7 @@ defmodule Cloak.Tags.Decoder do
     tag
   end
 
-  defp value_bytes(list, num_bytes) do
-    list
-    |> Enum.take(num_bytes)
-    |> Enum.reduce(0, fn value, acc -> acc * @byte_length + value end)
+  defp value_bytes(list) do
+    Enum.reduce(list, 0, fn value, acc -> acc * @byte_length + value end)
   end
 end
