@@ -57,10 +57,12 @@ This is the easiest option, and the vault will automatically read this configura
 # config/runtime.exs
 config :my_app, MyApp.MyVault,
     ciphers: [
-      default: Cloak.Ciphers.AES.GCM, 
-      tag: "AES.GCM.V1", 
-      key: Base.decode64!("your-key-here"),
-      iv_length: 12
+      default: {
+        Cloak.Ciphers.AES.GCM,
+        tag: "AES.GCM.V1",
+        key: Base.decode64!("your-key-here"),
+        iv_length: 12
+      }
     ]
 ```
 
