@@ -2,9 +2,14 @@ Cloak
 ======
 
 [![Hex Version](http://img.shields.io/hexpm/v/cloak.svg)](https://hex.pm/packages/cloak)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/cloak/)
+[![Total Download](https://img.shields.io/hexpm/dt/cloak.svg)](https://hex.pm/packages/cloak)
+[![License](https://img.shields.io/hexpm/l/cloak.svg)](https://github.com/danielberkompas/cloak/blob/master/LICENSE.md)
+[![Last Updated](https://img.shields.io/github/last-commit/danielberkompas/cloak.svg)](https://github.com/danielberkompas/cloak/commits/master)
 [![Build Status](https://danielberkompas.semaphoreci.com/badges/cloak/branches/master.svg?style=shields)](https://danielberkompas.semaphoreci.com/projects/cloak)
 [![Inline docs](http://inch-ci.org/github/danielberkompas/cloak.svg?branch=master)](http://inch-ci.org/github/danielberkompas/cloak)
 [![Coverage Status](https://coveralls.io/repos/github/danielberkompas/cloak/badge.svg?branch=migrate)](https://coveralls.io/github/danielberkompas/cloak?branch=migrate)
+
 
 Cloak is an Elixir encryption library that implements several best practices
 and conveniences for Elixir developers:
@@ -25,8 +30,8 @@ and conveniences for Elixir developers:
 ```elixir
 {:ok, ciphertext} = MyApp.Vault.encrypt("plaintext")
 # => {:ok, <<1, 10, 65, 69, 83, 46, 71, 67, 77, 46, 86, 49, 45, 1, 250, 221,
-# =>  189, 64, 26, 214, 26, 147, 171, 101, 181, 158, 224, 117, 10, 254, 140, 207, 
-# =>  215, 98, 208, 208, 174, 162, 33, 197, 179, 56, 236, 71, 81, 67, 85, 229, 
+# =>  189, 64, 26, 214, 26, 147, 171, 101, 181, 158, 224, 117, 10, 254, 140, 207,
+# =>  215, 98, 208, 208, 174, 162, 33, 197, 179, 56, 236, 71, 81, 67, 85, 229,
 # =>  ...>>}
 
 MyApp.Vault.decrypt(ciphertext)
@@ -52,7 +57,7 @@ config :my_app, MyApp.Vault,
     # In AES.GCM, it is important to specify 12-byte IV length for
     # interoperability with other encryption software. See this GitHub issue
     # for more details: https://github.com/danielberkompas/cloak/issues/93
-    # 
+    #
     # In Cloak 2.0, this will be the default iv length for AES.GCM.
     aes_gcm: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>, iv_length: 12},
     aes_ctr: {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: <<...>>}
@@ -95,3 +100,10 @@ You can use Cloak to transparently encrypt Ecto fields, using
 
 - Cloak is built on Erlang's `crypto` library, and therefore inherits its security.
 - You can implement your own cipher modules to use with Cloak, which may use any other encryption algorithms of your choice.
+
+## Copyright and License
+
+Copyright (c) 2015 Daniel Berkompas
+
+This work is free. You can redistribute it and/or modify it under the
+terms of the MIT License. See the [LICENSE.md](./LICENSE.md) file for more details.

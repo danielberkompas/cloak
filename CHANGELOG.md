@@ -234,7 +234,7 @@
 **Closed issues:**
 
 - Make json library configurable [\#44](https://github.com/danielberkompas/cloak/issues/44)
-- Encryption Arguement Error [\#41](https://github.com/danielberkompas/cloak/issues/41)
+- Encryption Argument Error [\#41](https://github.com/danielberkompas/cloak/issues/41)
 - \*\* \(MatchError\) no match of right hand side value: false [\#40](https://github.com/danielberkompas/cloak/issues/40)
 - Proposal / Forthcoming PRs: Multiple Ciphers With Keys [\#36](https://github.com/danielberkompas/cloak/issues/36)
 
