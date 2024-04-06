@@ -77,7 +77,7 @@ defmodule Cloak.Mixfile do
   defp package do
     [
       description: "Elixir encryption library",
-      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE"],
+      files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE.md"],
       maintainers: ["Daniel Berkompas"],
       licenses: ["MIT"],
       links: %{
