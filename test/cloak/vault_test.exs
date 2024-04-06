@@ -87,6 +87,10 @@ defmodule Cloak.VaultTest do
 
       GenServer.stop(pid)
     end
+
+    test "returns helpful error if vault hasn't been started" do
+      assert {:error, %Cloak.VaultNotStarted{}} = RuntimeVault.encrypt("plaintext")
+    end
   end
 
   describe ".encrypt!/1" do
@@ -105,6 +109,12 @@ defmodule Cloak.VaultTest do
 
       GenServer.stop(pid)
     end
+
+    test "raises error if vault has not been started" do
+      assert_raise Cloak.VaultNotStarted, fn ->
+        RuntimeVault.encrypt!("plaintext")
+      end
+    end
   end
 
   describe ".encrypt/2" do
@@ -115,6 +125,10 @@ defmodule Cloak.VaultTest do
 
     test "returns error if no cipher associated with label" do
       assert {:error, %Cloak.MissingCipher{}} = TestVault.encrypt("plaintext", :nonexistent)
+    end
+
+    test "returns error if vault has not been started" do
+      assert {:error, %Cloak.VaultNotStarted{}} = RuntimeVault.encrypt("plaintext", :secondary)
     end
   end
 
@@ -130,6 +144,12 @@ defmodule Cloak.VaultTest do
         TestVault.encrypt!("plaintext", :nonexistent)
       end
     end
+
+    test "raises error if vault has not been started" do
+      assert_raise Cloak.VaultNotStarted, fn ->
+        RuntimeVault.encrypt!("plaintext", :secondary)
+      end
+    end
   end
 
   describe ".decrypt/1" do
@@ -143,6 +163,10 @@ defmodule Cloak.VaultTest do
 
     test "returns error if no module found to decrypt" do
       assert {:error, %Cloak.MissingCipher{}} = TestVault.decrypt(<<123, 123>>)
+    end
+
+    test "returns error if vault not started" do
+      assert {:error, %Cloak.VaultNotStarted{}} = RuntimeVault.decrypt(<<123, 123>>)
     end
   end
 
@@ -160,11 +184,21 @@ defmodule Cloak.VaultTest do
         TestVault.decrypt!(<<123, 123>>)
       end
     end
+
+    test "raises error if vault has not been started" do
+      assert_raise Cloak.VaultNotStarted, fn ->
+        RuntimeVault.decrypt!(<<123, 123>>)
+      end
+    end
   end
 
   describe ".json_library/1" do
     test "returns Jason by default" do
       assert TestVault.json_library() == Jason
+    end
+
+    test "returns error if vault has not been started" do
+      assert {:error, %Cloak.VaultNotStarted{}} = RuntimeVault.json_library()
     end
   end
 end
