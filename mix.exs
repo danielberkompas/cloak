@@ -1,6 +1,8 @@
 defmodule Cloak.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/danielberkompas/cloak"
+
   def project do
     [
       app: :cloak,
@@ -15,8 +17,6 @@ defmodule Cloak.Mixfile do
         "coveralls.post": :test,
         "coveralls.html": :test
       ],
-      source_url: "https://github.com/danielberkompas/cloak",
-      description: "Elixir encryption library",
       package: package(),
       deps: deps(),
       docs: docs(),
@@ -39,9 +39,10 @@ defmodule Cloak.Mixfile do
 
   defp docs do
     [
-      main: "readme",
       extras: [
-        "README.md",
+        "CHANGELOG.md": [],
+        "LICENSE.md": [title: "License"],
+        "README.md": [title: "Overview"],
         "guides/how_to/install.md": [title: "Install Cloak"],
         "guides/how_to/generate_keys.md": [title: "Generate Encryption Keys"],
         "guides/upgrading/0.9.x_to_1.0.x.md": [title: "0.9.x to 1.0.x"],
@@ -50,6 +51,10 @@ defmodule Cloak.Mixfile do
         "guides/upgrading/0.6.x_to_0.7.x.md": [title: "0.6.x to 0.7.x"],
         "guides/cheatsheets/cheatsheet.cheatmd": [title: "Cheatsheet"]
       ],
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      formatters: ["html"],
       extra_section: "GUIDES",
       groups_for_extras: [
         Cheatsheets: ~r/cheatsheets/,
@@ -69,11 +74,13 @@ defmodule Cloak.Mixfile do
 
   defp package do
     [
+      description: "Elixir encryption library",
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md", "LICENSE"],
       maintainers: ["Daniel Berkompas"],
       licenses: ["MIT"],
       links: %{
-        "Github" => "https://github.com/danielberkompas/cloak"
+        "Changelog" => "https://hexdocs.pm/clock/changelog.html",
+        "GitHub" => @source_url
       }
     ]
   end
