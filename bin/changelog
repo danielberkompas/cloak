@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Generates an updated changelog for the version that will be released next.
+#
+#     bin/changelog x.x.x
+#
+# (x.x.x is the version number to release.)
+
+github_changelog_generator --user danielberkompas --project cloak --future-release v$1
