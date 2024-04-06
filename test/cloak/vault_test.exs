@@ -11,6 +11,19 @@ defmodule Cloak.VaultTest do
     use Cloak.Vault, otp_app: :cloak
   end
 
+  defmodule IgnoreVault do
+    use Cloak.Vault, otp_app: :cloak
+
+    # Simulate returning a different value than {:ok, pid}
+    # from the init/1 function.
+    # 
+    # See https://github.com/danielberkompas/cloak/pull/123
+    @impl GenServer
+    def init(_config) do
+      :ignore
+    end
+  end
+
   describe ".start_link/1" do
     test "allows configuration" do
       key = :crypto.strong_rand_bytes(32)
@@ -48,6 +61,10 @@ defmodule Cloak.VaultTest do
 
       assert SupervisedVault.json_library() == Jason
       GenServer.stop(pid)
+    end
+
+    test "can abort if init/1 returns something other than {:ok, pid}" do
+      assert :ignore = IgnoreVault.start_link()
     end
   end
 
