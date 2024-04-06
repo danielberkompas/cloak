@@ -180,14 +180,16 @@ defmodule Cloak.Vault do
         app_config = Application.get_env(@otp_app, __MODULE__, [])
         config = Keyword.merge(app_config, config)
 
-        # Start the server
-        {:ok, pid} = GenServer.start_link(__MODULE__, config, name: __MODULE__)
+        case GenServer.start_link(__MODULE__, config, name: __MODULE__) do
+          {:ok, pid} ->
+            # Ensure that the configuration is saved
+            GenServer.call(pid, :save_config, 10_000)
+            # Return the pid
+            {:ok, pid}
 
-        # Ensure that the configuration is saved
-        GenServer.call(pid, :save_config, 10_000)
-
-        # Return the pid
-        {:ok, pid}
+          other ->
+            other
+        end
       end
 
       # Users can override init/1 to customize the configuration
