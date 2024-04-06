@@ -222,51 +222,63 @@ defmodule Cloak.Vault do
 
       @impl Cloak.Vault
       def encrypt(plaintext) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.encrypt(plaintext)
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Cloak.Vault.encrypt(config, plaintext)
+        end
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.encrypt!(plaintext)
+        case Cloak.Vault.read_config(@table_name) do
+          {:ok, config} ->
+            Cloak.Vault.encrypt!(config, plaintext)
+
+          {:error, error} ->
+            raise error
+        end
       end
 
       @impl Cloak.Vault
       def encrypt(plaintext, label) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.encrypt(plaintext, label)
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Cloak.Vault.encrypt(config, plaintext, label)
+        end
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext, label) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.encrypt!(plaintext, label)
+        case Cloak.Vault.read_config(@table_name) do
+          {:ok, config} ->
+            Cloak.Vault.encrypt!(config, plaintext, label)
+
+          {:error, error} ->
+            raise error
+        end
       end
 
       @impl Cloak.Vault
       def decrypt(ciphertext) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.decrypt(ciphertext)
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Cloak.Vault.decrypt(config, ciphertext)
+        end
       end
 
       @impl Cloak.Vault
       def decrypt!(ciphertext) do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Cloak.Vault.decrypt!(ciphertext)
+        case Cloak.Vault.read_config(@table_name) do
+          {:ok, config} ->
+            Cloak.Vault.decrypt!(config, ciphertext)
+
+          {:error, error} ->
+            raise error
+        end
       end
 
       @impl Cloak.Vault
       def json_library do
-        @table_name
-        |> Cloak.Vault.read_config()
-        |> Keyword.get(:json_library, Jason)
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Keyword.get(config, :json_library, Jason)
+        end
       end
 
       defoverridable(Module.definitions_in(__MODULE__))
@@ -284,13 +296,11 @@ defmodule Cloak.Vault do
 
   @doc false
   def read_config(table_name) do
-    case :ets.lookup(table_name, :config) do
-      [{:config, config} | _] ->
-        config
-
-      _ ->
-        :error
-    end
+    [{:config, config} | _] = :ets.lookup(table_name, :config)
+    {:ok, config}
+  rescue
+    ArgumentError ->
+      {:error, Cloak.VaultNotStarted.exception(table_name)}
   end
 
   @doc false
