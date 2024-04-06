@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.1.4](https://github.com/danielberkompas/cloak/tree/v1.1.4) (2024-04-06)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.3...v1.1.4)
+
+**Fixed bugs:**
+
+- ETS error when running Vault without mix [\#125](https://github.com/danielberkompas/cloak/issues/125)
+
+**Merged pull requests:**
+
+- Raise helpful error if vault hasn't been started [\#126](https://github.com/danielberkompas/cloak/pull/126) ([danielberkompas](https://github.com/danielberkompas))
+
 ## [v1.1.3](https://github.com/danielberkompas/cloak/tree/v1.1.3) (2024-04-06)
 
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.2...v1.1.3)
