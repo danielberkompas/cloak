@@ -2,11 +2,12 @@ defmodule Cloak.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/danielberkompas/cloak"
+  @version "1.1.2"
 
   def project do
     [
       app: :cloak,
-      version: "1.1.2",
+      version: @version,
       elixir: "~> 1.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
