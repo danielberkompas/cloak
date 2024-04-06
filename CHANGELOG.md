@@ -1,5 +1,27 @@
 # Changelog
 
+## [v1.1.3](https://github.com/danielberkompas/cloak/tree/v1.1.3) (2024-04-06)
+
+[Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.2...v1.1.3)
+
+**Fixed bugs:**
+
+- Clock with changeset issue  [\#115](https://github.com/danielberkompas/cloak/issues/115)
+- {:badarg, {'aead.c', 90}, 'Unknown cipher or invalid key size'} [\#113](https://github.com/danielberkompas/cloak/issues/113)
+
+**Closed issues:**
+
+- How to use Cloak in ecto queries? [\#122](https://github.com/danielberkompas/cloak/issues/122)
+- \(UndefinedFunctionError\) function :crypto.stream\_init/3 is undefined or private [\#118](https://github.com/danielberkompas/cloak/issues/118)
+
+**Merged pull requests:**
+
+- Fix build on SemaphoreCI [\#124](https://github.com/danielberkompas/cloak/pull/124) ([danielberkompas](https://github.com/danielberkompas))
+- Allow vault gen server to return other responses [\#123](https://github.com/danielberkompas/cloak/pull/123) ([spencerdcarlson](https://github.com/spencerdcarlson))
+- Update cheatsheet to fix mix config [\#121](https://github.com/danielberkompas/cloak/pull/121) ([gworkman](https://github.com/gworkman))
+- Misc doc changes [\#110](https://github.com/danielberkompas/cloak/pull/110) ([kianmeng](https://github.com/kianmeng))
+- Fix example code for Base.decode64! [\#109](https://github.com/danielberkompas/cloak/pull/109) ([blunckr](https://github.com/blunckr))
+
 ## [v1.1.2](https://github.com/danielberkompas/cloak/tree/v1.1.2) (2022-06-17)
 
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.1...v1.1.2)
@@ -234,7 +256,7 @@
 **Closed issues:**
 
 - Make json library configurable [\#44](https://github.com/danielberkompas/cloak/issues/44)
-- Encryption Argument Error [\#41](https://github.com/danielberkompas/cloak/issues/41)
+- Encryption Arguement Error [\#41](https://github.com/danielberkompas/cloak/issues/41)
 - \*\* \(MatchError\) no match of right hand side value: false [\#40](https://github.com/danielberkompas/cloak/issues/40)
 - Proposal / Forthcoming PRs: Multiple Ciphers With Keys [\#36](https://github.com/danielberkompas/cloak/issues/36)
 
