@@ -4,7 +4,7 @@ name: "CI Build"
 agent:
   machine:
     type: e1-standard-2
-    os_image: ubuntu1804
+    os_image: ubuntu2004
 
 auto_cancel:
   running:
@@ -27,9 +27,9 @@ blocks:
         - name: "Build"
           matrix:
             - env_var: ELIXIR_VERSION
-              values: ["1.12.1", "1.13.4"]
+              values: ["1.12.1", "1.13.4", "1.16.0"]
             - env_var: ERLANG_VERSION
-              values: ["23.3", "24.0"]
+              values: ["23.3", "24.0", "26.0"]
           commands:
             - sem-version erlang $ERLANG_VERSION
             - sem-version elixir $ELIXIR_VERSION
