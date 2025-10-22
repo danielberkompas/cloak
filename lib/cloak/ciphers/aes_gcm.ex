@@ -10,7 +10,7 @@ defmodule Cloak.Ciphers.AES.GCM do
   alias Cloak.Crypto
 
   @aad "AES256GCM"
-  @default_iv_length 16
+  @default_iv_length 12
   @cipher Crypto.map_cipher(:aes_256_gcm)
 
   @doc """
