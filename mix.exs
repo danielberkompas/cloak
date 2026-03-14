@@ -12,13 +12,8 @@ defmodule Cloak.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test
-      ],
       package: package(),
+      cli: cli(),
       deps: deps(),
       docs: docs(),
       elixirc_paths: elixirc_paths(Mix.env())
@@ -27,6 +22,17 @@ defmodule Cloak.Mixfile do
 
   def application do
     [extra_applications: [:logger, :crypto]]
+  end
+
+  def cli do
+    [
+      preferred_envs: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
+    ]
   end
 
   defp deps do
