@@ -27,9 +27,9 @@ blocks:
         - name: "Build"
           matrix:
             - env_var: ELIXIR_VERSION
-              values: ["1.12.1", "1.13.4", "1.16.0"]
+              values: ["1.12.1", "1.13.4", "1.16.0", "1.19.5"]
             - env_var: ERLANG_VERSION
-              values: ["23.3", "24.0", "26.0"]
+              values: ["23.3", "24.0", "26.0", "28.4"]
           commands:
             - sem-version erlang $ERLANG_VERSION
             - sem-version elixir $ELIXIR_VERSION
