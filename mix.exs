@@ -62,7 +62,7 @@ defmodule Cloak.Mixfile do
       main: "readme",
       source_url: @source_url,
       source_ref: "v#{@version}",
-      formatters: ["html"],
+      formatters: ["html", "markdown"],
       extra_section: "GUIDES",
       groups_for_extras: [
         Cheatsheets: ~r/cheatsheets/,
