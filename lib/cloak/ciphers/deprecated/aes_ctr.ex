@@ -17,6 +17,14 @@ defmodule Cloak.Ciphers.Deprecated.AES.CTR do
   component, and uses a new format as described in its docs. This cipher can
   assist in upgrading old ciphertext to the new format.
 
+  > #### Security {: .warning}
+  >
+  > Like `Cloak.Ciphers.AES.CTR`, this cipher does not authenticate the ciphertexts
+  > it decrypts, so anyone who can write to your data can change what it decrypts
+  > to without the key ([CVE-2026-95105](https://cna.erlef.org/cves/CVE-2026-95105.html)).
+  > Re-encrypt legacy data with `Cloak.Ciphers.AES.GCM` and then remove this cipher
+  > from your vault. See the [AES.CTR to AES.GCM](ctr_to_gcm.html) guide.
+
   See the [Upgrading from 0.6.x](0.6.x_to_0.7.x.html) guide for usage.
   """
 
