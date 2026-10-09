@@ -2,7 +2,7 @@ defmodule Cloak.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/danielberkompas/cloak"
-  @version "1.1.4"
+  @version "1.1.5"
 
   def project do
     [
