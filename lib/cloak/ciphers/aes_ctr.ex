@@ -2,14 +2,41 @@ defmodule Cloak.Ciphers.AES.CTR do
   @moduledoc """
   A `Cloak.Cipher` which encrypts values with the AES cipher in CTR (stream) mode.
   Internally relies on Erlang's `:crypto.stream_encrypt/2`.
+
+  > #### Deprecated {: .warning}
+  >
+  > Use `Cloak.Ciphers.AES.GCM` instead. AES-CTR does not authenticate the
+  > ciphertexts it produces, so anyone who can write to your encrypted data can
+  > modify it without the key. Keep this cipher configured only to decrypt data
+  > that has not been re-encrypted yet, and migrate as described in the
+  > [AES.CTR to AES.GCM](ctr_to_gcm.html) guide.
+
+  ## Security
+
+  CTR is a stream cipher mode, so unlike GCM it provides **no authentication** of
+  the ciphertext. Anything XORed into a stored ciphertext is XORed into the
+  plaintext returned by `decrypt/2` at the same offset. An attacker who can write
+  to your encrypted data and who knows, or can guess, the plaintext can therefore
+  forge any value of the same length without knowing the key, and `decrypt/2` will
+  return it without complaint. See
+  [CVE-2026-95105](https://cna.erlef.org/cves/CVE-2026-95105.html).
+
+  If you are still encrypting data with this cipher, switch your vault's default
+  cipher to `Cloak.Ciphers.AES.GCM` and re-encrypt the existing data. The
+  [AES.CTR to AES.GCM](ctr_to_gcm.html) guide walks through the migration.
   """
+  @moduledoc deprecated:
+               "Use Cloak.Ciphers.AES.GCM instead. AES.CTR does not authenticate ciphertexts (CVE-2026-95105)."
 
   @behaviour Cloak.Cipher
+
+  require Logger
 
   alias Cloak.Tags.{Encoder, Decoder}
   alias Cloak.Crypto
 
   @cipher Crypto.map_cipher(:aes_256_ctr)
+  @insecure_warning_key {__MODULE__, :insecure_warning_logged}
 
   @doc """
   Callback implementation for `Cloak.Cipher`. Encrypts a value using
@@ -34,6 +61,7 @@ defmodule Cloak.Ciphers.AES.CTR do
   """
   @impl true
   def encrypt(plaintext, opts) when is_binary(plaintext) do
+    warn_insecure_encryption()
     key = Keyword.fetch!(opts, :key)
     tag = Keyword.fetch!(opts, :tag)
     iv = Crypto.strong_rand_bytes(16)
@@ -47,6 +75,11 @@ defmodule Cloak.Ciphers.AES.CTR do
 
   Uses the key tag to find the correct key for decryption, and the IV included
   in the header to decrypt the body of the ciphertext.
+
+  Because AES-CTR cannot detect tampering, this function cannot tell whether the
+  ciphertext it is given was forged by someone with write access to your storage.
+  Use it only to read data that has not been re-encrypted with
+  `Cloak.Ciphers.AES.GCM` yet.
 
   ### Parameters
 
@@ -83,6 +116,20 @@ defmodule Cloak.Ciphers.AES.CTR do
 
       _other ->
         false
+    end
+  end
+
+  defp warn_insecure_encryption do
+    unless :persistent_term.get(@insecure_warning_key, false) do
+      :persistent_term.put(@insecure_warning_key, true)
+
+      Logger.warning("""
+      Cloak.Ciphers.AES.CTR encrypts data without authenticating it, so stored \
+      ciphertext can be modified without the key (CVE-2026-95105). Configure \
+      Cloak.Ciphers.AES.GCM as your default cipher, re-encrypt existing data, \
+      and then remove Cloak.Ciphers.AES.CTR from your vault. See \
+      https://hexdocs.pm/cloak/ctr_to_gcm.html
+      """)
     end
   end
 end

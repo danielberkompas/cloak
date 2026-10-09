@@ -16,10 +16,35 @@ defmodule Cloak.Ciphers.AES.CTRTest do
 
   @opts [tag: "AES.CTR.V1", key: @key]
 
+  # Set by the cipher to avoid logging its deprecation warning more than once
+  @warning_key {Cipher, :insecure_warning_logged}
+
   describe ".encrypt/2" do
     test "encrypts plaintext" do
       assert {:ok, ciphertext} = Cipher.encrypt("plaintext", @opts)
       assert ciphertext != "plaintext"
+    end
+
+    test "logs a warning about the missing authentication" do
+      :persistent_term.erase(@warning_key)
+
+      log =
+        ExUnit.CaptureLog.capture_log(fn ->
+          assert {:ok, _ciphertext} = Cipher.encrypt("plaintext", @opts)
+        end)
+
+      assert log =~ "CVE-2026-95105"
+      assert log =~ "Cloak.Ciphers.AES.GCM"
+    end
+
+    test "logs the warning only once" do
+      :persistent_term.erase(@warning_key)
+
+      ExUnit.CaptureLog.capture_log(fn -> Cipher.encrypt("plaintext", @opts) end)
+
+      log = ExUnit.CaptureLog.capture_log(fn -> Cipher.encrypt("plaintext", @opts) end)
+
+      refute log =~ "CVE-2026-95105"
     end
 
     test "produces ciphertext in the format tag <> iv <> ciphertext" do
@@ -93,6 +118,11 @@ defmodule Cloak.Ciphers.AES.CTRTest do
     test "returns false if tag matches but format does not" do
       refute Cipher.can_decrypt?(<<1, 10, "AES.CTR.V1", 0, 0>>, @opts)
     end
+  end
+
+  test "the cipher is marked as deprecated" do
+    {:docs_v1, _anno, _language, _format, _moduledoc, metadata, _docs} = Code.fetch_docs(Cipher)
+    assert metadata[:deprecated]
   end
 
   defp create_ciphertext(_) do
