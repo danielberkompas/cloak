@@ -45,8 +45,25 @@ defmodule Cloak.Vault do
     The `opts` are specific to each cipher module. Check their
     codumentation for what each cipher requires.
 
-      - `Cloak.Ciphers.AES.GCM`
-      - `Cloak.Ciphers.AES.CTR`
+      - `Cloak.Ciphers.AES.GCM` (recommended)
+      - `Cloak.Ciphers.AES.CTR` (deprecated, see below)
+
+    Ciphers are tried in the order they are configured when decrypting, so a
+    deprecated cipher placed later in the list is still able to read data that was
+    encrypted with it before the vault was reconfigured to encrypt with another
+    cipher.
+
+  ### Security
+
+  Prefer `Cloak.Ciphers.AES.GCM`, which authenticates the ciphertexts it
+  produces. `Cloak.Ciphers.AES.CTR` cannot detect tampering, so anyone who can
+  write to your encrypted data can change what it decrypts to without the key
+  ([CVE-2026-95105](https://cna.erlef.org/cves/CVE-2026-95105.html)). If you still
+  have `Cloak.Ciphers.AES.CTR` in your `:ciphers`, make
+  `Cloak.Ciphers.AES.GCM` the default and re-encrypt your data, following the
+  [AES.CTR to AES.GCM](ctr_to_gcm.html) guide. Once you have done so, remove
+  `Cloak.Ciphers.AES.CTR` and `Cloak.Ciphers.Deprecated.AES.CTR` from the list so
+  that CTR ciphertexts are no longer accepted.
 
   ### Runtime Configuration
 

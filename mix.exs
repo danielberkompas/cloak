@@ -53,6 +53,7 @@ defmodule Cloak.Mixfile do
         "README.md": [title: "Overview"],
         "guides/how_to/install.md": [title: "Install Cloak"],
         "guides/how_to/generate_keys.md": [title: "Generate Encryption Keys"],
+        "guides/upgrading/ctr_to_gcm.md": [title: "AES.CTR to AES.GCM"],
         "guides/upgrading/0.9.x_to_1.0.x.md": [title: "0.9.x to 1.0.x"],
         "guides/upgrading/0.8.x_to_0.9.x.md": [title: "0.8.x to 0.9.x"],
         "guides/upgrading/0.7.x_to_0.8.x.md": [title: "0.7.x to 0.8.x"],
