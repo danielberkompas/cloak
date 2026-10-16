@@ -87,7 +87,7 @@ defmodule Cloak.Mixfile do
       maintainers: ["Daniel Berkompas"],
       licenses: ["MIT"],
       links: %{
-        "Changelog" => "https://hexdocs.pm/clock/changelog.html",
+        "Changelog" => "https://hexdocs.pm/cloak/changelog.html",
         "GitHub" => @source_url
       }
     ]
