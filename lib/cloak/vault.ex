@@ -211,7 +211,12 @@ defmodule Cloak.Vault do
       # refresh the configuration in case it changed
       @impl GenServer
       def code_change(_vsn, config, _extra) do
-        config = init(config)
+        config =
+          case init(config) do
+            {:ok, config} -> config
+            {:ok, config, _timeout} -> config
+          end
+
         Cloak.Vault.save_config(@table_name, config)
         {:ok, config}
       end
