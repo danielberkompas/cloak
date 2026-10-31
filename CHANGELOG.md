@@ -1,5 +1,18 @@
 # Changelog
 
+## [v1.1.5](https://github.com/danielberkompas/cloak/tree/v1.1.5) (unreleased)
+
+**Security:**
+
+- Deprecate `Cloak.Ciphers.AES.CTR`. AES-CTR does not authenticate the ciphertexts
+  it produces, so anyone with write access to your encrypted data can change what
+  it decrypts to without the key ([CVE-2026-95105](https://cna.erlef.org/cves/CVE-2026-95105.html)).
+  `Cloak.Ciphers.AES.CTR.encrypt/2` now logs a warning, and the cipher is marked as
+  deprecated in its documentation. Configure `Cloak.Ciphers.AES.GCM` as your default
+  cipher, re-encrypt your data, then remove `Cloak.Ciphers.AES.CTR` and
+  `Cloak.Ciphers.Deprecated.AES.CTR` from your vault. See the
+  [AES.CTR to AES.GCM](https://hexdocs.pm/cloak/ctr_to_gcm.html) guide.
+
 ## [v1.1.4](https://github.com/danielberkompas/cloak/tree/v1.1.4) (2024-04-06)
 
 [Full Changelog](https://github.com/danielberkompas/cloak/compare/v1.1.3...v1.1.4)

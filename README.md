@@ -21,6 +21,7 @@ and conveniences for Elixir developers:
 ## Documentation
 
 - [Hex Documentation](https://hexdocs.pm/cloak) (Includes installation guide)
+- [How to migrate from AES.CTR to AES.GCM](https://hexdocs.pm/cloak/ctr_to_gcm.html)
 - [How to upgrade from Cloak 0.9.x to 1.0.x](https://hexdocs.pm/cloak/0-9-x_to_1-0-x.html)
 
 ## Examples
@@ -60,6 +61,9 @@ config :my_app, MyApp.Vault,
     #
     # In Cloak 2.0, this will be the default iv length for AES.GCM.
     aes_gcm: {Cloak.Ciphers.AES.GCM, tag: "AES.GCM.V1", key: <<...>>, iv_length: 12},
+    # AES.CTR is deprecated, because it does not authenticate ciphertexts. Only
+    # keep it configured to read data that was encrypted before you migrated to
+    # AES.GCM. See https://hexdocs.pm/cloak/ctr_to_gcm.html
     aes_ctr: {Cloak.Ciphers.AES.CTR, tag: "AES.CTR.V1", key: <<...>>}
   ]
 ```
@@ -98,6 +102,15 @@ You can use Cloak to transparently encrypt Ecto fields, using
 
 ## Security Notes
 
+- `Cloak.Ciphers.AES.GCM` is the recommended cipher. It authenticates the
+  ciphertexts it produces, so tampering is detected on decryption.
+- `Cloak.Ciphers.AES.CTR` is deprecated and should not be used to encrypt new
+  data. It does not authenticate ciphertexts, so anyone who can write to your
+  encrypted data can change what it decrypts to without the key
+  ([CVE-2026-95105](https://cna.erlef.org/cves/CVE-2026-95105.html)). Make
+  `Cloak.Ciphers.AES.GCM` your default cipher, re-encrypt your data, then remove
+  `Cloak.Ciphers.AES.CTR` from your configuration. See the
+  [AES.CTR to AES.GCM](https://hexdocs.pm/cloak/ctr_to_gcm.html) guide.
 - Cloak is built on Erlang's `crypto` library, and therefore inherits its security.
 - You can implement your own cipher modules to use with Cloak, which may use any other encryption algorithms of your choice.
 
