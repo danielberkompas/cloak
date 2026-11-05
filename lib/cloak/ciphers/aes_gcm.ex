@@ -59,7 +59,7 @@ defmodule Cloak.Ciphers.AES.GCM do
       key = Keyword.fetch!(opts, :key)
       iv_length = Keyword.get(opts, :iv_length, @default_iv_length)
 
-      %{remainder: <<iv::binary-size(iv_length), ciphertag::binary-16, ciphertext::binary>>} =
+      %{remainder: <<iv::binary-size(^iv_length), ciphertag::binary-16, ciphertext::binary>>} =
         Decoder.decode(ciphertext)
 
       plaintext = Crypto.decrypt_one_time_aead(@cipher, key, iv, @aad, ciphertext, ciphertag)
@@ -81,7 +81,7 @@ defmodule Cloak.Ciphers.AES.GCM do
     case Decoder.decode(ciphertext) do
       %{
         tag: ^tag,
-        remainder: <<_iv::binary-size(iv_length), _ciphertag::binary-16, _ciphertext::binary>>
+        remainder: <<_iv::binary-size(^iv_length), _ciphertag::binary-16, _ciphertext::binary>>
       } ->
         true
 

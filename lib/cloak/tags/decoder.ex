@@ -20,7 +20,7 @@ defmodule Cloak.Tags.Decoder do
     length = tag_length(message)
 
     case message do
-      <<tlv::binary-size(length), remainder::binary>> ->
+      <<tlv::binary-size(^length), remainder::binary>> ->
         %{tag: tag(tlv), remainder: remainder}
 
       _other ->
@@ -42,7 +42,7 @@ defmodule Cloak.Tags.Decoder do
 
   defp tag(<<_type::size(8), len::size(8), rest::binary>>) when len >= @half_byte do
     size = len - @half_byte
-    <<_value_bytes::binary-size(size), tag::binary>> = rest
+    <<_value_bytes::binary-size(^size), tag::binary>> = rest
 
     tag
   end
