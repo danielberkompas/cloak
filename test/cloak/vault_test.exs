@@ -192,6 +192,97 @@ defmodule Cloak.VaultTest do
     end
   end
 
+  describe "padding" do
+    test "hides the length of the plaintext" do
+      {:ok, short} = TestVault.encrypt("no", padding: true)
+      {:ok, long} = TestVault.encrypt("yes", padding: true)
+      {:ok, block} = TestVault.encrypt(String.duplicate("a", 16))
+
+      assert byte_size(short) == byte_size(long)
+      assert byte_size(short) == byte_size(block)
+    end
+
+    test "pads to a multiple of the given size" do
+      {:ok, padded} = TestVault.encrypt("plaintext", padding: 24)
+      {:ok, block} = TestVault.encrypt(String.duplicate("a", 24))
+
+      assert byte_size(padded) == byte_size(block)
+    end
+
+    test "pads to the next multiple if plaintext is longer than the given size" do
+      {:ok, padded} = TestVault.encrypt(String.duplicate("a", 20), padding: 16)
+      {:ok, block} = TestVault.encrypt(String.duplicate("a", 32))
+
+      assert byte_size(padded) == byte_size(block)
+    end
+
+    test "does not pad by default" do
+      {:ok, short} = TestVault.encrypt("no")
+      {:ok, long} = TestVault.encrypt("yes", padding: false)
+
+      assert byte_size(short) < byte_size(long)
+    end
+
+    test "works with every encrypt and decrypt function" do
+      {:ok, ciphertext1} = TestVault.encrypt("plaintext", padding: true)
+      {:ok, ciphertext2} = TestVault.encrypt("plaintext", :secondary, padding: 24)
+      ciphertext3 = TestVault.encrypt!("plaintext", padding: 24)
+      ciphertext4 = TestVault.encrypt!("plaintext", :secondary, padding: true)
+
+      for ciphertext <- [ciphertext1, ciphertext2, ciphertext3, ciphertext4] do
+        assert {:ok, "plaintext"} == TestVault.decrypt(ciphertext, padding: true)
+        assert "plaintext" == TestVault.decrypt!(ciphertext, padding: true)
+      end
+    end
+
+    test "leaves padding in place if decrypting without the padding option" do
+      {:ok, ciphertext} = TestVault.encrypt("plaintext", padding: true)
+
+      assert {:ok, "plaintext" <> <<0x80, 0, 0, 0, 0, 0, 0>>} == TestVault.decrypt(ciphertext)
+    end
+
+    test "returns error if decrypting unpadded ciphertext with the padding option" do
+      {:ok, ciphertext} = TestVault.encrypt("plaintext")
+
+      assert {:error, %Cloak.InvalidPadding{}} = TestVault.decrypt(ciphertext, padding: true)
+
+      assert_raise Cloak.InvalidPadding, fn ->
+        TestVault.decrypt!(ciphertext, padding: true)
+      end
+    end
+
+    test "raises on invalid padding option" do
+      assert_raise ArgumentError, fn ->
+        TestVault.encrypt("plaintext", padding: 0)
+      end
+    end
+
+    test "returns the same errors as without padding" do
+      assert {:error, %Cloak.MissingCipher{}} =
+               TestVault.encrypt("plaintext", :nonexistent, padding: true)
+
+      assert_raise Cloak.MissingCipher, fn ->
+        TestVault.encrypt!("plaintext", :nonexistent, padding: true)
+      end
+
+      assert {:error, %Cloak.MissingCipher{}} = TestVault.decrypt(<<123, 123>>, padding: true)
+
+      assert {:error, %Cloak.VaultNotStarted{}} =
+               RuntimeVault.encrypt("plaintext", :secondary, padding: true)
+
+      assert_raise Cloak.VaultNotStarted, fn ->
+        RuntimeVault.encrypt!("plaintext", :secondary, padding: true)
+      end
+
+      assert {:error, %Cloak.VaultNotStarted{}} =
+               RuntimeVault.decrypt(<<123, 123>>, padding: true)
+
+      assert_raise Cloak.VaultNotStarted, fn ->
+        RuntimeVault.decrypt!(<<123, 123>>, padding: true)
+      end
+    end
+  end
+
   describe ".json_library/1" do
     test "returns Jason by default" do
       assert TestVault.json_library() == Jason

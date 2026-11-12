@@ -110,6 +110,26 @@ defmodule Cloak.Vault do
 
   See the documented callbacks below for the functions you can call.
 
+  ### Padding
+
+  The length of a ciphertext reveals the length of its plaintext. For fields
+  with only a few possible values, that can be enough to tell which value is
+  stored. To prevent this, pass the `:padding` option when encrypting, and
+  again when decrypting:
+
+      {:ok, ciphertext} = MyApp.Vault.encrypt("yes", padding: true)
+
+      MyApp.Vault.decrypt(ciphertext, padding: true)
+      # => {:ok, "yes"}
+
+  `padding: true` pads the plaintext to a multiple of 16 bytes. Pass an integer
+  to pad to a multiple of that many bytes instead, e.g. `padding: 32`. Choose
+  a size at least as large as the longest value you expect. See
+  `Cloak.Padding` for details.
+
+  A value that was encrypted with padding must be decrypted with padding, and
+  vice versa.
+
   ### Performance Notes
 
   Vaults are not bottlenecks. They simply store configuration in an ETS table
@@ -121,6 +141,7 @@ defmodule Cloak.Vault do
   @type plaintext :: binary
   @type ciphertext :: binary
   @type label :: atom
+  @type opts :: [padding: boolean | pos_integer]
 
   @doc """
   Encrypts a binary using the first configured cipher in the vault's
@@ -136,13 +157,33 @@ defmodule Cloak.Vault do
   @doc """
   Encrypts a binary using the vault's configured cipher with the
   corresponding label.
+
+  If given a keyword list instead of a label, encrypts using the first
+  configured cipher, with the given options.
+
+  ## Options
+
+  - `:padding` - Pads the plaintext before encryption, to hide its length.
+    `true` pads to a multiple of 16 bytes, an integer pads to a multiple of
+    that many bytes. Pass the same option to `decrypt/2`. (Default: `false`)
   """
-  @callback encrypt(plaintext, label) :: {:ok, ciphertext} | {:error, Exception.t()}
+  @callback encrypt(plaintext, label | opts) :: {:ok, ciphertext} | {:error, Exception.t()}
 
   @doc """
   Like `encrypt/2`, but raises any errors.
   """
-  @callback encrypt!(plaintext, label) :: ciphertext | no_return
+  @callback encrypt!(plaintext, label | opts) :: ciphertext | no_return
+
+  @doc """
+  Encrypts a binary using the vault's configured cipher with the
+  corresponding label. See `encrypt/2` for the available options.
+  """
+  @callback encrypt(plaintext, label, opts) :: {:ok, ciphertext} | {:error, Exception.t()}
+
+  @doc """
+  Like `encrypt/3`, but raises any errors.
+  """
+  @callback encrypt!(plaintext, label, opts) :: ciphertext | no_return
 
   @doc """
   Decrypts a binary with the configured cipher that generated the binary.
@@ -154,6 +195,23 @@ defmodule Cloak.Vault do
   Like `decrypt/1`, but raises any errors.
   """
   @callback decrypt!(ciphertext) :: plaintext | no_return
+
+  @doc """
+  Decrypts a binary like `decrypt/1`, with the given options.
+
+  ## Options
+
+  - `:padding` - Removes the padding from the decrypted plaintext. Must be
+    set if the binary was encrypted with the `:padding` option. Returns a
+    `Cloak.InvalidPadding` error if the plaintext is not padded.
+    (Default: `false`)
+  """
+  @callback decrypt(ciphertext, opts) :: {:ok, plaintext} | {:error, Exception.t()}
+
+  @doc """
+  Like `decrypt/2`, but raises any errors.
+  """
+  @callback decrypt!(ciphertext, opts) :: plaintext | no_return
 
   @doc """
   The JSON library the vault uses to convert maps and lists into
@@ -222,16 +280,26 @@ defmodule Cloak.Vault do
 
       @impl Cloak.Vault
       def encrypt(plaintext) do
-        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
-          Cloak.Vault.encrypt(config, plaintext)
-        end
+        encrypt(plaintext, [])
       end
 
       @impl Cloak.Vault
       def encrypt!(plaintext) do
+        encrypt!(plaintext, [])
+      end
+
+      @impl Cloak.Vault
+      def encrypt(plaintext, label_or_opts) do
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Cloak.Vault.encrypt(config, plaintext, label_or_opts)
+        end
+      end
+
+      @impl Cloak.Vault
+      def encrypt!(plaintext, label_or_opts) do
         case Cloak.Vault.read_config(@table_name) do
           {:ok, config} ->
-            Cloak.Vault.encrypt!(config, plaintext)
+            Cloak.Vault.encrypt!(config, plaintext, label_or_opts)
 
           {:error, error} ->
             raise error
@@ -239,17 +307,17 @@ defmodule Cloak.Vault do
       end
 
       @impl Cloak.Vault
-      def encrypt(plaintext, label) do
+      def encrypt(plaintext, label, opts) do
         with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
-          Cloak.Vault.encrypt(config, plaintext, label)
+          Cloak.Vault.encrypt(config, plaintext, label, opts)
         end
       end
 
       @impl Cloak.Vault
-      def encrypt!(plaintext, label) do
+      def encrypt!(plaintext, label, opts) do
         case Cloak.Vault.read_config(@table_name) do
           {:ok, config} ->
-            Cloak.Vault.encrypt!(config, plaintext, label)
+            Cloak.Vault.encrypt!(config, plaintext, label, opts)
 
           {:error, error} ->
             raise error
@@ -258,16 +326,26 @@ defmodule Cloak.Vault do
 
       @impl Cloak.Vault
       def decrypt(ciphertext) do
-        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
-          Cloak.Vault.decrypt(config, ciphertext)
-        end
+        decrypt(ciphertext, [])
       end
 
       @impl Cloak.Vault
       def decrypt!(ciphertext) do
+        decrypt!(ciphertext, [])
+      end
+
+      @impl Cloak.Vault
+      def decrypt(ciphertext, opts) do
+        with {:ok, config} <- Cloak.Vault.read_config(@table_name) do
+          Cloak.Vault.decrypt(config, ciphertext, opts)
+        end
+      end
+
+      @impl Cloak.Vault
+      def decrypt!(ciphertext, opts) do
         case Cloak.Vault.read_config(@table_name) do
           {:ok, config} ->
-            Cloak.Vault.decrypt!(config, ciphertext)
+            Cloak.Vault.decrypt!(config, ciphertext, opts)
 
           {:error, error} ->
             raise error
@@ -304,67 +382,89 @@ defmodule Cloak.Vault do
   end
 
   @doc false
-  def encrypt(config, plaintext) do
-    with [{_label, {module, opts}} | _ciphers] <- config[:ciphers] do
-      module.encrypt(plaintext, opts)
+  def encrypt(config, plaintext, label_or_opts \\ [])
+
+  def encrypt(config, plaintext, opts) when is_list(opts) do
+    with [{_label, {module, cipher_opts}} | _ciphers] <- config[:ciphers] do
+      plaintext
+      |> pad(opts[:padding])
+      |> module.encrypt(cipher_opts)
     else
       _ ->
         {:error, Cloak.InvalidConfig.exception("could not encrypt due to missing configuration")}
     end
   end
 
-  @doc false
-  def encrypt!(config, plaintext) do
-    case encrypt(config, plaintext) do
-      {:ok, ciphertext} ->
-        ciphertext
-
-      {:error, error} ->
-        raise error
-    end
+  def encrypt(config, plaintext, label) do
+    encrypt(config, plaintext, label, [])
   end
 
   @doc false
-  def encrypt(config, plaintext, label) do
+  def encrypt(config, plaintext, label, opts) do
     case config[:ciphers][label] do
       nil ->
         {:error, Cloak.MissingCipher.exception(vault: config[:vault], label: label)}
 
-      {module, opts} ->
-        module.encrypt(plaintext, opts)
+      {module, cipher_opts} ->
+        plaintext
+        |> pad(opts[:padding])
+        |> module.encrypt(cipher_opts)
     end
   end
 
   @doc false
-  def encrypt!(config, plaintext, label) do
-    case encrypt(config, plaintext, label) do
-      {:ok, ciphertext} ->
-        ciphertext
-
-      {:error, error} ->
-        raise error
-    end
+  def encrypt!(config, plaintext, label_or_opts \\ []) do
+    config
+    |> encrypt(plaintext, label_or_opts)
+    |> unwrap!()
   end
 
   @doc false
-  def decrypt(config, ciphertext) do
+  def encrypt!(config, plaintext, label, opts) do
+    config
+    |> encrypt(plaintext, label, opts)
+    |> unwrap!()
+  end
+
+  @doc false
+  def decrypt(config, ciphertext, opts \\ []) do
     case find_module_to_decrypt(config, ciphertext) do
       nil ->
         {:error, Cloak.MissingCipher.exception(vault: config[:vault], ciphertext: ciphertext)}
 
-      {_label, {module, opts}} ->
-        module.decrypt(ciphertext, opts)
+      {_label, {module, cipher_opts}} ->
+        with {:ok, plaintext} <- module.decrypt(ciphertext, cipher_opts) do
+          unpad(plaintext, opts[:padding])
+        end
     end
   end
 
   @doc false
-  def decrypt!(config, ciphertext) do
-    case decrypt(config, ciphertext) do
-      {:ok, plaintext} ->
-        plaintext
+  def decrypt!(config, ciphertext, opts \\ []) do
+    config
+    |> decrypt(ciphertext, opts)
+    |> unwrap!()
+  end
 
-      {:error, error} ->
-        raise error
+  defp unwrap!({:ok, result}), do: result
+  defp unwrap!({:error, error}), do: raise(error)
+
+  defp pad(plaintext, padding) when padding in [nil, false], do: plaintext
+  defp pad(plaintext, true), do: Cloak.Padding.pad(plaintext)
+
+  defp pad(plaintext, size) when is_integer(size) and size > 0,
+    do: Cloak.Padding.pad(plaintext, size)
+
+  defp pad(_plaintext, padding) do
+    raise ArgumentError,
+          "expected :padding to be a boolean or a positive integer, got: #{inspect(padding)}"
+  end
+
+  defp unpad(plaintext, padding) when padding in [nil, false], do: {:ok, plaintext}
+
+  defp unpad(plaintext, _padding) do
+    with :error <- Cloak.Padding.unpad(plaintext) do
+      {:error, Cloak.InvalidPadding.exception([])}
     end
   end
 
